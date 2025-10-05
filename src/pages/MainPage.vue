@@ -58,8 +58,6 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
-
 <style lang="scss" scoped>
 .main-page {
   &__welcome-msg {

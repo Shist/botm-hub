@@ -135,4 +135,14 @@ onMounted(() => {
   position: absolute;
   top: -9999px;
 }
+
+.skillset-maps-page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  row-gap: 20px;
+  &__headline {
+    @include default-headline(48px, 48px, var(--color-text));
+  }
+}
 </style>
