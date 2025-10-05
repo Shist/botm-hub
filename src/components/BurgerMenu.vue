@@ -1,12 +1,19 @@
 <template>
   <AppModal
     :isOpened="isPatchNotesModalOpened"
-    title="Последние обновления"
+    title="🛠️ Последние обновления 🛠️"
     closeBtnText="Понятно"
     :isClosableByClickOutside="true"
     @closeModal="closePatchNotesModal"
   >
-    <PatchNotes />
+    <div class="patch-notes-modal-wrapper">
+      <AppImage
+        :imgPath="newPatchImagePath"
+        imgAlt="Последние обновления"
+        class="patch-notes-modal-img"
+      />
+      <PatchNotes />
+    </div>
   </AppModal>
   <button class="burger-btn" @click="openMenu" />
   <Teleport defer to=".global-container">
@@ -83,6 +90,7 @@ import useToast from "@/composables/useToast";
 import useFirebaseErrorMsg from "@/composables/useFirebaseErrorMsg";
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
 import PatchNotes from "@/components/PatchNotes.vue";
+import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
 const router = useRouter();
 
@@ -94,6 +102,7 @@ const { getErrorMsg } = useFirebaseErrorMsg();
 
 const isMenuOpened = ref(false);
 const isPatchNotesModalOpened = ref(false);
+const newPatchImagePath = ref(newPatchImage);
 
 const userEmail = computed(() => authStore.user?.email);
 const userNick = computed(() => {
@@ -157,6 +166,15 @@ const onLogOutBtnClicked = async () => {
 </script>
 
 <style scoped lang="scss">
+.patch-notes-modal-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+.patch-notes-modal-img {
+  width: 95%;
+  align-self: center;
+}
+
 .burger-btn {
   width: 40px;
   height: 40px;

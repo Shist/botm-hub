@@ -80,10 +80,10 @@ onMounted(() => {
 .new-patch-modal-wrapper {
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 .new-patch-modal-img {
   width: 95%;
+  align-self: center;
 }
 .new-patch-label {
   @include default-text(16px, 16px, var(--color-burger-menu-text));
