@@ -17,6 +17,7 @@ export default defineConfig({
         additionalData: `
           @use "@/styles/reset" as *;
           @use "@/styles/global" as *;
+          @import "@mdi/font/css/materialdesignicons.css";
         `,
       },
     },

@@ -10,6 +10,7 @@ import {
   loadUserInfoFromFirbase,
 } from "@/services/firebase";
 import appComponents from "@/components/ui";
+import vuetifyConfig from "@/plugins/vuetify";
 import Vue3Toasity from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
@@ -27,6 +28,7 @@ onFirebaseAuthStateChanged((user: IFirebaseUser | null) => {
     app
       .use(router)
       .use(createPinia())
+      .use(vuetifyConfig)
       .use(Vue3Toasity, {
         clearOnUrlChange: false,
         theme: useThemeStore().currTheme,

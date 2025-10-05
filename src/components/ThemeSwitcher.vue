@@ -9,13 +9,17 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useThemeStore } from "@/stores/theme";
+import { useTheme } from "vuetify";
 
 const themeStore = useThemeStore();
+const vuetifyTheme = useTheme();
 
 const isSwitcherChecked = computed({
   get: () => themeStore.currTheme === "dark",
   set: (value: boolean) => {
-    themeStore.setCurrTheme(value ? "dark" : "light");
+    const themeValue = value ? "dark" : "light";
+    themeStore.setCurrTheme(themeValue);
+    vuetifyTheme.global.name.value = themeValue;
   },
 });
 </script>
