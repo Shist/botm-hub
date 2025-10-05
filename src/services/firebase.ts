@@ -7,7 +7,8 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc } from "firebase/firestore/lite";
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore/lite";
+import { type IUserAdditionalInfo } from "@/types";
 
 const firebaseApp = initializeApp({
   apiKey: import.meta.env.VITE_API_KEY,
@@ -27,7 +28,11 @@ function onFirebaseAuthStateChanged(
   onAuthStateChanged(auth, initFoo);
 }
 
-async function signUpUserToFirebase(email: string, password: string) {
+async function signUpUserToFirebase(
+  email: string,
+  password: string,
+  additionalInfo: IUserAdditionalInfo
+) {
   const auth = getAuth();
 
   const newUserInfo = await createUserWithEmailAndPassword(
@@ -44,7 +49,7 @@ async function signUpUserToFirebase(email: string, password: string) {
 
   await setDoc(doc(db, "users", newUserInfo.user.uid), {
     email,
-    isImportant: false,
+    ...additionalInfo,
   });
 
   return newUserInfo;
@@ -64,9 +69,21 @@ async function signOutUserFromFirebase() {
   await signOut(auth);
 }
 
+async function loadUserInfoFromFirbase(): Promise<IUserAdditionalInfo> {
+  const db = getFirestore();
+
+  const userDataDoc = doc(db, "users", `${auth.currentUser?.uid}`);
+
+  const userDocSnapshot = await getDoc(userDataDoc);
+  const userDocData = userDocSnapshot.data() as IUserAdditionalInfo;
+
+  return userDocData;
+}
+
 export {
   onFirebaseAuthStateChanged,
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
+  loadUserInfoFromFirbase,
 };

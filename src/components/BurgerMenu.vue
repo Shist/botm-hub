@@ -23,6 +23,19 @@
                 <span class="burger-menu__email-label">Почта:</span>
                 <span class="burger-menu__email-value">{{ userEmail }}</span>
               </div>
+              <div class="burger-menu__user-info-wrapper">
+                <span class="burger-menu__user-info-label">Ник:</span>
+                <AppSpinner v-if="userNick === 'loading'" />
+                <span
+                  v-else-if="userNick === 'loadingError'"
+                  class="burger-menu__user-info-error-label"
+                >
+                  (ошибка загрузки)
+                </span>
+                <span v-else class="burger-menu__user-info-label">
+                  {{ userNick }}
+                </span>
+              </div>
             </div>
           </div>
           <h2 class="burger-menu__headline">Меню</h2>
@@ -64,7 +77,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-//import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import { useThemeStore } from "@/stores/theme";
 import useToast from "@/composables/useToast";
 import useFirebaseErrorMsg from "@/composables/useFirebaseErrorMsg";
@@ -73,7 +86,7 @@ import PatchNotes from "@/components/PatchNotes.vue";
 
 const router = useRouter();
 
-//const authStore = useAuthStore();
+const authStore = useAuthStore();
 const themeStore = useThemeStore();
 
 const { setErrorToast } = useToast();
@@ -82,8 +95,16 @@ const { getErrorMsg } = useFirebaseErrorMsg();
 const isMenuOpened = ref(false);
 const isPatchNotesModalOpened = ref(false);
 
-//const userEmail = computed(() => authStore.user?.email);
-const userEmail = computed(() => "here will be email");
+const userEmail = computed(() => authStore.user?.email);
+const userNick = computed(() => {
+  if (!authStore.user) return "";
+
+  if (typeof authStore.user.additionalInfo === "string") {
+    return authStore.user.additionalInfo;
+  } else {
+    return authStore.user.additionalInfo.nick;
+  }
+});
 
 const switchThemeLabel = computed(
   () =>
@@ -121,7 +142,7 @@ const onLogInBtnClicked = () => {
 
 const onLogOutBtnClicked = async () => {
   try {
-    //await authStore.signOutUser();
+    await authStore.signOutUser();
 
     isMenuOpened.value = false;
 
@@ -262,6 +283,27 @@ const onLogOutBtnClicked = async () => {
             @media (max-width: $phone-l) {
               font-size: 12px;
               line-height: 14px;
+            }
+          }
+        }
+        .burger-menu__user-info-wrapper {
+          display: flex;
+          align-items: center;
+          column-gap: 5px;
+          .burger-menu__user-info-label,
+          .burger-menu__user-info-error-label {
+            @include default-text(28px, 28px, var(--color-burger-menu-text));
+            @media (max-width: $tablet-l) {
+              font-size: 20px;
+              line-height: 20px;
+            }
+            @media (max-width: $phone-l) {
+              font-size: 14px;
+              line-height: 14px;
+            }
+            @media (max-width: $phone-m) {
+              font-size: 12px;
+              line-height: 12px;
             }
           }
         }

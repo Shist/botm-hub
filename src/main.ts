@@ -2,10 +2,13 @@ import { createApp, type App as IApp } from "vue";
 import App from "@/App.vue";
 import router from "@/router";
 import { createPinia } from "pinia";
-// import { useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 import { useThemeStore } from "@/stores/theme";
 import { type User as IFirebaseUser } from "firebase/auth";
-import { onFirebaseAuthStateChanged } from "@/services/firebase";
+import {
+  onFirebaseAuthStateChanged,
+  loadUserInfoFromFirbase,
+} from "@/services/firebase";
 import appComponents from "@/components/ui";
 import Vue3Toasity from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
@@ -32,14 +35,14 @@ onFirebaseAuthStateChanged((user: IFirebaseUser | null) => {
   }
 
   if (user) {
-    // const { setBaseUserInfo, setUserImportance } = useAuthStore();
-    // setBaseUserInfo(user.uid, user.email ?? "");
-    // loadUserAccessInfoFromFirbase()
-    //   .then((isUserImportant) => {
-    //     setUserImportance(isUserImportant);
-    //   })
-    //   .catch(() => {
-    //     setUserImportance("loadingError");
-    //   });
+    const { setBaseUserInfo, setAdditionalUserInfo } = useAuthStore();
+    setBaseUserInfo(user.uid, user.email ?? "");
+    loadUserInfoFromFirbase()
+      .then((userInfo) => {
+        setAdditionalUserInfo(userInfo);
+      })
+      .catch(() => {
+        setAdditionalUserInfo("loadingError");
+      });
   }
 });
