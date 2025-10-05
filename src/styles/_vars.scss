@@ -1,5 +1,5 @@
-@import "@/assets/fonts/Roboto-Bold/font-roboto-bold.css";
-@import "@/assets/fonts/Roboto-Regular/font-roboto-regular.css";
+@use "@/assets/fonts/Roboto-Bold/font-roboto-bold.css" as *;
+@use "@/assets/fonts/Roboto-Regular/font-roboto-regular.css" as *;
 
 // Fonts
 $font-roboto: "Roboto", Helvetica, Arial, sans-serif;

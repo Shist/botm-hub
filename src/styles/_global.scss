@@ -1,6 +1,6 @@
-@import "@/styles/vars";
-@import "@/styles/templates";
-@import "@/styles/mixins";
+@forward "@/styles/vars";
+@forward "@/styles/mixins";
+@forward "@/styles/templates";
 
 // Global variables of the app
 :root {

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="img-wrapper">
     <div v-if="currImgState === 'loading'" class="img-skeleton">
       <img
         src="@/assets/images/img-loading.png"
@@ -55,8 +55,11 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.main-img {
+.img-wrapper {
   padding: 10px;
+}
+
+.main-img {
   width: 100%;
   max-width: 100%;
 }
@@ -88,7 +91,6 @@ onMounted(() => {
 
 .img-error {
   align-self: center;
-  padding: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -1,4 +1,4 @@
-@import "@/styles/vars";
+@use "@/styles/vars" as *;
 
 // Default settings of headlines, you only need to choose font size, line height and text color
 @mixin default-headline($font-size, $line-height, $text-color) {
