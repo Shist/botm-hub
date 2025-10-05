@@ -2,6 +2,12 @@ import { createRouter, createWebHistory } from "vue-router";
 import MainPage from "@/pages/MainPage.vue";
 import SignInPage from "@/pages/SignInPage.vue";
 import SignUpPage from "@/pages/SignUpPage.vue";
+import PlayersPage from "@/pages/PlayersPage.vue";
+import SkillsetsMapsPage from "@/pages/SkillsetsMapsPage.vue";
+import WorkoutConstructorPage from "@/pages/WorkoutConstructorPage.vue";
+import TrainingsPage from "@/pages/TrainingsPage.vue";
+import TournamentsPage from "@/pages/TournamentsPage.vue";
+import BountiesPage from "@/pages/BountiesPage.vue";
 import NotFoundPage from "@/pages/NotFoundPage.vue";
 import { useAuthStore } from "@/stores/auth";
 
@@ -22,6 +28,36 @@ const router = createRouter({
       path: "/sign-up",
       name: "sign-up",
       component: SignUpPage,
+    },
+    {
+      path: "/players",
+      name: "players",
+      component: PlayersPage,
+    },
+    {
+      path: "/skillsets-maps",
+      name: "skillsets-maps",
+      component: SkillsetsMapsPage,
+    },
+    {
+      path: "/workout-constructor",
+      name: "workout-constructor",
+      component: WorkoutConstructorPage,
+    },
+    {
+      path: "/trainings",
+      name: "trainings",
+      component: TrainingsPage,
+    },
+    {
+      path: "/tournaments",
+      name: "tournaments",
+      component: TournamentsPage,
+    },
+    {
+      path: "/bounties",
+      name: "bounties",
+      component: BountiesPage,
     },
     {
       path: "/:catchAll(.*)",
