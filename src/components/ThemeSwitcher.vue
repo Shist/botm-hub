@@ -19,7 +19,7 @@ const isSwitcherChecked = computed({
   set: (value: boolean) => {
     const themeValue = value ? "dark" : "light";
     themeStore.setCurrTheme(themeValue);
-    vuetifyTheme.global.name.value = themeValue;
+    vuetifyTheme.change(themeValue);
   },
 });
 </script>

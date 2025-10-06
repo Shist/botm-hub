@@ -7,8 +7,22 @@ import {
   createUserWithEmailAndPassword,
   signOut,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore/lite";
-import { type IUserAdditionalInfo } from "@/types";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  orderBy,
+} from "firebase/firestore/lite";
+import {
+  type IUserAdditionalInfo,
+  type OsuMapCategory,
+  type IOsuMap,
+} from "@/types";
 
 const firebaseApp = initializeApp({
   apiKey: import.meta.env.VITE_API_KEY,
@@ -80,10 +94,33 @@ async function loadUserInfoFromFirbase(): Promise<IUserAdditionalInfo> {
   return userDocData;
 }
 
+async function loadMapsByCategoryFromFirebase(category: OsuMapCategory) {
+  const db = getFirestore();
+  const queryByCategory = query(
+    collection(db, "maps"),
+    where("category", "==", category),
+    orderBy("starRate")
+  );
+  const mapsSnapshot = await getDocs(queryByCategory);
+
+  const mapsArr: IOsuMap[] = mapsSnapshot.docs.map((doc) => {
+    const mapData = doc.data();
+
+    return {
+      id: +doc.id,
+      link: `"https://osu.ppy.sh/b/${doc.id}`,
+      ...(mapData as Omit<IOsuMap, "id" | "link">),
+    };
+  });
+
+  return mapsArr;
+}
+
 export {
   onFirebaseAuthStateChanged,
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
   loadUserInfoFromFirbase,
+  loadMapsByCategoryFromFirebase,
 };
