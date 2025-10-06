@@ -20,7 +20,7 @@
           :search="searchQuery"
           :mobile-breakpoint="768"
           :fixed-header="true"
-          height="560px"
+          height="425px"
           hide-details
         >
           <template v-slot:[`item.id`]="{ item }">
