@@ -101,6 +101,7 @@ async function loadMapsByCategoryFromFirebase(category: OsuMapCategory) {
     where("category", "==", category),
     orderBy("starRate")
   );
+
   const mapsSnapshot = await getDocs(queryByCategory);
 
   const mapsArr: IOsuMap[] = mapsSnapshot.docs.map((doc) => {
@@ -116,6 +117,21 @@ async function loadMapsByCategoryFromFirebase(category: OsuMapCategory) {
   return mapsArr;
 }
 
+async function uploadMapToFirebase(
+  mapId: number,
+  mapInfo: Omit<IOsuMap, "id" | "link">
+) {
+  const db = getFirestore();
+  const existingMapDocRef = doc(db, "maps", `${mapId}`);
+
+  const docSnap = await getDoc(existingMapDocRef);
+  if (docSnap.exists()) {
+    throw new Error(`Карта с "mapId = ${mapId}" уже существует`);
+  }
+
+  await setDoc(doc(db, "maps", `${mapId}`), mapInfo);
+}
+
 export {
   onFirebaseAuthStateChanged,
   signUpUserToFirebase,
@@ -123,4 +139,5 @@ export {
   signOutUserFromFirebase,
   loadUserInfoFromFirbase,
   loadMapsByCategoryFromFirebase,
+  uploadMapToFirebase,
 };
