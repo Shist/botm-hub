@@ -23,6 +23,14 @@
           height="560px"
           hide-details
         >
+          <template v-slot:[`item.id`]="{ item }">
+            <span
+              class="skillset-maps-page__id-label"
+              @click="copyToClipboard(item.id)"
+            >
+              {{ item.id }}
+            </span>
+          </template>
           <template v-slot:[`item.link`]="{ item }">
             <a :href="item.link" target="_blank">{{ item.link }}</a>
           </template>
@@ -49,7 +57,7 @@ const props = defineProps<{
 
 const mapsStore = useMapsStore();
 
-const { setErrorToast } = useToast();
+const { setSuccessToast, setErrorToast } = useToast();
 
 onMounted(async () => {
   try {
@@ -154,6 +162,16 @@ const headers = reactive([
     maxWidth: "300px",
   },
 ]);
+
+const copyToClipboard = async (mapId: number) => {
+  try {
+    await navigator.clipboard.writeText(`${mapId}`);
+    setSuccessToast("ID карты скопирован в буфер обмена");
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось скопировать ID карты: ${msg}`);
+  }
+};
 </script>
 
 <style scoped lang="scss">
@@ -172,6 +190,12 @@ const headers = reactive([
     }
     & :deep(td) {
       vertical-align: middle;
+    }
+  }
+  &__id-label {
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
