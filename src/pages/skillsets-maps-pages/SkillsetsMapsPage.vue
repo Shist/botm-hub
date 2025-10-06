@@ -3,178 +3,26 @@
     <h2 class="skillsets-maps-page__headline">Мапы Скиллсетов</h2>
     <nav>
       <ul class="skillsets-maps-page__links-list">
-        <li>
+        <li
+          v-for="(mapCategoryName, mapCategoryKey) in MAPS_CATEGORIES"
+          :key="mapCategoryKey"
+        >
           <router-link
-            to="/skillsets-maps/nm1"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_nm1"
+            :to="`/skillsets-maps/${mapCategoryKey}`"
+            class="skillsets-maps-page__btn"
+            :class="`skillsets-maps-page__btn_${mapCategoryKey}`"
           >
-            NM1 (Raw Aim)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/nm2"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_nm2"
-          >
-            NM2 (Flow Tapping)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/nm3"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_nm3"
-          >
-            NM3 (Alternate)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/nm4"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_nm4"
-          >
-            NM4 (Technical)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/nm5"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_nm5"
-          >
-            NM5 (Finger Control)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/nm6"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_nm6"
-          >
-            NM6 (Reading)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/nm7"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_nm7"
-          >
-            NM7 (Polyrhythm)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/hd1"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_hd1"
-          >
-            HD1 (Consistency)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/hd2"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_hd2"
-          >
-            HD2 (Low AR)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/hd3"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_hd3"
-          >
-            HD3 (Technical)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/hr1"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_hr1"
-          >
-            HR1 (Consistency)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/hr2"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_hr2"
-          >
-            HR2 (High CS)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/hr3"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_hr3"
-          >
-            HR3 (Technical)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/dt1"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_dt1"
-          >
-            DT1 (Consistency)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/dt2"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_dt2"
-          >
-            DT2 (High BPM)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/dt3"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_dt3"
-          >
-            DT3 (Technical)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/dt4"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_dt4"
-          >
-            DT4 (Old Mapping)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/fm1"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_fm1"
-          >
-            FM1 (Consistency)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/fm2"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_fm2"
-          >
-            FM2 (Antimod)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/fm3"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_fm3"
-          >
-            FM3 (Technical)
-          </router-link>
-        </li>
-        <li>
-          <router-link
-            to="/skillsets-maps/tb"
-            class="skillsets-maps-page__btn skillsets-maps-page__btn_tb"
-          >
-            TB (Long Consistency)
+            {{ mapCategoryName }}
           </router-link>
         </li>
       </ul>
     </nav>
   </div>
 </template>
+
+<script setup lang="ts">
+import { MAPS_CATEGORIES } from "@/constants";
+</script>
 
 <style lang="scss" scoped>
 .skillsets-maps-page {

@@ -108,7 +108,7 @@ async function loadMapsByCategoryFromFirebase(category: OsuMapCategory) {
 
     return {
       id: +doc.id,
-      link: `"https://osu.ppy.sh/b/${doc.id}`,
+      link: `https://osu.ppy.sh/b/${doc.id}`,
       ...(mapData as Omit<IOsuMap, "id" | "link">),
     };
   });

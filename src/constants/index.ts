@@ -1,0 +1,25 @@
+import type { OsuMapCategory } from "@/types";
+
+export const MAPS_CATEGORIES: Record<OsuMapCategory, string> = {
+  nm1: "NM1 (Raw Aim)",
+  nm2: "NM2 (Flow Tapping)",
+  nm3: "NM3 (Alternate)",
+  nm4: "NM4 (Technical)",
+  nm5: "NM5 (Finger Control)",
+  nm6: "NM6 (Reading)",
+  nm7: "NM7 (Polyrhythm)",
+  hd1: "HD1 (Consistency)",
+  hd2: "HD2 (Low AR)",
+  hd3: "HD3 (Technical)",
+  hr1: "HR1 (Consistency)",
+  hr2: "HR2 (High CS)",
+  hr3: "HR3 (Technical)",
+  dt1: "DT1 (Consistency)",
+  dt2: "DT2 (High BPM)",
+  dt3: "DT3 (Technical)",
+  dt4: "DT4 (Old Mapping)",
+  fm1: "FM1 (Consistency)",
+  fm2: "FM2 (Antimod)",
+  fm3: "FM3 (Technical)",
+  tb: "TB (Long Consistency)",
+};

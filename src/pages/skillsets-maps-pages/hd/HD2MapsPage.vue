@@ -1,5 +1,8 @@
 <template>
-  <div class="skillset-maps-page">
-    <h2 class="skillset-maps-page__headline">Мапы HD2 (Low AR)</h2>
-  </div>
+  <SkillsetMapsTable :category="OsuMapCategory.hd2" />
 </template>
+
+<script setup lang="ts">
+import SkillsetMapsTable from "@/components/SkillsetMapsTable.vue";
+import { OsuMapCategory } from "@/types";
+</script>
