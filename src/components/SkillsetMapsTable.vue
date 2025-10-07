@@ -18,10 +18,10 @@
           :headers="headers"
           :items="mapsInfo.mapsList"
           :search="searchQuery"
-          :mobile-breakpoint="768"
+          :mobile-breakpoint="769"
           :fixed-header="true"
-          height="425px"
           hide-details
+          class="skillset-maps-page__table"
         >
           <template v-slot:[`item.id`]="{ item }">
             <span
@@ -35,7 +35,10 @@
             <a :href="item.link" target="_blank">{{ item.link }}</a>
           </template>
           <template v-slot:[`item.category`]="{ item }">
-            <CategoryBadge :category="item.category" />
+            <CategoryBadge
+              :category="item.category"
+              class="skillset-maps-page__badge"
+            />
           </template>
         </v-data-table-virtual>
       </v-skeleton-loader>
@@ -78,43 +81,37 @@ const headers = reactive([
   {
     key: "id",
     title: "ID",
-    width: "130px",
-    maxWidth: "130px",
+    minWidth: "104px",
   },
   {
     key: "link",
     title: "Ссылка",
-    width: "280px",
-    maxWidth: "280px",
+    minWidth: "255px",
   },
   {
     key: "category",
     title: "Мод",
-    width: "80px",
-    maxWidth: "80px",
+    minWidth: "89px",
   },
   {
     key: "name",
     title: "Название",
-    minWidth: "300px",
+    minWidth: "340px",
   },
   {
     key: "mapper",
     title: "Мапер",
-    width: "200px",
-    maxWidth: "200px",
+    minWidth: "182px",
   },
   {
     key: "starRate",
     title: "Сложность",
-    width: "110px",
-    maxWidth: "110px",
+    minWidth: "140px",
   },
   {
     key: "duration",
     title: "Длительность",
-    width: "130px",
-    maxWidth: "130px",
+    minWidth: "164px",
     sort: (a: string, b: string) => {
       const aArr = a.split(":").reverse().map(Number);
       const bArr = b.split(":").reverse().map(Number);
@@ -128,38 +125,32 @@ const headers = reactive([
   {
     key: "bpm",
     title: "BPM",
-    width: "65px",
-    maxWidth: "65px",
+    minWidth: "91px",
   },
   {
     key: "cs",
     title: "CS",
-    width: "55px",
-    maxWidth: "55px",
+    minWidth: "76px",
   },
   {
     key: "ar",
     title: "AR",
-    width: "55px",
-    maxWidth: "55px",
+    minWidth: "77px",
   },
   {
     key: "od",
     title: "OD",
-    width: "55px",
-    maxWidth: "55px",
+    minWidth: "78px",
   },
   {
     key: "hp",
     title: "HP",
-    width: "55px",
-    maxWidth: "55px",
+    minWidth: "78px",
   },
   {
     key: "comment",
     title: "Комментарий",
-    width: "300px",
-    maxWidth: "300px",
+    minWidth: "190px",
   },
 ]);
 
@@ -182,6 +173,10 @@ const copyToClipboard = async (mapId: number) => {
   row-gap: 20px;
   &__headline {
     @include default-headline(28px, 28px, var(--color-text));
+    @media (max-width: $phone-l) {
+      font-size: 20px;
+      line-height: 20px;
+    }
   }
   &__table-wrapper {
     width: 100%;
@@ -192,10 +187,18 @@ const copyToClipboard = async (mapId: number) => {
       vertical-align: middle;
     }
   }
+  &__table {
+    height: calc(100vh - 350px);
+  }
   &__id-label {
     cursor: pointer;
     &:hover {
       text-decoration: underline;
+    }
+  }
+  &__badge {
+    @media (max-width: $tablet-l) {
+      float: right;
     }
   }
 }

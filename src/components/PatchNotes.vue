@@ -1,6 +1,29 @@
 <template>
   <ul class="patch-notes">
     <li class="patch-notes__patch-wrapper">
+      <h3 class="patch-notes__patch-version">Версия 1.1.0</h3>
+      <ol class="patch_notes__patch-features-wrapper">
+        <li class="patch_notes__patch-feature">
+          Высота таблиц с картами теперь адаптируется под доступную высоту
+          страницы браузера устройства (ранее она была захардкожена в 425
+          пикселей)
+        </li>
+        <li class="patch_notes__patch-feature">
+          Добавлены значения минимальной ширины столбцов для таблиц с картами,
+          теперь колонки никогда не перекрывают друг друга (включая иконки
+          сортировки), при этом они полностью видны на вьюпортах full hd (1920
+          пикселей), начиная с 1903 пикселей ширины экрана и меньше появляется
+          горизонтальный ползунок, позволяющий смотреть не вмещающуюся таблицу
+          вширь
+        </li>
+        <li class="patch_notes__patch-feature">
+          Начиная с 768 пикселей и меньше (планшеты и телефоны) таблицы с
+          картами адаптируются под свою мобильную версию, позволяя удобно
+          смотреть карты с мобильных устройств
+        </li>
+      </ol>
+    </li>
+    <li class="patch-notes__patch-wrapper">
       <h3 class="patch-notes__patch-version">Версия 1.0.0</h3>
       <ol class="patch_notes__patch-features-wrapper">
         <li class="patch_notes__patch-feature">Создан проект</li>
