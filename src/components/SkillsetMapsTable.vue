@@ -170,7 +170,7 @@ const copyToClipboard = async (mapId: number) => {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  row-gap: 20px;
+  row-gap: 10px;
   &__headline {
     @include default-headline(28px, 28px, var(--color-text));
     @media (max-width: $phone-l) {
@@ -188,7 +188,13 @@ const copyToClipboard = async (mapId: number) => {
     }
   }
   &__table {
-    height: calc(100vh - 350px);
+    height: calc(100vh - 300px);
+    @media (max-width: $tablet-l) {
+      height: calc(100vh - 290px);
+    }
+    @media (max-width: $phone-l) {
+      height: calc(100vh - 277px);
+    }
   }
   &__id-label {
     cursor: pointer;
