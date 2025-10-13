@@ -22,33 +22,16 @@
 </template>
 
 <script setup lang="ts">
-import { uploadMapToFirebase } from "@/services/firebase";
+import { uploadMapsToFirebase } from "@/services/firebase";
 import mapsArr from "@/components/maps-upload/maps.json";
-import { OsuMapCategory, type IOsuMap } from "@/types";
+import { type IOsuMap } from "@/types";
 
 const uploadMaps = async () => {
-  for (let i = 0; i < mapsArr.length; i++) {
-    const mapData = mapsArr[i] as Omit<IOsuMap, "link">;
-    const mapId = mapData.id;
-    const mapInfo = {
-      ar: mapData.ar,
-      bpm: mapData.bpm,
-      category: OsuMapCategory[mapData.category as OsuMapCategory],
-      comment: mapData.comment,
-      cs: mapData.cs,
-      duration: mapData.duration,
-      hp: mapData.hp,
-      mapper: mapData.mapper,
-      name: mapData.name,
-      od: mapData.od,
-      starRate: mapData.starRate,
-    };
-    try {
-      await uploadMapToFirebase(mapId, mapInfo);
-      console.log("Успешная загрузка!!!");
-    } catch (error) {
-      console.error(error);
-    }
+  try {
+    await uploadMapsToFirebase(mapsArr as Omit<IOsuMap, "link">[]);
+    console.log("Конец загрузки карт");
+  } catch (error) {
+    console.error(error);
   }
 };
 </script>

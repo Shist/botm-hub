@@ -13,6 +13,8 @@ import {
   setDoc,
   getDoc,
   getDocs,
+  updateDoc,
+  arrayUnion,
   collection,
   query,
   where,
@@ -117,19 +119,50 @@ async function loadMapsByCategoryFromFirebase(category: OsuMapCategory) {
   return mapsArr;
 }
 
-async function uploadMapToFirebase(
-  mapId: number,
-  mapInfo: Omit<IOsuMap, "id" | "link">
-) {
+async function uploadMapsToFirebase(maps: Omit<IOsuMap, "link">[]) {
   const db = getFirestore();
-  const existingMapDocRef = doc(db, "maps", `${mapId}`);
 
-  const docSnap = await getDoc(existingMapDocRef);
-  if (docSnap.exists()) {
-    throw new Error(`Карта с "mapId = ${mapId}" уже существует`);
+  const categorizedMaps: Partial<
+    Record<OsuMapCategory, Omit<IOsuMap, "link" | "category">[]>
+  > = {};
+  maps.forEach((map) => {
+    const category = map.category;
+    if (!categorizedMaps[category]) categorizedMaps[category] = [];
+    const { category: _, ...mapInfo } = map;
+    categorizedMaps[category].push(mapInfo);
+  });
+
+  for (const category in categorizedMaps) {
+    const mapsToUpload = categorizedMaps[category as OsuMapCategory] ?? [];
+
+    const categoryDocRef = doc(db, "maps", category);
+    const categoryDoc = await getDoc(categoryDocRef);
+    const categoryMaps = (categoryDoc.data()?.maps ?? []) as Omit<
+      IOsuMap,
+      "link" | "category"
+    >[];
+
+    for (const map of mapsToUpload) {
+      const mapId = map.id;
+
+      if (categoryMaps.some((m) => m.id === mapId)) {
+        console.error(
+          `[${category}] Карта с ID = ${mapId} уже существует. Пропуск...`
+        );
+        continue;
+      }
+
+      try {
+        await updateDoc(categoryDocRef, { maps: arrayUnion(map) });
+        console.log(`[${category}] Карта с ID = ${mapId} успешно добавлена`);
+      } catch (error) {
+        console.error(
+          `[${category}] Ошибка при добавлении карты с ID = ${mapId}:`,
+          error
+        );
+      }
+    }
   }
-
-  await setDoc(doc(db, "maps", `${mapId}`), mapInfo);
 }
 
 export {
@@ -139,5 +172,5 @@ export {
   signOutUserFromFirebase,
   loadUserInfoFromFirbase,
   loadMapsByCategoryFromFirebase,
-  uploadMapToFirebase,
+  uploadMapsToFirebase,
 };
