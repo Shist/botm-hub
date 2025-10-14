@@ -1,6 +1,18 @@
 <template>
   <ul class="patch-notes">
     <li class="patch-notes__patch-wrapper">
+      <h3 class="patch-notes__patch-version">Версия 1.3.1</h3>
+      <ol class="patch_notes__patch-features-wrapper">
+        <li class="patch_notes__patch-feature">
+          Был замечен баг, что при открытии модального окна ('Последние
+          обновления') страница могла скролится (хотя не должна), в добавок к
+          этому хедер страницы переставал быть 'sticky', а был привязан к верху
+          до перезагрузки страницы. Теперь открытие любого модального окна
+          блокирует прокрутку, а хедер после его закрытия остаётся 'sticky'
+        </li>
+      </ol>
+    </li>
+    <li class="patch-notes__patch-wrapper">
       <h3 class="patch-notes__patch-version">Версия 1.3.0</h3>
       <ol class="patch_notes__patch-features-wrapper">
         <li class="patch_notes__patch-feature">

@@ -45,10 +45,10 @@ watch(
   () => props.isOpened,
   (newValue) => {
     if (newValue) {
-      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
       scrollbarPaddingStore.isPaddingNeeded = true;
     } else {
-      document.body.style.overflow = "auto";
+      document.documentElement.style.overflow = "auto";
       scrollbarPaddingStore.isPaddingNeeded = false;
     }
   }
