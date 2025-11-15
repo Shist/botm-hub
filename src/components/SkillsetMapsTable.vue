@@ -1,81 +1,54 @@
 <template>
-  <div class="skillset-maps-page">
-    <h2 class="skillset-maps-page__headline">
-      Мапы {{ MAPS_CATEGORIES[category] }}
-    </h2>
-    <div class="skillset-maps-page__table-wrapper">
-      <v-text-field
-        v-model="searchQuery"
-        prepend-inner-icon="mdi-magnify"
-        label="Найти карты по любому полю"
+  <div class="skillset-maps-table">
+    <v-text-field
+      v-model="searchQuery"
+      prepend-inner-icon="mdi-magnify"
+      label="Найти карты по любому полю"
+      hide-details
+    />
+    <v-skeleton-loader type="table" :loading="isSomeCategoryLoading">
+      <v-data-table-virtual
+        :headers="headers"
+        :items="allMapsList"
+        :search="searchQuery"
+        :mobile-breakpoint="769"
+        :fixed-header="true"
         hide-details
-      />
-      <v-skeleton-loader
-        type="table"
-        :loading="mapsInfo.loadingState === LoadingState.LOADING"
+        class="skillset-maps-table__content"
       >
-        <v-data-table-virtual
-          :headers="headers"
-          :items="mapsInfo.mapsList"
-          :search="searchQuery"
-          :mobile-breakpoint="769"
-          :fixed-header="true"
-          hide-details
-          class="skillset-maps-page__table"
-        >
-          <template v-slot:[`item.id`]="{ item }">
-            <span
-              class="skillset-maps-page__id-label"
-              @click="copyToClipboard(item.id)"
-            >
-              {{ item.id }}
-            </span>
-          </template>
-          <template v-slot:[`item.link`]="{ item }">
-            <a :href="item.link" target="_blank">{{ item.link }}</a>
-          </template>
-          <template v-slot:[`item.category`]="{ item }">
-            <CategoryBadge
-              :category="item.category"
-              class="skillset-maps-page__badge"
-            />
-          </template>
-        </v-data-table-virtual>
-      </v-skeleton-loader>
-    </div>
+        <template v-slot:[`item.id`]="{ item }">
+          <span
+            class="skillset-maps-table__id-label"
+            @click="copyToClipboard(item.id)"
+          >
+            {{ item.id }}
+          </span>
+        </template>
+        <template v-slot:[`item.link`]="{ item }">
+          <a :href="item.link" target="_blank">{{ item.link }}</a>
+        </template>
+        <template v-slot:[`item.category`]="{ item }">
+          <CategoryBadge
+            :category="item.category"
+            class="skillset-maps-table__badge"
+          />
+        </template>
+      </v-data-table-virtual>
+    </v-skeleton-loader>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from "vue";
-import { useMapsStore } from "@/stores/maps";
+import { ref, reactive, computed } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
-import { LoadingState, OsuMapCategory } from "@/types";
-import { MAPS_CATEGORIES } from "@/constants";
+import { LoadingState, type IOsuMapsCategoryState } from "@/types";
 
-const props = defineProps<{
-  category: OsuMapCategory;
-}>();
-
-const mapsStore = useMapsStore();
+const props = defineProps<{ mapsCategories: IOsuMapsCategoryState[] }>();
 
 const { setSuccessToast, setErrorToast } = useToast();
 
-onMounted(async () => {
-  try {
-    await mapsStore.loadMapsByCategory(props.category);
-  } catch (error) {
-    const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(
-      `Не удалось загрузить карты для категории "${props.category}": ${msg}`
-    );
-  }
-});
-
 const searchQuery = ref("");
-
-const mapsInfo = computed(() => mapsStore.maps[props.category]);
 
 const headers = reactive([
   {
@@ -154,6 +127,15 @@ const headers = reactive([
   },
 ]);
 
+const isSomeCategoryLoading = computed(() =>
+  props.mapsCategories.some(
+    (category) => category.loadingState === LoadingState.LOADING
+  )
+);
+const allMapsList = computed(() =>
+  props.mapsCategories.map((category) => category.mapsList).flat()
+);
+
 const copyToClipboard = async (mapId: number) => {
   try {
     await navigator.clipboard.writeText(`${mapId}`);
@@ -166,28 +148,15 @@ const copyToClipboard = async (mapId: number) => {
 </script>
 
 <style scoped lang="scss">
-.skillset-maps-page {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  row-gap: 10px;
-  &__headline {
-    @include default-headline(28px, 28px, var(--color-text));
-    @media (max-width: $phone-l) {
-      font-size: 20px;
-      line-height: 20px;
-    }
+.skillset-maps-table {
+  width: 100%;
+  & :deep(th) {
+    vertical-align: middle;
   }
-  &__table-wrapper {
-    width: 100%;
-    & :deep(th) {
-      vertical-align: middle;
-    }
-    & :deep(td) {
-      vertical-align: middle;
-    }
+  & :deep(td) {
+    vertical-align: middle;
   }
-  &__table {
+  &__content {
     height: calc(100vh - 300px);
     @media (max-width: $tablet-l) {
       height: calc(100vh - 290px);
