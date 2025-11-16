@@ -2,8 +2,10 @@
   <div class="skillset-maps-table">
     <v-text-field
       v-model="searchQuery"
+      variant="solo-filled"
       prepend-inner-icon="mdi-magnify"
       label="Найти карты по любому полю"
+      clearable
       hide-details
     />
     <v-skeleton-loader type="table" :loading="isSomeCategoryLoading">
@@ -150,6 +152,8 @@ const copyToClipboard = async (mapId: number) => {
 <style scoped lang="scss">
 .skillset-maps-table {
   width: 100%;
+  border: 4px solid var(--color-vuetify-table-borders);
+  border-radius: 4px;
   & :deep(th) {
     vertical-align: middle;
   }
@@ -157,12 +161,12 @@ const copyToClipboard = async (mapId: number) => {
     vertical-align: middle;
   }
   &__content {
-    height: calc(100vh - 300px);
+    height: calc(100vh - 307px);
     @media (max-width: $tablet-l) {
-      height: calc(100vh - 290px);
+      height: calc(100vh - 297px);
     }
     @media (max-width: $phone-l) {
-      height: calc(100vh - 277px);
+      height: calc(100vh - 284px);
     }
   }
   &__id-label {

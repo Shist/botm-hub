@@ -55,6 +55,8 @@
   --color-modal-text: #ffffff;
   --color-modal-back-bg-rgb: 255, 255, 255;
 
+  --color-vuetify-table-borders: #212121;
+
   --burger-menu-btn-img: url("@/assets/icons/burger-btn-white.svg");
   --color-burger-menu-bg: #181818;
   --color-burger-menu-text: #ffffff;
@@ -80,10 +82,10 @@
 .light-theme {
   color-scheme: light;
 
-  --color-global-bg: #f8f8f8;
+  --color-global-bg: #fafafa;
 
-  --color-header: #f0e9d4;
-  --color-footer: #f0e9d4;
+  --color-header: #f0aaaa;
+  --color-footer: #f0aaaa;
 
   --color-auth-form-bg: #ffffff;
 
@@ -96,6 +98,8 @@
   --color-modal-bg: #ffffff;
   --color-modal-text: #2b2b2b;
   --color-modal-back-bg-rgb: 0, 0, 0;
+
+  --color-vuetify-table-borders: #ffffff;
 
   --burger-menu-btn-img: url("@/assets/icons/burger-btn-black.svg");
   --color-burger-menu-bg: #ffffff;
