@@ -19,11 +19,11 @@
 }
 
 // Default settings of buttons, you only need to choose max-width, text-color and bg-color
-@mixin default-btn($max-width, $text-color, $bg-color) {
+@mixin default-btn($max-width, $text-color, $bg-color, $padding: 15px) {
   position: relative;
   max-width: $max-width;
   width: 100%;
-  padding: 15px;
+  padding: $padding;
   font-family: $font-roboto;
   font-weight: 700;
   font-size: 16px;

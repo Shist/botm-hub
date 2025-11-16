@@ -5,6 +5,7 @@
     </h2>
     <div class="workout-constructor-page__inputs-wrapper">
       <v-select
+        v-model="chosenCategories"
         :items="categoriesOptions"
         variant="solo"
         label="Скиллсеты"
@@ -16,6 +17,7 @@
         hide-details
       />
       <v-number-input
+        v-model="chosenDuration"
         :min="30"
         :max="960"
         variant="solo"
@@ -26,6 +28,7 @@
         hide-details
       />
       <v-number-input
+        v-model="chosenBreak"
         :min="0"
         :max="5"
         variant="solo"
@@ -36,16 +39,67 @@
         hide-details
       />
     </div>
+    <v-btn
+      :disabled="!isInfoSpecified"
+      :loading="isLoadingMaps"
+      height="50"
+      class="workout-constructor-page__confirm-btn"
+      @click="onConfirm"
+    >
+      Подобрать карты
+    </v-btn>
   </div>
 </template>
 
 <script setup lang="ts">
-import { OsuMapCategory } from "@/types";
-import { computed } from "vue";
+import { ref, computed } from "vue";
+import { useMapsStore } from "@/stores/maps";
+import useToast from "@/composables/useToast";
+import { LoadingState, OsuMapCategory, type IOsuMap } from "@/types";
+
+const mapsStore = useMapsStore();
+
+const { setErrorToast } = useToast();
+
+const chosenCategories = ref<OsuMapCategory[]>([]);
+const chosenDuration = ref(120);
+const chosenBreak = ref(2);
+const isLoadingMaps = ref(false);
 
 const categoriesOptions = computed(() =>
-  Object.values(OsuMapCategory).map((category) => category.toUpperCase())
+  Object.values(OsuMapCategory).map((category) => ({
+    value: category,
+    title: category.toUpperCase(),
+  }))
 );
+const isInfoSpecified = computed(
+  () =>
+    !!chosenCategories.value.length &&
+    chosenDuration.value !== null &&
+    chosenBreak.value !== null
+);
+
+const onConfirm = async () => {
+  const neededRequests: (() => Promise<IOsuMap[]>)[] = [];
+
+  chosenCategories.value.forEach((category) => {
+    if (mapsStore.maps[category].loadingState !== LoadingState.LOADED) {
+      neededRequests.push(() => mapsStore.loadMapsByCategory(category));
+    }
+  });
+
+  if (neededRequests.length) {
+    try {
+      isLoadingMaps.value = true;
+      await Promise.all(neededRequests.map((request) => request()));
+    } catch (error) {
+      const msg = error instanceof Error ? error?.message : error;
+      setErrorToast(`Не удалось загрузить карты для тренировки: ${msg}`);
+    } finally {
+      isLoadingMaps.value = false;
+    }
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -76,6 +130,9 @@ const categoriesOptions = computed(() =>
         flex: 1 1 100%;
       }
     }
+  }
+  &__confirm-btn {
+    @include default-btn(100%, var(--color-btn-text), var(--color-btn-bg), 0);
   }
 }
 </style>

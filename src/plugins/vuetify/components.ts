@@ -1,4 +1,5 @@
 import {
+  VBtn,
   VTextField,
   VNumberInput,
   VSelect,
@@ -7,6 +8,7 @@ import {
 } from "vuetify/components";
 
 export default {
+  VBtn,
   VTextField,
   VNumberInput,
   VSelect,
