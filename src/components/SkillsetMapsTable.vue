@@ -8,10 +8,10 @@
       clearable
       hide-details
     />
-    <v-skeleton-loader type="table" :loading="isSomeCategoryLoading">
+    <v-skeleton-loader type="table" :loading="isLoading">
       <v-data-table-virtual
         :headers="headers"
-        :items="allMapsList"
+        :items="mapsList"
         :search="searchQuery"
         :mobile-breakpoint="769"
         :fixed-header="true"
@@ -41,12 +41,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
-import { LoadingState, type IOsuMapsCategoryState } from "@/types";
+import { type IOsuMap } from "@/types";
 
-const props = defineProps<{ mapsCategories: IOsuMapsCategoryState[] }>();
+defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();
 
 const { setSuccessToast, setErrorToast } = useToast();
 
@@ -128,15 +128,6 @@ const headers = reactive([
     minWidth: "190px",
   },
 ]);
-
-const isSomeCategoryLoading = computed(() =>
-  props.mapsCategories.some(
-    (category) => category.loadingState === LoadingState.LOADING
-  )
-);
-const allMapsList = computed(() =>
-  props.mapsCategories.map((category) => category.mapsList).flat()
-);
 
 const copyToClipboard = async (mapId: number) => {
   try {
