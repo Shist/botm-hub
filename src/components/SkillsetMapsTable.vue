@@ -46,7 +46,8 @@
 import { ref, reactive, computed } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
-import { type IOsuMap } from "@/types";
+import { OsuMapCategory, type IOsuMap } from "@/types";
+import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 
 const props = defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();
 
@@ -69,6 +70,8 @@ const headers = reactive([
     key: "category",
     title: "Мод",
     minWidth: "89px",
+    sort: (a: OsuMapCategory, b: OsuMapCategory) =>
+      CATEGORIES_SORT_PRIORITIES[a] - CATEGORIES_SORT_PRIORITIES[b],
   },
   {
     key: "name",

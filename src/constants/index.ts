@@ -24,7 +24,7 @@ export const MAPS_CATEGORIES: Record<OsuMapCategory, string> = {
   tb: "TB (Long Consistency)",
 };
 
-export const CATEGORIES_SORT_PRIORITIES = {
+export const CATEGORIES_SORT_PRIORITIES: Record<OsuMapCategory, number> = {
   nm1: 1,
   nm2: 2,
   nm3: 3,
