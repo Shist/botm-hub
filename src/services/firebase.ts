@@ -59,7 +59,6 @@ async function signUpUserToFirebase(
   const db = getFirestore();
 
   await setDoc(doc(db, "users", newUserInfo.user.uid), {
-    email,
     ...additionalInfo,
   });
 

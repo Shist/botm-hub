@@ -33,6 +33,7 @@ export enum OsuMapCategory {
 
 export interface IUserAdditionalInfo {
   nick: string;
+  email: string;
 }
 
 export interface IUser {
