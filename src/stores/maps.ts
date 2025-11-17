@@ -51,8 +51,36 @@ export const useMapsStore = defineStore("maps", () => {
     }
   };
 
+  const getMapsOfGivenCategories = (
+    categories: OsuMapCategory[],
+    sortBy: keyof IOsuMap = "starRate"
+  ): IOsuMap[] => {
+    const mapsList = categories.flatMap((category) => maps[category].mapsList);
+
+    if (["id", "starRate", "bpm", "cs", "ar", "od", "hp"].includes(sortBy)) {
+      mapsList.sort((a, b) => (a[sortBy] as number) - (b[sortBy] as number));
+    } else if (sortBy === "duration") {
+      mapsList.sort((a, b) => {
+        const aArr = a.duration.split(":").reverse().map(Number);
+        const bArr = b.duration.split(":").reverse().map(Number);
+        const aSeconds =
+          (aArr[0] ?? 0) + (aArr[1] ?? 0) * 60 + (aArr[2] ?? 0) * 3600;
+        const bSeconds =
+          (bArr[0] ?? 0) + (bArr[1] ?? 0) * 60 + (bArr[2] ?? 0) * 3600;
+        return aSeconds - bSeconds;
+      });
+    } else {
+      mapsList.sort((a, b) =>
+        (a[sortBy] as string).localeCompare(b[sortBy] as string)
+      );
+    }
+
+    return mapsList;
+  };
+
   return {
     maps,
     loadMapsByCategory,
+    getMapsOfGivenCategories,
   };
 });

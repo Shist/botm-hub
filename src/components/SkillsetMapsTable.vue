@@ -11,7 +11,8 @@
     <v-skeleton-loader type="table" :loading="isLoading">
       <v-data-table-virtual
         :headers="headers"
-        :items="mapsList"
+        :items="itemsForTable"
+        :item-value="'idWithCategory'"
         :search="searchQuery"
         :mobile-breakpoint="769"
         :fixed-header="true"
@@ -41,12 +42,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
 import { type IOsuMap } from "@/types";
 
-defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();
+const props = defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();
 
 const { setSuccessToast, setErrorToast } = useToast();
 
@@ -128,6 +129,13 @@ const headers = reactive([
     minWidth: "190px",
   },
 ]);
+
+const itemsForTable = computed(() =>
+  props.mapsList.map((item) => ({
+    idWithCategory: `${item.id}-${item.category}`,
+    ...item,
+  }))
+);
 
 const copyToClipboard = async (mapId: number) => {
   try {
