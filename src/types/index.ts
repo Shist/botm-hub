@@ -50,6 +50,12 @@ export interface IUser {
     | "loadingError";
 }
 
+export interface IAllUsersListItem {
+  uid: string;
+  nick: string;
+  skillsets: string;
+}
+
 export interface IOsuMap {
   id: number;
   link: string;

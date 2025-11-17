@@ -22,6 +22,7 @@ import {
 import {
   type IUserAdditionalInfo,
   type OsuMapCategory,
+  type IAllUsersListItem,
   type IOsuMap,
 } from "@/types";
 
@@ -56,6 +57,24 @@ async function updateUserAdditionalInfoToFirebase(
   const db = getFirestore();
   const userDoc = doc(db, "users", userUid);
   await setDoc(userDoc, additionalInfo);
+
+  const allUsersDocRef = doc(db, "users", "allUsers");
+  const allUsersDoc = await getDoc(allUsersDocRef);
+  const allUsers = (allUsersDoc.data()?.allUsers ?? []) as IAllUsersListItem[];
+  const existingUserIndex = allUsers.findIndex((u) => u.uid === userUid);
+  if (existingUserIndex === -1) {
+    allUsers.push({
+      uid: userUid,
+      nick: additionalInfo.nick,
+      skillsets: additionalInfo.skillsets,
+    });
+  } else {
+    (allUsers[existingUserIndex] as IAllUsersListItem).nick =
+      additionalInfo.nick;
+    (allUsers[existingUserIndex] as IAllUsersListItem).skillsets =
+      additionalInfo.skillsets;
+  }
+  await updateDoc(allUsersDocRef, { allUsers: allUsers });
 }
 
 async function signUpUserToFirebase(
