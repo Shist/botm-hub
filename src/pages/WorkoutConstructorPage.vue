@@ -4,18 +4,7 @@
       Конструктор Тренировочной Сессии
     </h2>
     <div class="workout-constructor-page__inputs-wrapper">
-      <v-select
-        v-model="chosenCategories"
-        :items="categoriesOptions"
-        variant="solo"
-        label="Скиллсеты"
-        placeholder="Выбери скиллсет(ы)"
-        multiple
-        chips
-        closable-chips
-        clearable
-        hide-details
-      />
+      <SkillsetsSelect v-model="chosenCategories" />
       <v-number-input
         v-model="chosenStarRate"
         :min="3"
@@ -103,6 +92,7 @@
 import { ref, computed, reactive } from "vue";
 import { useMapsStore } from "@/stores/maps";
 import SkillsetMapsTable from "@/components/SkillsetMapsTable.vue";
+import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import { LoadingState, OsuMapCategory, type IOsuMap } from "@/types";
 import { fromDurationToSeconds, fromTotalSecondsToLabel } from "@/utils";
@@ -118,12 +108,6 @@ const chosenBreak = ref(2);
 const isPreparingMaps = ref(false);
 const suggestedMapsList = reactive<IOsuMap[]>([]);
 
-const categoriesOptions = computed(() =>
-  Object.values(OsuMapCategory).map((category) => ({
-    value: category,
-    title: category.toUpperCase(),
-  }))
-);
 const isInfoSpecified = computed(
   () =>
     !!chosenCategories.value.length &&
