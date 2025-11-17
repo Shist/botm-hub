@@ -53,6 +53,11 @@
             <ThemeSwitcher class="burger-menu__theme-switch" />
           </div>
           <ul class="burger-menu__nav-list">
+            <li v-if="authStore.user" class="burger-menu__nav-list-item">
+              <a class="burger-menu__link" @click.stop="onProfileBtnClicked">
+                Личный кабинет
+              </a>
+            </li>
             <li class="burger-menu__nav-list-item">
               <button
                 class="burger-menu__btn"
@@ -133,6 +138,12 @@ const openPatchNotesModal = () => {
 };
 const closePatchNotesModal = () => {
   isPatchNotesModalOpened.value = false;
+};
+
+const onProfileBtnClicked = () => {
+  isMenuOpened.value = false;
+
+  router.push({ name: "personal-account" });
 };
 
 const closeMenu = (event: MouseEvent) => {

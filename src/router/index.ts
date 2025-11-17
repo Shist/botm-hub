@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import MainPage from "@/pages/MainPage.vue";
 import SignInPage from "@/pages/SignInPage.vue";
 import SignUpPage from "@/pages/SignUpPage.vue";
+import PersonalAccountPage from "@/pages/PersonalAccountPage.vue";
 import PlayersPage from "@/pages/PlayersPage.vue";
 import SkillsetsMapsPage from "@/pages/skillsets-maps-pages/SkillsetsMapsPage.vue";
 import NM1MapsPage from "@/pages/skillsets-maps-pages/nm/NM1MapsPage.vue";
@@ -49,6 +50,11 @@ const router = createRouter({
       path: "/sign-up",
       name: "sign-up",
       component: SignUpPage,
+    },
+    {
+      path: "/personal-account",
+      name: "personal-account",
+      component: PersonalAccountPage,
     },
     {
       path: "/players",
@@ -209,6 +215,12 @@ router.beforeEach((to, _, next) => {
       next({ name: "main" });
     } else {
       next();
+    }
+  } else if (to.name === "personal-account") {
+    if (user) {
+      next();
+    } else {
+      next({ name: "sign-in" });
     }
   } else {
     next();

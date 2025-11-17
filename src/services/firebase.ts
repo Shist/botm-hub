@@ -10,10 +10,14 @@ import {
 import {
   getFirestore,
   doc,
+  collection,
   setDoc,
   getDoc,
+  getDocs,
   updateDoc,
   arrayUnion,
+  query,
+  where,
 } from "firebase/firestore/lite";
 import {
   type IUserAdditionalInfo,
@@ -45,6 +49,12 @@ async function signUpUserToFirebase(
   additionalInfo: IUserAdditionalInfo
 ) {
   const auth = getAuth();
+
+  const existingUser = await loadUserInfoFromFirbaseByNick(additionalInfo.nick);
+
+  if (existingUser) {
+    throw new Error("Пользователь с таким ником уже зарегистрирован!");
+  }
 
   const newUserInfo = await createUserWithEmailAndPassword(
     auth,
@@ -88,6 +98,22 @@ async function loadUserInfoFromFirbase(): Promise<IUserAdditionalInfo> {
   const userDocData = userDocSnapshot.data() as IUserAdditionalInfo;
 
   return userDocData;
+}
+
+async function loadUserInfoFromFirbaseByNick(
+  nick: string
+): Promise<IUserAdditionalInfo | null> {
+  const db = getFirestore();
+  const usersRef = collection(db, "users");
+  const queryByNick = query(usersRef, where("nick", "==", nick));
+
+  const querySnapshot = await getDocs(queryByNick);
+
+  const userDocSnapshot = querySnapshot.docs[0];
+
+  if (!userDocSnapshot) return null;
+
+  return userDocSnapshot.data() as IUserAdditionalInfo;
 }
 
 async function loadMapsByCategoryFromFirebase(
