@@ -34,6 +34,7 @@ export enum OsuMapCategory {
 export interface IUserAdditionalInfo {
   nick: string;
   email: string;
+  skillsets: string;
 }
 
 export interface IUser {
@@ -41,7 +42,9 @@ export interface IUser {
   email: string;
   additionalInfo:
     | {
-        [key in keyof IUserAdditionalInfo]: IUserAdditionalInfo[keyof IUserAdditionalInfo];
+        nick: string;
+        email: string;
+        skillsets: OsuMapCategory[];
       }
     | "loading"
     | "loadingError";

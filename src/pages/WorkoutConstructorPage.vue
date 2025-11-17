@@ -99,7 +99,7 @@ import { fromDurationToSeconds, fromTotalSecondsToLabel } from "@/utils";
 
 const mapsStore = useMapsStore();
 
-const { setErrorToast } = useToast();
+const { setErrorToast, setSuccessToast } = useToast();
 
 const chosenCategories = ref<OsuMapCategory[]>([]);
 const chosenStarRate = ref(5.0);
@@ -201,6 +201,8 @@ const onConfirm = async () => {
   suggestedMapsList.sort((a, b) => a.starRate - b.starRate);
 
   isPreparingMaps.value = false;
+
+  setSuccessToast("Карты для тренировки успешно подготовлены!");
 };
 </script>
 

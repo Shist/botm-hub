@@ -23,3 +23,27 @@ export const MAPS_CATEGORIES: Record<OsuMapCategory, string> = {
   fm3: "FM3 (Technical)",
   tb: "TB (Long Consistency)",
 };
+
+export const CATEGORIES_SORT_PRIORITIES = {
+  nm1: 1,
+  nm2: 2,
+  nm3: 3,
+  nm4: 4,
+  nm5: 5,
+  nm6: 6,
+  nm7: 7,
+  hd1: 8,
+  hd2: 9,
+  hd3: 10,
+  hr1: 11,
+  hr2: 12,
+  hr3: 13,
+  dt1: 14,
+  dt2: 15,
+  dt3: 16,
+  dt4: 17,
+  fm1: 18,
+  fm2: 19,
+  fm3: 20,
+  tb: 21,
+};

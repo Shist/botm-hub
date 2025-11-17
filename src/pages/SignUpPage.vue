@@ -127,8 +127,8 @@ const onConfirmBtnClicked = async () => {
   setLoadingToast("Регистрация...");
 
   try {
-    const additionalInfo = { nick: nick.value, email: email.value };
-    await authStore.signUpUser(email.value, password.value, additionalInfo);
+    const partialInfo = { nick: nick.value, email: email.value };
+    await authStore.signUpUser(email.value, password.value, partialInfo);
 
     email.value = "";
     nick.value = "";

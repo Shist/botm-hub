@@ -5,6 +5,7 @@
       variant="solo-filled"
       prepend-inner-icon="mdi-magnify"
       label="Найти карты по любому полю"
+      placeholder="Введи любое ключевое слово любого поля"
       clearable
       hide-details
     />

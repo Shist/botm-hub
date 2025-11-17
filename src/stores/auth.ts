@@ -1,6 +1,7 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
 import {
+  updateUserAdditionalInfoToFirebase,
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
@@ -27,46 +28,68 @@ export const useAuthStore = defineStore("auth", () => {
   const setAdditionalUserInfo = (
     additionalInfoFields: IUserAdditionalInfo | "loadingError"
   ) => {
-    if (user.value) {
+    if (!user.value) return;
+
+    if (additionalInfoFields === "loadingError") {
       user.value.additionalInfo = additionalInfoFields;
+    } else {
+      user.value.additionalInfo = {
+        ...additionalInfoFields,
+        skillsets: JSON.parse(additionalInfoFields.skillsets),
+      };
     }
   };
 
   const signUpUser = async (
     email: string,
     password: string,
-    additionalInfo: IUserAdditionalInfo
+    partialInfo: Omit<IUserAdditionalInfo, "skillsets">
   ) => {
+    const fullAdditionalInfo: IUserAdditionalInfo = {
+      ...partialInfo,
+      skillsets: "[]",
+    };
     const authServerData = await signUpUserToFirebase(
       email,
       password,
-      additionalInfo
+      fullAdditionalInfo
     );
 
     if (authServerData) {
       setBaseUserInfo(authServerData.user.uid, authServerData.user.email ?? "");
-      setAdditionalUserInfo(additionalInfo);
+      setAdditionalUserInfo(fullAdditionalInfo);
     }
   };
 
   const signInUser = async (email: string, password: string) => {
     const authServerData = await signInUserToFirebase(email, password);
-
     setBaseUserInfo(authServerData.user.uid, authServerData.user.email ?? "");
 
-    loadUserInfoFromFirbase()
-      .then((userInfo) => {
-        setAdditionalUserInfo(userInfo);
-      })
-      .catch(() => {
-        setAdditionalUserInfo("loadingError");
-      });
+    try {
+      const userInfo = await loadUserInfoFromFirbase();
+      setAdditionalUserInfo(userInfo);
+    } catch {
+      setAdditionalUserInfo("loadingError");
+    }
   };
 
   const signOutUser = async () => {
     user.value = null;
 
     await signOutUserFromFirebase();
+  };
+
+  const updateUserAdditionalInfo = async (
+    additionalInfo: Omit<IUserAdditionalInfo, "email">
+  ) => {
+    if (!user.value) return;
+    const newUserInfo = { email: user.value.email, ...additionalInfo };
+    await updateUserAdditionalInfoToFirebase(
+      user.value.uid,
+      user.value.email,
+      newUserInfo
+    );
+    setAdditionalUserInfo(newUserInfo);
   };
 
   return {
@@ -76,5 +99,6 @@ export const useAuthStore = defineStore("auth", () => {
     signUpUser,
     signInUser,
     signOutUser,
+    updateUserAdditionalInfo,
   };
 });

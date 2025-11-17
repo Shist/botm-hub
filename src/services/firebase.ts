@@ -43,6 +43,21 @@ function onFirebaseAuthStateChanged(
   onAuthStateChanged(auth, initFoo);
 }
 
+async function updateUserAdditionalInfoToFirebase(
+  userUid: string,
+  userEmail: string,
+  additionalInfo: IUserAdditionalInfo
+) {
+  const existingUser = await loadUserInfoFromFirbaseByNick(additionalInfo.nick);
+  if (existingUser && existingUser.email !== userEmail) {
+    throw new Error("Этот ник уже занят другим игроком!");
+  }
+
+  const db = getFirestore();
+  const userDoc = doc(db, "users", userUid);
+  await setDoc(userDoc, additionalInfo);
+}
+
 async function signUpUserToFirebase(
   email: string,
   password: string,
@@ -66,11 +81,11 @@ async function signUpUserToFirebase(
     return;
   }
 
-  const db = getFirestore();
-
-  await setDoc(doc(db, "users", newUserInfo.user.uid), {
-    ...additionalInfo,
-  });
+  await updateUserAdditionalInfoToFirebase(
+    newUserInfo.user.uid,
+    newUserInfo.user.email ?? "",
+    additionalInfo
+  );
 
   return newUserInfo;
 }
@@ -190,6 +205,7 @@ async function uploadMapsToFirebase(maps: Omit<IOsuMap, "link">[]) {
 
 export {
   onFirebaseAuthStateChanged,
+  updateUserAdditionalInfoToFirebase,
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
