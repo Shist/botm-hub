@@ -25,7 +25,7 @@
     <h3 class="personal-account-page__small-headline">
       Здесь пока мало что есть, поэтому я разместил здесь коллаб с eh-ами
     </h3>
-    <img src="@/assets/images/eh-collab.png" alt="Коллаб белых котов eh-ов" />
+    <AppImage :imgPath="ehCollabImagePath" imgAlt="Коллаб белых котов eh-ов" />
   </div>
 </template>
 
@@ -34,6 +34,7 @@ import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
+import ehCollabImage from "@/assets/images/eh-collab.png";
 import { OsuMapCategory } from "@/types";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 
@@ -44,6 +45,7 @@ const { setErrorToast, setSuccessToast } = useToast();
 const chosenNick = ref("");
 const chosenCategories = ref<OsuMapCategory[]>([]);
 const isUpdating = ref(false);
+const ehCollabImagePath = ref(ehCollabImage);
 
 const currentNick = computed(() => {
   if (
