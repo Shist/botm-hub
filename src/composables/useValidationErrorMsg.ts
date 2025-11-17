@@ -1,6 +1,17 @@
 import { type ISignUpStateRef } from "@/types";
 
 export default function useValidationErrorMsg() {
+  const getNickValidationError = (nick: string) => {
+    if (!nick) {
+      return "Ник не может быть пустым!";
+    } else if (nick.length < 3) {
+      return "Ник не может быть короче 3 символов!";
+    } else if (nick.length > 15) {
+      return "Ник не может быть длиннее 15 символов!";
+    }
+    return null;
+  };
+
   const getSignUpValidationError = ({
     email,
     nick,
@@ -13,13 +24,8 @@ export default function useValidationErrorMsg() {
       return "Введенный вами адрес электронной почты недействителен!";
     }
 
-    if (!nick.value) {
-      return "Ник не может быть пустым!";
-    } else if (nick.value.length < 3) {
-      return "Ник не может быть короче 3 символов!";
-    } else if (nick.value.length > 15) {
-      return "Ник не может быть длиннее 15 символов!";
-    }
+    const nickError = getNickValidationError(nick.value);
+    if (nickError) return nickError;
 
     if (password.value.length < 8) {
       return "Пароль не может быть короче 8 символов!";
@@ -34,5 +40,5 @@ export default function useValidationErrorMsg() {
     return null;
   };
 
-  return { getSignUpValidationError };
+  return { getNickValidationError, getSignUpValidationError };
 }

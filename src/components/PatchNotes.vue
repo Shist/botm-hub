@@ -1,6 +1,17 @@
 <template>
   <ul class="patch-notes">
     <li class="patch-notes__patch-wrapper">
+      <h3 class="patch-notes__patch-version">Версия 1.5.1</h3>
+      <ol class="patch_notes__patch-features-wrapper">
+        <li class="patch_notes__patch-feature">
+          Был замечен баг, что в личном кабинете можно было поменять себе ник на
+          пустой, слишком короткий или слишком длинный. Теперь валидация, что
+          работает при регистрации, также добавлена и в личный кабинет - ник не
+          может быть меньше 3 символов или больше 15 символов
+        </li>
+      </ol>
+    </li>
+    <li class="patch-notes__patch-wrapper">
       <h3 class="patch-notes__patch-version">Версия 1.5.0</h3>
       <ol class="patch_notes__patch-features-wrapper">
         <li class="patch_notes__patch-feature">

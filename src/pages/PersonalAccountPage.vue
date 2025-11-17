@@ -34,6 +34,7 @@ import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
+import useValidationErrorMsg from "@/composables/useValidationErrorMsg";
 import ehCollabImage from "@/assets/images/eh-collab.png";
 import { OsuMapCategory } from "@/types";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
@@ -41,6 +42,7 @@ import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 const authStore = useAuthStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
+const { getNickValidationError } = useValidationErrorMsg();
 
 const chosenNick = ref("");
 const chosenCategories = ref<OsuMapCategory[]>([]);
@@ -88,6 +90,12 @@ onMounted(() => {
 });
 
 const onUpdate = async () => {
+  const nickErrorMsg = getNickValidationError(chosenNick.value);
+  if (nickErrorMsg) {
+    setErrorToast(nickErrorMsg);
+    return;
+  }
+
   try {
     isUpdating.value = true;
 
