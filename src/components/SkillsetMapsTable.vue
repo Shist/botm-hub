@@ -72,7 +72,7 @@ const headers = reactive([
   {
     key: "name",
     title: "Название",
-    minWidth: "340px",
+    minWidth: "335px",
   },
   {
     key: "mapper",
