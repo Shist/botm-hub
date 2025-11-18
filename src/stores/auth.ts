@@ -43,10 +43,11 @@ export const useAuthStore = defineStore("auth", () => {
   const signUpUser = async (
     email: string,
     password: string,
-    partialInfo: Omit<IUserAdditionalInfo, "digitCategory" | "skillsets">
+    partialInfo: Pick<IUserAdditionalInfo, "nick" | "email">
   ) => {
     const fullAdditionalInfo: IUserAdditionalInfo = {
       ...partialInfo,
+      osuId: null,
       digitCategory: null,
       skillsets: "[]",
     };

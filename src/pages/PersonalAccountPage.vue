@@ -2,6 +2,18 @@
   <div class="personal-account-page">
     <h2 class="personal-account-page__headline">Личный кабинет</h2>
     <div class="personal-account-page__inputs-wrapper">
+      <v-number-input
+        v-model="chosenOsuId"
+        :min="0"
+        :max="1000000000"
+        variant="solo"
+        control-variant="hidden"
+        prepend-inner-icon="mdi-identifier"
+        label="osu! ID"
+        placeholder="Введи свой osu! ID ('https://osu.ppy.sh/users/<ID>')"
+        clearable
+        hide-details
+      />
       <v-text-field
         v-model="chosenNick"
         variant="solo"
@@ -54,6 +66,7 @@ const authStore = useAuthStore();
 const { setErrorToast, setSuccessToast } = useToast();
 const { getNickValidationError } = useValidationErrorMsg();
 
+const chosenOsuId = ref<number | null>(null);
 const chosenNick = ref<string | null>(null);
 const chosenDigit = ref<DigitCategory | null>(null);
 const chosenCategories = ref<OsuMapCategory[]>([]);
@@ -66,6 +79,16 @@ const digitOptions = computed(() =>
     title: digitValue,
   }))
 );
+const currentOsuId = computed(() => {
+  if (
+    authStore.user?.additionalInfo === "loading" ||
+    authStore.user?.additionalInfo === "loadingError"
+  ) {
+    return null;
+  } else {
+    return authStore.user?.additionalInfo.osuId ?? null;
+  }
+});
 const currentNick = computed(() => {
   if (
     authStore.user?.additionalInfo === "loading" ||
@@ -97,7 +120,10 @@ const currentSkillsets = computed(() => {
   }
 });
 const isSomeInfoChanged = computed(() => {
+  const osuIdFromStore =
+    currentOsuId.value === null ? null : +currentOsuId.value;
   return (
+    chosenOsuId.value !== osuIdFromStore ||
     chosenNick.value !== currentNick.value ||
     chosenDigit.value !== currentDigit.value ||
     JSON.stringify(chosenCategories.value) !==
@@ -105,6 +131,9 @@ const isSomeInfoChanged = computed(() => {
   );
 });
 
+watch(currentOsuId, (valueFromStore) => {
+  chosenOsuId.value = valueFromStore === null ? null : +valueFromStore;
+});
 watch(currentNick, (valueFromStore) => {
   chosenNick.value = valueFromStore;
 });
@@ -116,6 +145,7 @@ watch(currentSkillsets, (valueFromStore) => {
 });
 
 onMounted(() => {
+  chosenOsuId.value = currentOsuId.value === null ? null : +currentOsuId.value;
   chosenNick.value = currentNick.value;
   chosenDigit.value = currentDigit.value;
   chosenCategories.value = currentSkillsets.value;
@@ -136,6 +166,7 @@ const onUpdate = async () => {
     );
 
     await authStore.updateUserAdditionalInfo({
+      osuId: chosenOsuId.value === null ? null : `${chosenOsuId.value}`,
       nick: chosenNick.value ?? "",
       digitCategory: chosenDigit.value,
       skillsets: JSON.stringify(sortedCategories),

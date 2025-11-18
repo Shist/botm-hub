@@ -38,6 +38,7 @@ export enum DigitCategory {
 }
 
 export interface IUserAdditionalInfo {
+  osuId: string | null;
   nick: string;
   email: string;
   digitCategory: DigitCategory | null;
@@ -49,6 +50,7 @@ export interface IUser {
   email: string;
   additionalInfo:
     | {
+        osuId: string | null;
         nick: string;
         email: string;
         digitCategory: DigitCategory | null;
@@ -60,6 +62,7 @@ export interface IUser {
 
 export interface IAllUsersListItem {
   uid: string;
+  osuId: string | null;
   nick: string;
   digitCategory: DigitCategory | null;
   skillsets: string;
