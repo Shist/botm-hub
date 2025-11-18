@@ -3,9 +3,14 @@ import {
   VTextField,
   VNumberInput,
   VSelect,
+  VTabs,
+  VTab,
+  VTabsWindow,
+  VTabsWindowItem,
   VDataTableVirtual,
   VSkeletonLoader,
   VTooltip,
+  VDivider,
 } from "vuetify/components";
 
 export default {
@@ -13,7 +18,12 @@ export default {
   VTextField,
   VNumberInput,
   VSelect,
+  VTabs,
+  VTab,
+  VTabsWindow,
+  VTabsWindowItem,
   VDataTableVirtual,
   VSkeletonLoader,
   VTooltip,
+  VDivider,
 };

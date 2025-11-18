@@ -1,10 +1,11 @@
 <template>
-  <div class="img-wrapper">
+  <div>
     <div v-if="currImgState === 'loading'" class="img-skeleton">
       <img
         src="@/assets/images/img-loading.png"
         alt="Изображение загружается"
         class="img-skeleton__img-loading-icon"
+        :class="{ 'rounded-img': isRounded }"
       />
     </div>
     <img
@@ -12,6 +13,7 @@
       :src="imgSrc"
       :alt="imgAlt"
       class="main-img"
+      :class="{ 'rounded-img': isRounded }"
       @load="handleImageSrcLoad"
       @error="handleImageSrcError"
     />
@@ -20,6 +22,7 @@
         src="@/assets/images/img-error.png"
         alt="Ошибка при загрузке изображения"
         class="img-error__icon"
+        :class="{ 'rounded-img': isRounded }"
       />
       <span class="img-error__message">
         Во время загрузки изображения произошла ошибка
@@ -34,6 +37,7 @@ import { ref, type Ref, onMounted, watch } from "vue";
 const props = defineProps<{
   imgPath: string;
   imgAlt: string;
+  isRounded?: boolean;
 }>();
 
 const currImgState = ref("loading");
@@ -63,8 +67,8 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.img-wrapper {
-  padding: 10px;
+.rounded-img {
+  border-radius: 50%;
 }
 
 .main-img {

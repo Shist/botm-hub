@@ -149,6 +149,18 @@ async function loadUserInfoFromFirbase(): Promise<IUserAdditionalInfo> {
   return userDocData;
 }
 
+async function loadAllUsersFromFirbase(): Promise<IAllUsersListItem[]> {
+  const db = getFirestore();
+
+  const allUsersDoc = doc(db, "users", "allUsers");
+
+  const allUsersSnapshot = await getDoc(allUsersDoc);
+  const allUsersDocData = allUsersSnapshot.data();
+  const allUsers = allUsersDocData?.allUsers as IAllUsersListItem[];
+
+  return allUsers.sort((a, b) => a.nick.localeCompare(b.nick));
+}
+
 async function loadMapsByCategoryFromFirebase(
   category: OsuMapCategory
 ): Promise<IOsuMap[]> {
@@ -228,6 +240,7 @@ export {
   signInUserToFirebase,
   signOutUserFromFirebase,
   loadUserInfoFromFirbase,
+  loadAllUsersFromFirbase,
   loadMapsByCategoryFromFirebase,
   uploadMapsToFirebase,
 };

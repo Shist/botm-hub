@@ -26,3 +26,14 @@ export function fromTotalSecondsToLabel(totalSeconds: number) {
     .map((item) => `${item}`.padStart(2, "0"))
     .join(":");
 }
+
+export function getLeftAmountLabel(amount: number) {
+  if (amount === 0) return "Нет игроков";
+  let ending = "ов";
+  const lastDigit = amount % 10;
+  if (lastDigit === 1) ending = "";
+  else if ([2, 3, 4].includes(lastDigit)) ending = "а";
+  const lastTwoDigits = amount % 100;
+  if ([11, 12, 13, 14].includes(lastTwoDigits)) ending = "ов";
+  return `${amount} игрок${ending}`;
+}

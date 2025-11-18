@@ -115,6 +115,7 @@ onMounted(() => {
   flex-grow: 1;
   &__container {
     @extend %default-wrapper;
+    &:has(.players-page),
     &:has(.skillset-maps-page),
     &:has(.workout-constructor-page) {
       padding: 10px;

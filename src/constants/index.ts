@@ -47,3 +47,27 @@ export const CATEGORIES_SORT_PRIORITIES: Record<OsuMapCategory, number> = {
   fm3: 20,
   tb: 21,
 };
+
+export const CATEGORIES_COLORS = {
+  nm1: "#64b5f6",
+  nm2: "#42a5f5",
+  nm3: "#2196f3",
+  nm4: "#1976d2",
+  nm5: "#1565c0",
+  nm6: "#0d47a1",
+  nm7: "#003366",
+  hd1: "#ffd600",
+  hd2: "#f9a825",
+  hd3: "#c66900",
+  hr1: "#f0baba",
+  hr2: "#e57373",
+  hr3: "#c62828",
+  dt1: "#cda6d5",
+  dt2: "#ba68c8",
+  dt3: "#7e57c2",
+  dt4: "#5b259d",
+  fm1: "#94c596",
+  fm2: "#55aa59",
+  fm3: "#277d2b",
+  tb: "#d4ac7c",
+};

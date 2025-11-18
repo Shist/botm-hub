@@ -90,8 +90,8 @@ const isUpdating = ref(false);
 const ehCollabImagePath = ref(ehCollabImage);
 
 const digitOptions = computed(() =>
-  Object.entries(DigitCategory).map(([digitKey, digitValue]) => ({
-    value: digitKey,
+  Object.values(DigitCategory).map((digitValue) => ({
+    value: digitValue,
     title: digitValue,
   }))
 );
