@@ -34,22 +34,21 @@
           required
         />
       </div>
-      <button
+      <v-btn
+        :loading="isLoading"
+        height="50"
         class="sign-in-page__confirm-btn"
         @click.prevent="onConfirmBtnClicked"
-        :disabled="isLoading"
       >
         Войти в аккаунт
-      </button>
+      </v-btn>
     </form>
     <h3 class="sign-in-page__sign-up-suggestion-headline">Eщё нет аккаунта?</h3>
-    <router-link
-      to="/sign-up"
-      class="sign-in-page__sign-up-btn"
-      :class="{ 'disabled-link': isLoading }"
-    >
-      Зарегистрироваться
-    </router-link>
+    <v-btn :disabled="isLoading" height="50" class="sign-in-page__sign-up-btn">
+      <router-link to="/sign-up" class="sign-in-page__sign-up-btn-label">
+        Зарегистрироваться
+      </router-link>
+    </v-btn>
   </div>
 </template>
 
@@ -135,7 +134,10 @@ const onConfirmBtnClicked = async () => {
     margin-bottom: 5px;
   }
   &__sign-up-btn {
-    @include default-btn(200px, var(--color-btn-text), var(--color-btn-bg));
+    @include default-btn(250px, var(--color-btn-text), var(--color-btn-bg));
+  }
+  &__sign-up-btn-label {
+    color: var(--color-btn-text);
     text-decoration: none;
   }
 }
