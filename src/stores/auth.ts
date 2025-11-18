@@ -43,10 +43,11 @@ export const useAuthStore = defineStore("auth", () => {
   const signUpUser = async (
     email: string,
     password: string,
-    partialInfo: Omit<IUserAdditionalInfo, "skillsets">
+    partialInfo: Omit<IUserAdditionalInfo, "digitCategory" | "skillsets">
   ) => {
     const fullAdditionalInfo: IUserAdditionalInfo = {
       ...partialInfo,
+      digitCategory: null,
       skillsets: "[]",
     };
     const authServerData = await signUpUserToFirebase(

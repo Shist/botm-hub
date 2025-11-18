@@ -31,9 +31,16 @@ export enum OsuMapCategory {
   tb = "tb",
 }
 
+export enum DigitCategory {
+  fourDigit = "4-digit",
+  fiveDigit = "5-digit",
+  sixDigit = "6-digit",
+}
+
 export interface IUserAdditionalInfo {
   nick: string;
   email: string;
+  digitCategory: DigitCategory | null;
   skillsets: string;
 }
 
@@ -44,6 +51,7 @@ export interface IUser {
     | {
         nick: string;
         email: string;
+        digitCategory: DigitCategory | null;
         skillsets: OsuMapCategory[];
       }
     | "loading"
@@ -53,6 +61,7 @@ export interface IUser {
 export interface IAllUsersListItem {
   uid: string;
   nick: string;
+  digitCategory: DigitCategory | null;
   skillsets: string;
 }
 

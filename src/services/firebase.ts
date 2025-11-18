@@ -66,11 +66,14 @@ async function updateUserAdditionalInfoToFirebase(
     allUsers.push({
       uid: userUid,
       nick: additionalInfo.nick,
+      digitCategory: additionalInfo.digitCategory,
       skillsets: additionalInfo.skillsets,
     });
   } else {
     (allUsers[existingUserIndex] as IAllUsersListItem).nick =
       additionalInfo.nick;
+    (allUsers[existingUserIndex] as IAllUsersListItem).digitCategory =
+      additionalInfo.digitCategory;
     (allUsers[existingUserIndex] as IAllUsersListItem).skillsets =
       additionalInfo.skillsets;
   }

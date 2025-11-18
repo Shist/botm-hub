@@ -11,6 +11,16 @@
         clearable
         hide-details
       />
+      <v-select
+        v-model="chosenDigit"
+        :items="digitOptions"
+        variant="solo"
+        prepend-inner-icon="mdi-star-half-full"
+        label="Digit-категория"
+        placeholder="Выбери Digit-категорию"
+        clearable
+        hide-details
+      />
       <SkillsetsSelect v-model="chosenCategories" />
     </div>
     <v-btn
@@ -36,7 +46,7 @@ import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import useValidationErrorMsg from "@/composables/useValidationErrorMsg";
 import ehCollabImage from "@/assets/images/eh-collab.png";
-import { OsuMapCategory } from "@/types";
+import { OsuMapCategory, DigitCategory } from "@/types";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 
 const authStore = useAuthStore();
@@ -44,19 +54,36 @@ const authStore = useAuthStore();
 const { setErrorToast, setSuccessToast } = useToast();
 const { getNickValidationError } = useValidationErrorMsg();
 
-const chosenNick = ref("");
+const chosenNick = ref<string | null>(null);
+const chosenDigit = ref<DigitCategory | null>(null);
 const chosenCategories = ref<OsuMapCategory[]>([]);
 const isUpdating = ref(false);
 const ehCollabImagePath = ref(ehCollabImage);
 
+const digitOptions = computed(() =>
+  Object.entries(DigitCategory).map(([digitKey, digitValue]) => ({
+    value: digitKey,
+    title: digitValue,
+  }))
+);
 const currentNick = computed(() => {
   if (
     authStore.user?.additionalInfo === "loading" ||
     authStore.user?.additionalInfo === "loadingError"
   ) {
-    return "";
+    return null;
   } else {
-    return authStore.user?.additionalInfo.nick ?? "";
+    return authStore.user?.additionalInfo.nick ?? null;
+  }
+});
+const currentDigit = computed(() => {
+  if (
+    authStore.user?.additionalInfo === "loading" ||
+    authStore.user?.additionalInfo === "loadingError"
+  ) {
+    return null;
+  } else {
+    return authStore.user?.additionalInfo.digitCategory ?? null;
   }
 });
 const currentSkillsets = computed(() => {
@@ -72,6 +99,7 @@ const currentSkillsets = computed(() => {
 const isSomeInfoChanged = computed(() => {
   return (
     chosenNick.value !== currentNick.value ||
+    chosenDigit.value !== currentDigit.value ||
     JSON.stringify(chosenCategories.value) !==
       JSON.stringify(currentSkillsets.value)
   );
@@ -80,17 +108,21 @@ const isSomeInfoChanged = computed(() => {
 watch(currentNick, (valueFromStore) => {
   chosenNick.value = valueFromStore;
 });
+watch(currentDigit, (valueFromStore) => {
+  chosenDigit.value = valueFromStore;
+});
 watch(currentSkillsets, (valueFromStore) => {
   chosenCategories.value = valueFromStore;
 });
 
 onMounted(() => {
   chosenNick.value = currentNick.value;
+  chosenDigit.value = currentDigit.value;
   chosenCategories.value = currentSkillsets.value;
 });
 
 const onUpdate = async () => {
-  const nickErrorMsg = getNickValidationError(chosenNick.value);
+  const nickErrorMsg = getNickValidationError(chosenNick.value ?? "");
   if (nickErrorMsg) {
     setErrorToast(nickErrorMsg);
     return;
@@ -104,7 +136,8 @@ const onUpdate = async () => {
     );
 
     await authStore.updateUserAdditionalInfo({
-      nick: chosenNick.value,
+      nick: chosenNick.value ?? "",
+      digitCategory: chosenDigit.value,
       skillsets: JSON.stringify(sortedCategories),
     });
     setSuccessToast("🥳🥳🥳 Информация успешно обновлена!!! 🥳🥳🥳");
