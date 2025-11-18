@@ -6,18 +6,15 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  type UserCredential,
 } from "firebase/auth";
 import {
   getFirestore,
   doc,
-  collection,
-  setDoc,
+  runTransaction,
   getDoc,
-  getDocs,
   updateDoc,
   arrayUnion,
-  query,
-  where,
 } from "firebase/firestore/lite";
 import {
   type IUserAdditionalInfo,
@@ -46,38 +43,46 @@ function onFirebaseAuthStateChanged(
 
 async function updateUserAdditionalInfoToFirebase(
   userUid: string,
-  userEmail: string,
   additionalInfo: IUserAdditionalInfo
 ) {
-  const existingUser = await loadUserInfoFromFirbaseByNick(additionalInfo.nick);
-  if (existingUser && existingUser.email !== userEmail) {
-    throw new Error("Этот ник уже занят другим игроком!");
-  }
-
   const db = getFirestore();
-  const userDoc = doc(db, "users", userUid);
-  await setDoc(userDoc, additionalInfo);
+  await runTransaction(db, async (transaction) => {
+    const userDocRef = doc(db, "users", userUid);
+    const allUsersDocRef = doc(db, "users", "allUsers");
 
-  const allUsersDocRef = doc(db, "users", "allUsers");
-  const allUsersDoc = await getDoc(allUsersDocRef);
-  const allUsers = (allUsersDoc.data()?.allUsers ?? []) as IAllUsersListItem[];
-  const existingUserIndex = allUsers.findIndex((u) => u.uid === userUid);
-  if (existingUserIndex === -1) {
-    allUsers.push({
-      uid: userUid,
-      nick: additionalInfo.nick,
-      digitCategory: additionalInfo.digitCategory,
-      skillsets: additionalInfo.skillsets,
-    });
-  } else {
-    (allUsers[existingUserIndex] as IAllUsersListItem).nick =
-      additionalInfo.nick;
-    (allUsers[existingUserIndex] as IAllUsersListItem).digitCategory =
-      additionalInfo.digitCategory;
-    (allUsers[existingUserIndex] as IAllUsersListItem).skillsets =
-      additionalInfo.skillsets;
-  }
-  await updateDoc(allUsersDocRef, { allUsers: allUsers });
+    const allUsersDoc = await transaction.get(allUsersDocRef);
+    const allUsers = (allUsersDoc.data()?.allUsers ??
+      []) as IAllUsersListItem[];
+
+    const isNickTakenByAnotherUser = allUsers.some(
+      (u) => u.nick === additionalInfo.nick && u.uid !== userUid
+    );
+    if (isNickTakenByAnotherUser) {
+      throw new Error("Этот ник уже занят другим игроком!");
+    }
+
+    const existingUserIndex = allUsers.findIndex((u) => u.uid === userUid);
+    if (existingUserIndex === -1) {
+      allUsers.push({
+        uid: userUid,
+        nick: additionalInfo.nick,
+        digitCategory: additionalInfo.digitCategory,
+        skillsets: additionalInfo.skillsets,
+      });
+    } else {
+      (allUsers[existingUserIndex] as IAllUsersListItem).nick =
+        additionalInfo.nick;
+      (allUsers[existingUserIndex] as IAllUsersListItem).digitCategory =
+        additionalInfo.digitCategory;
+      (allUsers[existingUserIndex] as IAllUsersListItem).skillsets =
+        additionalInfo.skillsets;
+    }
+
+    allUsers.sort((a, b) => (a.uid > b.uid ? 1 : a.uid < b.uid ? -1 : 0));
+
+    transaction.set(userDocRef, additionalInfo);
+    transaction.update(allUsersDocRef, { allUsers });
+  });
 }
 
 async function signUpUserToFirebase(
@@ -86,30 +91,27 @@ async function signUpUserToFirebase(
   additionalInfo: IUserAdditionalInfo
 ) {
   const auth = getAuth();
+  let newUserInfo: UserCredential | null = null;
 
-  const existingUser = await loadUserInfoFromFirbaseByNick(additionalInfo.nick);
+  try {
+    newUserInfo = await createUserWithEmailAndPassword(auth, email, password);
 
-  if (existingUser) {
-    throw new Error("Пользователь с таким ником уже зарегистрирован!");
+    if (!newUserInfo.user.uid) {
+      throw new Error(
+        "Не удалось получить UID пользователя после создания аккаунта"
+      );
+    }
+
+    await updateUserAdditionalInfoToFirebase(
+      newUserInfo.user.uid,
+      additionalInfo
+    );
+
+    return newUserInfo;
+  } catch (error) {
+    if (newUserInfo) await newUserInfo.user.delete();
+    throw error;
   }
-
-  const newUserInfo = await createUserWithEmailAndPassword(
-    auth,
-    email,
-    password
-  );
-
-  if (!newUserInfo.user.uid) {
-    return;
-  }
-
-  await updateUserAdditionalInfoToFirebase(
-    newUserInfo.user.uid,
-    newUserInfo.user.email ?? "",
-    additionalInfo
-  );
-
-  return newUserInfo;
 }
 
 async function signInUserToFirebase(email: string, password: string) {
@@ -135,22 +137,6 @@ async function loadUserInfoFromFirbase(): Promise<IUserAdditionalInfo> {
   const userDocData = userDocSnapshot.data() as IUserAdditionalInfo;
 
   return userDocData;
-}
-
-async function loadUserInfoFromFirbaseByNick(
-  nick: string
-): Promise<IUserAdditionalInfo | null> {
-  const db = getFirestore();
-  const usersRef = collection(db, "users");
-  const queryByNick = query(usersRef, where("nick", "==", nick));
-
-  const querySnapshot = await getDocs(queryByNick);
-
-  const userDocSnapshot = querySnapshot.docs[0];
-
-  if (!userDocSnapshot) return null;
-
-  return userDocSnapshot.data() as IUserAdditionalInfo;
 }
 
 async function loadMapsByCategoryFromFirebase(

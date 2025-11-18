@@ -85,11 +85,7 @@ export const useAuthStore = defineStore("auth", () => {
   ) => {
     if (!user.value) return;
     const newUserInfo = { email: user.value.email, ...additionalInfo };
-    await updateUserAdditionalInfoToFirebase(
-      user.value.uid,
-      user.value.email,
-      newUserInfo
-    );
+    await updateUserAdditionalInfoToFirebase(user.value.uid, newUserInfo);
     setAdditionalUserInfo(newUserInfo);
   };
 
