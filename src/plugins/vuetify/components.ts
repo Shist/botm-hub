@@ -5,6 +5,7 @@ import {
   VSelect,
   VDataTableVirtual,
   VSkeletonLoader,
+  VTooltip,
 } from "vuetify/components";
 
 export default {
@@ -14,4 +15,5 @@ export default {
   VSelect,
   VDataTableVirtual,
   VSkeletonLoader,
+  VTooltip,
 };

@@ -29,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref, onMounted } from "vue";
+import { ref, type Ref, onMounted, watch } from "vue";
 
 const props = defineProps<{
   imgPath: string;
@@ -52,6 +52,14 @@ const handleImageSrcError = () => {
 onMounted(() => {
   imgSrc.value = props.imgPath;
 });
+
+watch(
+  () => props.imgPath,
+  (newSrc) => {
+    imgSrc.value = newSrc;
+    currImgState.value = "loading";
+  }
+);
 </script>
 
 <style lang="scss" scoped>

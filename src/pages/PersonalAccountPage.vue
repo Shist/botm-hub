@@ -1,39 +1,55 @@
 <template>
   <div class="personal-account-page">
     <h2 class="personal-account-page__headline">Личный кабинет</h2>
-    <div class="personal-account-page__inputs-wrapper">
-      <v-number-input
-        v-model="chosenOsuId"
-        :min="0"
-        :max="1000000000"
-        variant="solo"
-        control-variant="hidden"
-        prepend-inner-icon="mdi-identifier"
-        label="osu! ID"
-        placeholder="Введи свой osu! ID ('https://osu.ppy.sh/users/<ID>')"
-        clearable
-        hide-details
-      />
-      <v-text-field
-        v-model="chosenNick"
-        variant="solo"
-        prepend-inner-icon="mdi-account"
-        label="osu! Ник"
-        placeholder="Введи свой osu! ник"
-        clearable
-        hide-details
-      />
-      <v-select
-        v-model="chosenDigit"
-        :items="digitOptions"
-        variant="solo"
-        prepend-inner-icon="mdi-star-half-full"
-        label="Digit-категория"
-        placeholder="Выбери Digit-категорию"
-        clearable
-        hide-details
-      />
-      <SkillsetsSelect v-model="chosenCategories" />
+    <div class="personal-account-page__avatar-inputs-wrapper">
+      <v-tooltip
+        :disabled="currentOsuId !== null"
+        text="Для подгрузки аватара требуется osu! ID"
+        location="top"
+      >
+        <template v-slot:activator="{ props }">
+          <AppImage
+            v-bind="props"
+            :imgPath="avatarSrc"
+            imgAlt="Аватар"
+            class="personal-account-page__avatar"
+          />
+        </template>
+      </v-tooltip>
+      <div class="personal-account-page__inputs-wrapper">
+        <v-number-input
+          v-model="chosenOsuId"
+          :min="0"
+          :max="1000000000"
+          variant="solo"
+          control-variant="hidden"
+          prepend-inner-icon="mdi-identifier"
+          label="osu! ID"
+          placeholder="Введи свой osu! ID ('https://osu.ppy.sh/users/<ID>')"
+          clearable
+          hide-details
+        />
+        <v-text-field
+          v-model="chosenNick"
+          variant="solo"
+          prepend-inner-icon="mdi-account"
+          label="osu! Ник"
+          placeholder="Введи свой osu! ник"
+          clearable
+          hide-details
+        />
+        <v-select
+          v-model="chosenDigit"
+          :items="digitOptions"
+          variant="solo"
+          prepend-inner-icon="mdi-star-half-full"
+          label="Digit-категория"
+          placeholder="Выбери Digit-категорию"
+          clearable
+          hide-details
+        />
+        <SkillsetsSelect v-model="chosenCategories" />
+      </div>
     </div>
     <v-btn
       :disabled="!isSomeInfoChanged"
@@ -130,6 +146,7 @@ const isSomeInfoChanged = computed(() => {
       JSON.stringify(currentSkillsets.value)
   );
 });
+const avatarSrc = computed(() => `https://a.ppy.sh/${currentOsuId.value}?.png`);
 
 watch(currentOsuId, (valueFromStore) => {
   chosenOsuId.value = valueFromStore === null ? null : +valueFromStore;
@@ -197,7 +214,20 @@ const onUpdate = async () => {
       line-height: 20px;
     }
   }
+  &__avatar-inputs-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    @media (max-width: $tablet-l) {
+      flex-direction: column;
+    }
+  }
+  &__avatar {
+    width: 256px;
+    height: 256px;
+  }
   &__inputs-wrapper {
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     gap: 10px;
