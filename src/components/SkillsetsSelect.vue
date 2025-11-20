@@ -21,6 +21,7 @@
 import { computed } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import { OsuMapCategory } from "@/types";
+import { MAPS_CATEGORIES } from "@/constants";
 
 const props = defineProps<{
   modelValue: OsuMapCategory[];
@@ -38,7 +39,7 @@ const chosenCategories = computed({
 const categoriesOptions = computed(() =>
   Object.values(OsuMapCategory).map((category) => ({
     value: category,
-    title: category.toUpperCase(),
+    title: MAPS_CATEGORIES[category],
   }))
 );
 </script>

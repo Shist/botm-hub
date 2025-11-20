@@ -1,6 +1,17 @@
 <template>
   <ul class="patch-notes">
     <li class="patch-notes__patch-wrapper">
+      <h3 class="patch-notes__patch-version">Версия 1.8.2</h3>
+      <ol class="patch_notes__patch-features-wrapper">
+        <li class="patch_notes__patch-feature">
+          Для компонента 'SkillsetsSelect' были улучшены подписи для скиллсетов
+          ('NM1' -> 'NM1 (Raw Aim)', 'NM2' -> 'NM2 (Flow Tapping)', и т.д.). Это
+          изменение повлияло как на компонент в личном кабинете, так и на
+          компонент на странице конструктора тренировочной сессии
+        </li>
+      </ol>
+    </li>
+    <li class="patch-notes__patch-wrapper">
       <h3 class="patch-notes__patch-version">Версия 1.8.1</h3>
       <ol class="patch_notes__patch-features-wrapper">
         <li class="patch_notes__patch-feature">
