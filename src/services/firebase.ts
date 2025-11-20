@@ -54,12 +54,14 @@ async function updateUserAdditionalInfoToFirebase(
     const allUsers = (allUsersDoc.data()?.allUsers ??
       []) as IAllUsersListItem[];
 
-    const isOsuIdTakenByAnotherUser = allUsers.some(
-      (u) => u.osuId === additionalInfo.osuId && u.uid !== userUid
-    );
-    if (isOsuIdTakenByAnotherUser) {
-      const user = allUsers.find((u) => u.osuId === additionalInfo.osuId);
-      throw new Error(`Этот osu! ID уже занят игроком ${user?.nick}`);
+    if (additionalInfo.osuId !== null) {
+      const isOsuIdTakenByAnotherUser = allUsers.some(
+        (u) => u.osuId === additionalInfo.osuId && u.uid !== userUid
+      );
+      if (isOsuIdTakenByAnotherUser) {
+        const user = allUsers.find((u) => u.osuId === additionalInfo.osuId);
+        throw new Error(`Этот osu! ID уже занят игроком ${user?.nick}`);
+      }
     }
     const isNickTakenByAnotherUser = allUsers.some(
       (u) => u.nick === additionalInfo.nick && u.uid !== userUid

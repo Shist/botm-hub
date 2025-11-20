@@ -1,6 +1,21 @@
 <template>
   <ul class="patch-notes">
     <li class="patch-notes__patch-wrapper">
+      <h3 class="patch-notes__patch-version">Версия 1.8.1</h3>
+      <ol class="patch_notes__patch-features-wrapper">
+        <li class="patch_notes__patch-feature">
+          Был замечен баг, что при попытке регистрации возникала ошибка в
+          случае, если в базе уже есть хотя бы один игрок, пока не указавший
+          'osuId'. Дело в том, что на 'osuId', как и на ник, действует проверка
+          - если такой уже существует, мы не сохраняем игрока, а показываем ему
+          ошибку. Это также работало и в случае, если игрок хочет сохранить
+          пустой 'osuId' (null). Если у кого-то он тоже пустой (null),
+          показывалась ошибка. Теперь в проверку добавлено уточнение - если
+          новый 'osuId' пустой (null), то мы игнорируем это правило
+        </li>
+      </ol>
+    </li>
+    <li class="patch-notes__patch-wrapper">
       <h3 class="patch-notes__patch-version">Версия 1.8.0</h3>
       <ol class="patch_notes__patch-features-wrapper">
         <li class="patch_notes__patch-feature">
