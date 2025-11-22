@@ -152,7 +152,7 @@ const copyToClipboard = async (mapId: number) => {
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .skillset-maps-table {
   width: 100%;
   border: 4px solid var(--color-vuetify-table-borders);

@@ -176,7 +176,7 @@ const onLogOutBtnClicked = async () => {
 };
 </script>
 
-<style scoped lang="scss">
+<style lang="scss" scoped>
 .patch-notes-modal-wrapper {
   display: flex;
   flex-direction: column;

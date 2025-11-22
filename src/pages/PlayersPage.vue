@@ -54,23 +54,12 @@
                       В поисках талантов...
                     </span>
                     <template v-else>
-                      <div
+                      <UserCard
                         v-for="user in usersList"
                         :key="user.uid"
-                        class="skillsets-cards-grid__players-list-item"
-                      >
-                        <AppImage
-                          :imgPath="`https://a.ppy.sh/${user.osuId}?.png`"
-                          :imgAlt="`Аватар ${user.nick}`"
-                          isRounded
-                          class="skillsets-cards-grid__players-list-item-avatar"
-                        />
-                        <span
-                          class="skillsets-cards-grid__players-list-item-label"
-                        >
-                          {{ user.nick }}
-                        </span>
-                      </div>
+                        :osuId="user.osuId"
+                        :nick="user.nick"
+                      />
                     </template>
                   </div>
                 </div>
@@ -122,23 +111,12 @@
                       В поисках талантов...
                     </span>
                     <template v-else>
-                      <div
+                      <UserCard
                         v-for="user in usersList"
                         :key="user.uid"
-                        class="skillsets-cards-grid__players-list-item"
-                      >
-                        <AppImage
-                          :imgPath="`https://a.ppy.sh/${user.osuId}?.png`"
-                          :imgAlt="`Аватар ${user.nick}`"
-                          isRounded
-                          class="skillsets-cards-grid__players-list-item-avatar"
-                        />
-                        <span
-                          class="skillsets-cards-grid__players-list-item-label"
-                        >
-                          {{ user.nick }}
-                        </span>
-                      </div>
+                        :osuId="user.osuId"
+                        :nick="user.nick"
+                      />
                     </template>
                   </div>
                 </div>
@@ -154,6 +132,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
+import UserCard from "@/components/UserCard.vue";
 import useToast from "@/composables/useToast";
 import { DigitCategory, OsuMapCategory, type IAllUsersListItem } from "@/types";
 import { MAPS_CATEGORIES, CATEGORIES_COLORS } from "@/constants";
@@ -337,15 +316,6 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     row-gap: 5px;
-  }
-  &__players-list-item {
-    display: flex;
-    align-items: center;
-    column-gap: 10px;
-  }
-  &__players-list-item-avatar {
-    width: 36px;
-    height: 36px;
   }
   &__players-list-item-label {
     @include default-text(20px, 20px, var(--color-text-white));
