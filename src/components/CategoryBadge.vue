@@ -6,9 +6,10 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
+import { OsuMapCategory } from "@/types";
 
 const props = defineProps<{
-  category: string;
+  category: OsuMapCategory;
 }>();
 
 const categoryLabel = computed(() => `${props.category}`.toUpperCase());

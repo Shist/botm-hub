@@ -37,6 +37,13 @@ export enum DigitCategory {
   sixDigit = "6-digit",
 }
 
+export enum TrainingStatus {
+  waiting = "waiting",
+  inProgress = "in-progress",
+  completed = "completed",
+  archived = "archived",
+}
+
 export interface IUserAdditionalInfo {
   osuId: string | null;
   nick: string;
