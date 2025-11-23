@@ -23,8 +23,12 @@
   --color-text-white: #ffffff;
   --color-text-dark: #000000;
 
+  --color-date-picker-header: #bb8800;
+  --color-time-picker-header: #bb8800;
+
   --color-btn-text: #ffffff;
   --color-btn-bg: #bb8800;
+  --color-btn-cancel-bg: #292929;
   --color-btn-bg-our-players: #f0d540;
   --color-btn-bg-skillsets-maps: #33cad9;
   --color-btn-bg-workout-constructor: #e55a78;
@@ -59,6 +63,7 @@
   --color-training-archived: #9b59b6;
 
   --color-link-active: #ffec8b;
+  --color-footer-link-active: #ffec8b;
 
   --color-modal-bg: #181818;
   --color-modal-text: #ffffff;
@@ -93,8 +98,8 @@
 
   --color-global-bg: #fafafa;
 
-  --color-header: #f0aaaa;
-  --color-footer: #f0aaaa;
+  --color-header: #ddaa22;
+  --color-footer: #ddaa22;
 
   --color-auth-form-bg: #ffffff;
   --color-tabs-bg: #ffffff;
@@ -106,7 +111,8 @@
 
   --color-text: #2b2b2b;
 
-  --color-link-active: #e8c547;
+  --color-link-active: #c6a325;
+  --color-footer-link-active: #ffec8b;
 
   --color-modal-bg: #ffffff;
   --color-modal-text: #2b2b2b;
@@ -118,7 +124,7 @@
   --color-burger-menu-bg: #ffffff;
   --color-burger-menu-text: #2b2b2b;
   --color-burger-menu-link-borders: #2b2b2b;
-  --color-burger-menu-link: #e8c547;
+  --color-burger-menu-link: #c6a325;
   --color-burger-menu-back-bg-rgb: 0, 0, 0;
 
   --sun-icon-img: url("@/assets/images/sun-black.png");

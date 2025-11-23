@@ -43,7 +43,7 @@
         transform: scale(1.1);
       }
       &:hover > .app-footer__git-link > .app-footer__git-text {
-        color: var(--color-link-active);
+        color: var(--color-footer-link-active);
       }
       .app-footer__git-link {
         display: flex;
