@@ -33,7 +33,7 @@ defineProps<Pick<IAllUsersListItem, "osuId" | "nick">>();
   text-decoration: none;
   cursor: pointer;
   &:hover {
-    filter: brightness(1.2);
+    filter: brightness(var(--user-card-hover-brightness));
   }
   &__avatar {
     width: 36px;
