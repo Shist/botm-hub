@@ -306,7 +306,7 @@ onMounted(async () => {
     }
   }
   &__skillset-title {
-    @include default-headline(24px, 24px, var(--color-text-white));
+    @include default-headline(22px, 22px, var(--color-text-white));
     text-align: center;
   }
   &__divier {
