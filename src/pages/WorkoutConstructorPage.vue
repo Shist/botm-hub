@@ -3,45 +3,47 @@
     <h2 class="workout-constructor-page__headline">
       Конструктор Тренировочной Сессии
     </h2>
-    <div class="workout-constructor-page__inputs-wrapper">
-      <SkillsetsSelect v-model="chosenCategories" />
-      <v-number-input
-        v-model="chosenStarRate"
-        :min="3"
-        :max="10"
-        :precision="2"
-        :step="0.01"
-        decimal-separator="."
-        variant="solo"
-        control-variant="stacked"
-        label="Сложность (★)"
-        placeholder="Укажи среднюю сложность карт (в звездах)"
-        clearable
-        hide-details
-      />
-      <v-number-input
-        v-model="chosenDuration"
-        :min="30"
-        :max="960"
-        variant="solo"
-        control-variant="stacked"
-        label="Длительность (мин.)"
-        placeholder="Укажи длительность тренировки (в минутах)"
-        clearable
-        hide-details
-      />
-      <v-number-input
-        v-model="chosenBreak"
-        :min="0"
-        :max="5"
-        variant="solo"
-        control-variant="stacked"
-        label="Перерыв (мин.)"
-        placeholder="Укажи время перерывов между картами (в минутах)"
-        clearable
-        hide-details
-      />
-    </div>
+    <v-skeleton-loader type="paragraph" :loading="isUserDataLoading">
+      <div class="workout-constructor-page__inputs-wrapper">
+        <SkillsetsSelect v-model="chosenCategories" />
+        <v-number-input
+          v-model="chosenStarRate"
+          :min="3"
+          :max="10"
+          :precision="2"
+          :step="0.01"
+          decimal-separator="."
+          variant="solo"
+          control-variant="stacked"
+          label="Сложность (★)"
+          placeholder="Укажи среднюю сложность карт (в звездах)"
+          clearable
+          hide-details
+        />
+        <v-number-input
+          v-model="chosenDuration"
+          :min="30"
+          :max="960"
+          variant="solo"
+          control-variant="stacked"
+          label="Длительность (мин.)"
+          placeholder="Укажи длительность тренировки (в минутах)"
+          clearable
+          hide-details
+        />
+        <v-number-input
+          v-model="chosenBreak"
+          :min="0"
+          :max="5"
+          variant="solo"
+          control-variant="stacked"
+          label="Перерыв (мин.)"
+          placeholder="Укажи время перерывов между картами (в минутах)"
+          clearable
+          hide-details
+        />
+      </div>
+    </v-skeleton-loader>
     <v-btn
       :disabled="!isInfoSpecified"
       :loading="isPreparingMaps"
@@ -89,8 +91,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 import { useMapsStore } from "@/stores/maps";
+import { useAuthStore } from "@/stores/auth";
 import SkillsetMapsTable from "@/components/SkillsetMapsTable.vue";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
@@ -98,6 +101,7 @@ import { LoadingState, OsuMapCategory, type IOsuMap } from "@/types";
 import { fromDurationToSeconds, fromTotalSecondsToLabel } from "@/utils";
 
 const mapsStore = useMapsStore();
+const authStore = useAuthStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
 
@@ -108,6 +112,21 @@ const chosenBreak = ref(2);
 const isPreparingMaps = ref(false);
 const suggestedMapsList = reactive<IOsuMap[]>([]);
 
+const isUserDataLoading = computed(
+  () => authStore.user?.additionalInfo === "loading"
+);
+const userMainCategories = computed(() => {
+  const user = authStore.user;
+  if (
+    !user ||
+    user.additionalInfo === "loading" ||
+    user.additionalInfo === "loadingError"
+  ) {
+    return [];
+  } else {
+    return user.additionalInfo.skillsets;
+  }
+});
 const isInfoSpecified = computed(
   () =>
     !!chosenCategories.value.length &&
@@ -129,6 +148,14 @@ const totalBreaksDurationLabel = computed(() => {
   const totalSeconds = 60 * chosenBreak.value * (suggestedMapsList.length - 1);
   return fromTotalSecondsToLabel(totalSeconds);
 });
+
+watch(
+  userMainCategories,
+  () => {
+    chosenCategories.value = userMainCategories.value;
+  },
+  { immediate: true }
+);
 
 const onConfirm = async () => {
   isPreparingMaps.value = true;
