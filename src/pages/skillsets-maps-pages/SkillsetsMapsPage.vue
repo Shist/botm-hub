@@ -39,11 +39,14 @@ import { MAPS_CATEGORIES } from "@/constants";
   }
   &__links-list {
     padding: 30px;
-    display: flex;
-    flex-direction: column;
-    row-gap: 20px;
-    li {
-      display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(7, 1fr);
+    gap: 20px;
+    @media (max-width: $tablet-l) {
+      padding: 15px;
+      grid-template-columns: repeat(1, 1fr);
+      grid-template-rows: repeat(21, 1fr);
     }
   }
   &__btn {
