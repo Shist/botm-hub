@@ -1,4 +1,4 @@
-export function getScrollbarWidth() {
+export function getScrollbarWidth(): number {
   const scrollDiv = document.createElement("div");
   scrollDiv.className = "scrollbar-measure";
   document.body.appendChild(scrollDiv);
@@ -18,7 +18,7 @@ export function fromDurationToSeconds(duration: string): number {
   return seconds;
 }
 
-export function fromTotalSecondsToLabel(totalSeconds: number) {
+export function fromTotalSecondsToLabel(totalSeconds: number): string {
   const hours = Math.floor(totalSeconds / 3600);
   const minutes = Math.floor((totalSeconds % 3600) / 60);
   const seconds = Math.floor((totalSeconds % 3600) % 60);
@@ -27,7 +27,7 @@ export function fromTotalSecondsToLabel(totalSeconds: number) {
     .join(":");
 }
 
-export function getLeftAmountLabel(amount: number) {
+export function getLeftAmountLabel(amount: number): string {
   if (amount === 0) return "Нет игроков";
   let ending = "ов";
   const lastDigit = amount % 10;
@@ -36,4 +36,35 @@ export function getLeftAmountLabel(amount: number) {
   const lastTwoDigits = amount % 100;
   if ([11, 12, 13, 14].includes(lastTwoDigits)) ending = "ов";
   return `${amount} игрок${ending}`;
+}
+
+export function getCurrentDateIso(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+export function getCurrentTimeIso(date: Date): string {
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${hours}:${minutes}`;
+}
+
+export function isFirstTimeBeforeSecond(t1: string, t2: string): boolean {
+  const [h1, min1] = t1.split(":").map(Number);
+  const [h2, min2] = t2.split(":").map(Number);
+
+  if (
+    h1 === undefined ||
+    h2 === undefined ||
+    min1 === undefined ||
+    min2 === undefined
+  )
+    return false;
+
+  if (h1 < h2) return true;
+  if (h1 > h2) return false;
+
+  return min1 < min2;
 }

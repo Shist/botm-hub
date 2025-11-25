@@ -6,14 +6,16 @@
     :isClosableByClickOutside="true"
     @closeModal="closePatchNotesModal"
   >
-    <div class="patch-notes-modal-wrapper">
-      <AppImage
-        :imgPath="newPatchImagePath"
-        imgAlt="Последние обновления"
-        class="patch-notes-modal-img"
-      />
-      <PatchNotes />
-    </div>
+    <template #default>
+      <div class="patch-notes-modal-wrapper">
+        <AppImage
+          :imgPath="newPatchImagePath"
+          imgAlt="Последние обновления"
+          class="patch-notes-modal-img"
+        />
+        <PatchNotes />
+      </div>
+    </template>
   </AppModal>
   <button class="burger-btn" @click="openMenu" />
   <Teleport defer to=".global-container">
@@ -178,6 +180,8 @@ const onLogOutBtnClicked = async () => {
 
 <style lang="scss" scoped>
 .patch-notes-modal-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }

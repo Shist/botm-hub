@@ -6,19 +6,21 @@
     :isClosableByClickOutside="false"
     @closeModal="closeNewPatchModal"
   >
-    <div class="new-patch-modal-wrapper">
-      <AppImage
-        :imgPath="newPatchImagePath"
-        imgAlt="Новый патч"
-        class="new-patch-modal-img"
-      />
-      <p class="new-patch-label">
-        Вышла новая версия веб-приложения BOTM Hub - 1.8.2! Вы можете взглянуть
-        на полный список изменений по кнопке `Последние обновления`, находящейся
-        в бургер-меню. Это окно больше не будет показываться, пока не выйдет
-        новый патч или пока вы не почистите кэш браузера.
-      </p>
-    </div>
+    <template #default>
+      <div class="new-patch-modal-wrapper">
+        <AppImage
+          :imgPath="newPatchImagePath"
+          imgAlt="Новый патч"
+          class="new-patch-modal-img"
+        />
+        <p class="new-patch-label">
+          Вышла новая версия веб-приложения BOTM Hub - 1.8.2! Вы можете
+          взглянуть на полный список изменений по кнопке `Последние обновления`,
+          находящейся в бургер-меню. Это окно больше не будет показываться, пока
+          не выйдет новый патч или пока вы не почистите кэш браузера.
+        </p>
+      </div>
+    </template>
   </AppModal>
   <div class="global-container" :class="{ 'light-theme': isLightTheme }">
     <TheHeader :style="{ paddingRight: scrollbarWidth }" />
@@ -78,6 +80,8 @@ onMounted(() => {
 
 <style lang="scss">
 .new-patch-modal-wrapper {
+  max-height: 420px;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }

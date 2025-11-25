@@ -80,7 +80,7 @@
               class="training-card__btn"
               @click="() => {}"
             >
-              Изменить тренировку
+              Изменить качалочку
             </v-btn>
             <v-btn
               :disabled="false"
@@ -89,7 +89,7 @@
               class="training-card__btn"
               @click="() => {}"
             >
-              Завершить тренировку
+              Завершить качалочку
             </v-btn>
           </div>
         </div>

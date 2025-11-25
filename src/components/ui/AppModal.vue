@@ -6,12 +6,12 @@
           <header>
             <h2 class="modal__title">{{ title }}</h2>
           </header>
-          <section class="modal__content">
-            <slot />
-          </section>
-          <button @click="close(true)" class="modal__ok-btn">
-            {{ closeBtnText }}
-          </button>
+          <slot />
+          <slot name="actions">
+            <button @click="close(true)" class="modal__ok-btn">
+              {{ closeBtnText ?? "Закрыть" }}
+            </button>
+          </slot>
         </dialog>
       </div>
     </Transition>
@@ -25,7 +25,7 @@ import { useScrollbarPaddingStore } from "@/stores/scrollbar-padding";
 const props = defineProps<{
   isOpened: boolean;
   title: string;
-  closeBtnText: string;
+  closeBtnText?: string;
   isClosableByClickOutside: boolean;
 }>();
 
@@ -45,10 +45,10 @@ watch(
   () => props.isOpened,
   (newValue) => {
     if (newValue) {
-      document.documentElement.style.overflow = "hidden";
+      document.documentElement.style.overflowY = "hidden";
       scrollbarPaddingStore.isPaddingNeeded = true;
     } else {
-      document.documentElement.style.overflow = "auto";
+      document.documentElement.style.overflowY = "scroll";
       scrollbarPaddingStore.isPaddingNeeded = false;
     }
   }
@@ -139,10 +139,6 @@ watch(
         font-size: 24px;
         line-height: 24px;
       }
-    }
-    .modal__content {
-      max-height: 420px;
-      overflow-y: auto;
     }
     .modal__ok-btn {
       @include default-btn(250px, var(--color-btn-text), var(--color-btn-bg));

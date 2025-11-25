@@ -12,8 +12,17 @@
           value="plans"
           class="trainings-page__tab-window-wrapper"
         >
+          <v-btn
+            v-if="true"
+            height="50"
+            :disabled="!userInfo"
+            class="trainings-page__btn"
+            @click="isPlanTrainingModalOpened = true"
+          >
+            Запланировать качалочку
+          </v-btn>
           <h4 v-if="false" class="trainings-page__empty-label">
-            Здесь пока пусто...
+            Пока нет качалочек в планах...
           </h4>
           <v-expansion-panels v-else>
             <TrainingCard v-for="i in 1" :key="i" />
@@ -24,7 +33,7 @@
           class="trainings-page__tab-window-wrapper"
         >
           <h4 v-if="true" class="trainings-page__empty-label">
-            Здесь пока пусто...
+            Пока нет записей в архиве...
           </h4>
           <v-expansion-panels v-else>
             <TrainingCard v-for="i in 1" :key="i" />
@@ -32,14 +41,34 @@
         </v-tabs-window-item>
       </v-tabs-window>
     </div>
+    <PlanTrainingModal
+      :isOpened="isPlanTrainingModalOpened"
+      @closeModal="isPlanTrainingModalOpened = false"
+    />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
 import TrainingCard from "@/components/TrainingCard.vue";
+import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
+
+const authStore = useAuthStore();
 
 const currTab = ref("plans");
+const isPlanTrainingModalOpened = ref(false);
+
+const userInfo = computed(() => {
+  if (
+    authStore.user?.additionalInfo === "loading" ||
+    authStore.user?.additionalInfo === "loadingError"
+  ) {
+    return null;
+  } else {
+    return authStore.user?.additionalInfo ?? null;
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -75,8 +104,23 @@ const currTab = ref("plans");
   }
   &__tab-window-wrapper {
     padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  &__btn {
+    @include default-btn(100%, var(--color-btn-text), var(--color-btn-bg), 0);
+    @media (max-width: $phone-l) {
+      font-size: 12px;
+      line-height: 12px;
+    }
+    @media (max-width: $phone-m) {
+      font-size: 10px;
+      line-height: 10px;
+    }
   }
   &__empty-label {
+    padding: 20px;
     @include default-text(24px, 24px, var(--color-text));
     text-align: center;
     @media (max-width: $tablet-l) {
