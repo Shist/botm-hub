@@ -3,6 +3,7 @@
     v-model="chosenCategories"
     :items="categoriesOptions"
     variant="solo"
+    prepend-inner-icon="mdi-star-cog"
     label="Скиллсеты"
     placeholder="Выбери скиллсет(ы)"
     multiple

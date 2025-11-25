@@ -4,8 +4,8 @@
       Конструктор Тренировочной Сессии
     </h2>
     <v-skeleton-loader type="paragraph" :loading="isUserDataLoading">
+      <SkillsetsSelect v-model="chosenCategories" />
       <div class="workout-constructor-page__inputs-wrapper">
-        <SkillsetsSelect v-model="chosenCategories" />
         <v-number-input
           v-model="chosenStarRate"
           :min="3"
@@ -14,6 +14,7 @@
           :step="0.01"
           decimal-separator="."
           variant="solo"
+          prepend-inner-icon="mdi-star"
           control-variant="stacked"
           label="Сложность (★)"
           placeholder="Укажи среднюю сложность карт (в звездах)"
@@ -25,6 +26,7 @@
           :min="30"
           :max="960"
           variant="solo"
+          prepend-inner-icon="mdi-timer"
           control-variant="stacked"
           label="Длительность (мин.)"
           placeholder="Укажи длительность тренировки (в минутах)"
@@ -36,6 +38,7 @@
           :min="0"
           :max="5"
           variant="solo"
+          prepend-inner-icon="mdi-coffee"
           control-variant="stacked"
           label="Перерыв (мин.)"
           placeholder="Укажи время перерывов между картами (в минутах)"
