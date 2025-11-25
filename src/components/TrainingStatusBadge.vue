@@ -26,7 +26,7 @@ const statusLabel = computed(() =>
   padding: 4px;
   display: flex;
   justify-content: center;
-  width: 110px;
+  width: 120px;
   border-radius: 10px;
   @media (max-width: $phone-l) {
     font-size: 12px;

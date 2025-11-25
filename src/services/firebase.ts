@@ -15,11 +15,13 @@ import {
   getDoc,
   updateDoc,
   arrayUnion,
+  Timestamp,
 } from "firebase/firestore/lite";
 import {
   type IUserAdditionalInfo,
   type OsuMapCategory,
   type IAllUsersListItem,
+  type IAllTrainingsFirebaseItem,
   type IOsuMap,
 } from "@/types";
 
@@ -39,6 +41,10 @@ function onFirebaseAuthStateChanged(
   initFoo: (user: IFirebaseUser | null) => void
 ) {
   onAuthStateChanged(auth, initFoo);
+}
+
+function convertFirestoreTimestampToDate(timestamp: Timestamp): Date {
+  return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
 }
 
 async function updateUserAdditionalInfoToFirebase(
@@ -163,6 +169,21 @@ async function loadAllUsersFromFirbase(): Promise<IAllUsersListItem[]> {
   return allUsers.sort((a, b) => a.nick.localeCompare(b.nick));
 }
 
+async function loadAllTrainingsFromFirbase(): Promise<
+  IAllTrainingsFirebaseItem[]
+> {
+  const db = getFirestore();
+
+  const allTrainingsDoc = doc(db, "trainings", "allTrainings");
+
+  const allTrainingsSnapshot = await getDoc(allTrainingsDoc);
+  const allTrainingsDocData = allTrainingsSnapshot.data();
+  const allTrainings =
+    allTrainingsDocData?.allTrainings as IAllTrainingsFirebaseItem[];
+
+  return allTrainings.sort((a, b) => a.dateTime.seconds - b.dateTime.seconds);
+}
+
 async function loadMapsByCategoryFromFirebase(
   category: OsuMapCategory
 ): Promise<IOsuMap[]> {
@@ -237,12 +258,14 @@ async function uploadMapsToFirebase(maps: Omit<IOsuMap, "link">[]) {
 
 export {
   onFirebaseAuthStateChanged,
+  convertFirestoreTimestampToDate,
   updateUserAdditionalInfoToFirebase,
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
   loadUserInfoFromFirbase,
   loadAllUsersFromFirbase,
+  loadAllTrainingsFromFirbase,
   loadMapsByCategoryFromFirebase,
   uploadMapsToFirebase,
 };

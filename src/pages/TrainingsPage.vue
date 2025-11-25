@@ -13,30 +13,59 @@
           class="trainings-page__tab-window-wrapper"
         >
           <v-btn
-            v-if="true"
+            :disabled="isLoading || !userInfo"
             height="50"
-            :disabled="!userInfo"
             class="trainings-page__btn"
             @click="isPlanTrainingModalOpened = true"
           >
             Запланировать качалочку
           </v-btn>
-          <h4 v-if="false" class="trainings-page__empty-label">
+          <template v-if="isLoading">
+            <v-skeleton-loader
+              v-for="i in 3"
+              :key="i"
+              type="paragraph"
+              :loading="isLoading"
+            />
+          </template>
+          <h4
+            v-if="!isLoading && !activeTrainingsList.length"
+            class="trainings-page__empty-label"
+          >
             Пока нет качалочек в планах...
           </h4>
           <v-expansion-panels v-else>
-            <TrainingCard v-for="i in 1" :key="i" />
+            <TrainingCard
+              v-for="training in activeTrainingsList"
+              :key="training.id"
+              :training="training"
+            />
           </v-expansion-panels>
         </v-tabs-window-item>
         <v-tabs-window-item
           value="archive"
           class="trainings-page__tab-window-wrapper"
         >
-          <h4 v-if="true" class="trainings-page__empty-label">
+          <template v-if="isLoading">
+            <v-skeleton-loader
+              v-for="i in 3"
+              :key="i"
+              type="paragraph"
+              :loading="isLoading"
+            />
+          </template>
+          <h4
+            v-if="!isLoading && !archivedTrainingsList.length"
+            class="trainings-page__empty-label"
+          >
             Пока нет записей в архиве...
           </h4>
           <v-expansion-panels v-else>
-            <TrainingCard v-for="i in 1" :key="i" />
+            <TrainingCard
+              v-for="training in archivedTrainingsList"
+              :key="training.id"
+              :training="training"
+            />
           </v-expansion-panels>
         </v-tabs-window-item>
       </v-tabs-window>
@@ -49,14 +78,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { useTrainingsStore } from "@/stores/trainings";
 import TrainingCard from "@/components/TrainingCard.vue";
 import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
+import useToast from "@/composables/useToast";
 
 const authStore = useAuthStore();
+const trainingsStore = useTrainingsStore();
+
+const { setErrorToast } = useToast();
 
 const currTab = ref("plans");
+const isLoading = ref(false);
 const isPlanTrainingModalOpened = ref(false);
 
 const userInfo = computed(() => {
@@ -67,6 +102,24 @@ const userInfo = computed(() => {
     return null;
   } else {
     return authStore.user?.additionalInfo ?? null;
+  }
+});
+const activeTrainingsList = computed(() => {
+  return trainingsStore.trainings.filter((t) => !t.isArchived);
+});
+const archivedTrainingsList = computed(() => {
+  return trainingsStore.trainings.filter((t) => t.isArchived);
+});
+
+onMounted(async () => {
+  try {
+    isLoading.value = true;
+    await trainingsStore.loadAllTrainings();
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось загрузить список качалочек: ${msg}`);
+  } finally {
+    isLoading.value = false;
   }
 });
 </script>

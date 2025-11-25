@@ -4,11 +4,18 @@
       <div class="training-card__panel-header-wrapper">
         <div class="training-card__titles-wrapper">
           <h3 class="training-card__training-name">
-            Самая лучшая качалочка в мире
+            {{ training.title }}
           </h3>
-          <h4 class="training-card__trainer">Тренер: {{ "Shist" }}</h4>
+          <h4 class="training-card__trainer">
+            Тренер: {{ training.trainerNick }}
+          </h4>
         </div>
-        <span class="training-card__time-label">00:32:17</span>
+        <div class="training-card__time-status-wrapper">
+          <span v-if="remainingTimeLabel" class="training-card__time-label">
+            {{ remainingTimeLabel }}
+          </span>
+          <TrainingStatusBadge :status="currentStatus" />
+        </div>
       </div>
     </template>
     <template #text>
@@ -18,62 +25,43 @@
           <div class="training-card__training-details-wrapper">
             <span>Скиллсеты:</span>
             <div class="training-card__categories-wrapper">
-              <CategoryBadge :category="OsuMapCategory.nm2" />
-              <CategoryBadge :category="OsuMapCategory.nm5" />
-              <CategoryBadge :category="OsuMapCategory.dt2" />
-              <CategoryBadge :category="OsuMapCategory.nm2" />
-              <CategoryBadge :category="OsuMapCategory.nm5" />
-              <CategoryBadge :category="OsuMapCategory.dt2" />
-              <CategoryBadge :category="OsuMapCategory.nm2" />
-              <CategoryBadge :category="OsuMapCategory.nm5" />
-              <CategoryBadge :category="OsuMapCategory.dt2" />
-              <CategoryBadge :category="OsuMapCategory.nm2" />
-              <CategoryBadge :category="OsuMapCategory.nm5" />
-              <CategoryBadge :category="OsuMapCategory.dt2" />
-              <CategoryBadge :category="OsuMapCategory.nm2" />
-              <CategoryBadge :category="OsuMapCategory.nm5" />
-              <CategoryBadge :category="OsuMapCategory.dt2" />
-              <CategoryBadge :category="OsuMapCategory.nm2" />
-              <CategoryBadge :category="OsuMapCategory.nm5" />
-              <CategoryBadge :category="OsuMapCategory.dt2" />
-              <CategoryBadge :category="OsuMapCategory.nm2" />
-              <CategoryBadge :category="OsuMapCategory.nm5" />
-              <CategoryBadge :category="OsuMapCategory.dt2" />
+              <CategoryBadge
+                v-for="skillset in training.skillsets"
+                :key="skillset"
+                :category="OsuMapCategory[skillset]"
+              />
             </div>
             <span>Дата начала:</span>
-            <span>{{ "20.12.2025, 19:00" }}</span>
+            <span>{{ dateTimeLabel }}</span>
             <span>Длительность:</span>
-            <span>2 ч 30 мин</span>
+            <span>{{ durationLabel }}</span>
             <span>Описание:</span>
             <p class="training-card__training-description">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis
-              qui voluptatem numquam neque modi debitis fugit, voluptatum
-              assumenda nostrum dignissimos, magnam veritatis quidem natus
-              commodi excepturi molestiae quo nam delectus placeat. Harum sint
-              corporis et amet atque doloremque consequuntur deleniti ipsam
-              neque quidem, tempora exercitationem eveniet ut ratione,
-              aspernatur officiis blanditiis id sunt pariatur minus vitae
-              veritatis numquam placeat praesentium! Saepe dolore inventore qui
-              numquam corporis aut hic porro cupiditate. Facilis exercitationem
-              aperiam repudiandae ea asperiores minima, aliquid illo tempore est
-              nam saepe eum aliquam temporibus quis quidem fuga natus recusandae
-              dolor cupiditate dolore ullam laudantium commodi! Cumque, minus
-              sit.
+              {{ training.description }}
             </p>
-            <span>Статус:</span>
-            <TrainingStatusBadge :status="TrainingStatus.waiting" />
-            <span v-if="true">MP-link:</span>
-            <div v-if="true">
+            <span v-if="training.isArchived">MP-link:</span>
+            <div v-if="training.isArchived">
               <a
-                href="https://osu.ppy.sh/community/matches/119894518"
+                :href="`https://osu.ppy.sh/community/matches/${training.mpLink}`"
                 target="_blank"
               >
-                119894518
+                {{ training.mpLink }}
               </a>
             </div>
           </div>
           <div class="training-card__btns-wrapper">
             <v-btn
+              v-if="isTrainingEditable"
+              :disabled="false"
+              :loading="false"
+              height="50"
+              class="training-card__btn training-card__btn_delete"
+              @click="() => {}"
+            >
+              Удалить качалочку
+            </v-btn>
+            <v-btn
+              v-if="isTrainingEditable"
               :disabled="false"
               :loading="false"
               height="50"
@@ -83,13 +71,14 @@
               Изменить качалочку
             </v-btn>
             <v-btn
+              v-if="isArchiveTrainingBtnVisible"
               :disabled="false"
               :loading="false"
               height="50"
-              class="training-card__btn"
+              class="training-card__btn training-card__btn_archive"
               @click="() => {}"
             >
-              Завершить качалочку
+              Заархивировать качалочку
             </v-btn>
           </div>
         </div>
@@ -101,27 +90,20 @@
           class="training-card__vertical-divider border-opacity-100"
         />
         <div class="training-card__players-info-wrapper">
-          <h4 class="training-card__players-title">Участники (16/16):</h4>
+          <h4 class="training-card__players-title">
+            {{ participantsTitle }}
+          </h4>
           <ul class="training-card__players-list">
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
-            <UserCard :osuId="'12772663'" :nick="'Shist'" />
+            <UserCard
+              v-for="participant in training.participants"
+              :key="participant.uid"
+              :osuId="participant.osuId"
+              :nick="participant.nick"
+            />
           </ul>
           <v-btn
-            :disabled="false"
+            v-if="isTrainingEditable"
+            :disabled="isSignUpBtnDisabled"
             :loading="false"
             height="50"
             class="training-card__btn"
@@ -136,10 +118,98 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useDate } from "vuetify";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
 import UserCard from "@/components/UserCard.vue";
-import { OsuMapCategory, TrainingStatus } from "@/types";
+import {
+  OsuMapCategory,
+  TrainingStatus,
+  type IAllTrainingsListItem,
+} from "@/types";
+import { fromMinsToDurationLabel, fromSecondsToDurationLabel } from "@/utils";
+
+const props = defineProps<{
+  training: IAllTrainingsListItem;
+}>();
+
+const vuetifyDate = useDate();
+
+const timeDiffSeconds = ref(0);
+const timeUpdateIntervalId = ref<number | null>(null);
+
+const currentStatus = computed(() => {
+  if (props.training.isArchived) {
+    return TrainingStatus.archived;
+  } else {
+    const totalDurationSec = props.training.durationMins * 60;
+    if (timeDiffSeconds.value > 0) {
+      return TrainingStatus.waiting;
+    } else if (timeDiffSeconds.value > -totalDurationSec) {
+      return TrainingStatus.inProgress;
+    } else {
+      return TrainingStatus.completed;
+    }
+  }
+});
+const dateTimeLabel = computed(() => {
+  const dateLabel = vuetifyDate.format(
+    props.training.dateTime,
+    "fullDateWithWeekday"
+  );
+  const timeLabel = vuetifyDate.format(props.training.dateTime, "fullTime24h");
+  return `${dateLabel}, ${timeLabel}`;
+});
+const totalDurationSecs = computed(() => {
+  return props.training.durationMins * 60;
+});
+const remainingTimeLabel = computed(() => {
+  switch (currentStatus.value) {
+    case TrainingStatus.waiting:
+      return fromSecondsToDurationLabel(timeDiffSeconds.value);
+    case TrainingStatus.inProgress:
+      return fromSecondsToDurationLabel(
+        totalDurationSecs.value + timeDiffSeconds.value
+      );
+    default:
+      return null;
+  }
+});
+const durationLabel = computed(() => {
+  return fromMinsToDurationLabel(props.training.durationMins);
+});
+const participantsTitle = computed(() => {
+  return `Участники (${props.training.participants.length}/16):`;
+});
+const isTrainingEditable = computed(() => {
+  return [TrainingStatus.waiting, TrainingStatus.inProgress].includes(
+    currentStatus.value
+  );
+});
+const isArchiveTrainingBtnVisible = computed(() => {
+  return currentStatus.value === TrainingStatus.completed;
+});
+const isSignUpBtnDisabled = computed(() => {
+  return props.training.participants.length >= 16;
+});
+
+onMounted(() => {
+  updateTimeLabel();
+  timeUpdateIntervalId.value = setInterval(updateTimeLabel, 1000);
+});
+
+onUnmounted(() => {
+  if (timeUpdateIntervalId.value) clearInterval(timeUpdateIntervalId.value);
+});
+
+const updateTimeLabel = () => {
+  timeDiffSeconds.value =
+    vuetifyDate.getDiff(props.training.dateTime, new Date()) / 1000;
+  if (timeDiffSeconds.value < -totalDurationSecs.value) {
+    if (timeUpdateIntervalId.value) clearInterval(timeUpdateIntervalId.value);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -183,8 +253,14 @@ import { OsuMapCategory, TrainingStatus } from "@/types";
       line-height: 16px;
     }
   }
-  &__time-label {
+  &__time-status-wrapper {
     margin-right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  &__time-label {
+    text-align: right;
     @include default-text(24px, 24px, var(--color-text));
     @media (max-width: $tablet-l) {
       margin-right: 10px;
@@ -192,6 +268,7 @@ import { OsuMapCategory, TrainingStatus } from "@/types";
       line-height: 20px;
     }
     @media (max-width: $phone-l) {
+      text-align: left;
       margin-right: 5px;
       font-size: 16px;
       line-height: 16px;
@@ -281,6 +358,12 @@ import { OsuMapCategory, TrainingStatus } from "@/types";
     @media (max-width: $phone-m) {
       font-size: 10px;
       line-height: 10px;
+    }
+    &_delete {
+      background-color: var(--color-training-deletion);
+    }
+    &_archive {
+      background-color: var(--color-training-archived);
     }
   }
   &__players-info-wrapper {

@@ -1,4 +1,5 @@
 import { type Ref } from "vue";
+import { Timestamp } from "firebase/firestore/lite";
 
 export enum LoadingState {
   NOT_LOADED,
@@ -105,4 +106,30 @@ export interface ISignUpStateRef {
 
 export interface IFirebaseError extends Error {
   code: string;
+}
+
+export interface IAllTrainingsFirebaseItem {
+  id: string;
+  title: string;
+  trainerUid: string;
+  skillsets: string;
+  dateTime: Timestamp;
+  durationMins: number;
+  description: string;
+  participantsUids: string;
+  mpLink: string | null;
+  isArchived: boolean;
+}
+
+export interface IAllTrainingsListItem {
+  id: string;
+  title: string;
+  trainerNick: string;
+  skillsets: OsuMapCategory[];
+  dateTime: Date;
+  durationMins: number;
+  description: string;
+  participants: IAllUsersListItem[];
+  mpLink: string | null;
+  isArchived: boolean;
 }

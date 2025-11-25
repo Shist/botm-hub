@@ -68,3 +68,23 @@ export function isFirstTimeBeforeSecond(t1: string, t2: string): boolean {
 
   return min1 < min2;
 }
+
+export function fromMinsToDurationLabel(mins: number) {
+  const resultArr: string[] = [];
+  const hours = Math.floor(mins / 60);
+  if (hours) resultArr.push(`${hours} ч`);
+  const minutes = mins % 60;
+  if (minutes) resultArr.push(`${minutes} мин`);
+  return resultArr.join(" ");
+}
+
+export function fromSecondsToDurationLabel(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = Math.floor((totalSeconds % 3600) % 60);
+  return [
+    `${hours.toString().padStart(2, "0")}`,
+    `${minutes.toString().padStart(2, "0")}`,
+    `${seconds.toString().padStart(2, "0")}`,
+  ].join(":");
+}
