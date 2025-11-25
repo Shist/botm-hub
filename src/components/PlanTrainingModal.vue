@@ -252,14 +252,20 @@ const isConfirmBtnDisabled = computed(() => {
     !trainingDescription.value
   );
 });
+const isSameDates = computed(() => {
+  if (!props.training) return false;
+  return (
+    vuetifyDate.format(props.training.dateTime, "keyboardDateTime") ===
+    vuetifyDate.format(trainingDateObject.value, "keyboardDateTime")
+  );
+});
 const isTrainingDataSame = computed(() => {
   if (!props.training) return false;
   return (
     props.training.title === trainingTitle.value &&
     JSON.stringify(props.training.skillsets) ===
       JSON.stringify(trainingCategories.value) &&
-    vuetifyDate.format(props.training.dateTime, "keyboardDateTime") ===
-      vuetifyDate.format(trainingDateObject.value, "keyboardDateTime") &&
+    isSameDates.value &&
     props.training.durationMins === trainingDuration.value &&
     props.training.description === trainingDescription.value
   );
@@ -278,7 +284,13 @@ watch(userInfo, (valueFromStore) => {
   trainingCategories.value = valueFromStore?.skillsets ?? [];
 });
 watch(trainingDate, (value) => {
-  if (!value || !minPossibleTimeIso.value || !trainingTime.value) return;
+  if (
+    props.training ||
+    !value ||
+    !minPossibleTimeIso.value ||
+    !trainingTime.value
+  )
+    return;
   if (
     vuetifyDate.isSameDay(trainingDate.value, currDate.value) &&
     isFirstTimeBeforeSecond(trainingTime.value, minPossibleTimeIso.value)
@@ -295,6 +307,7 @@ onMounted(() => {
   timeUpdateIntervalId.value = setInterval(() => {
     currDate.value = new Date();
     if (
+      !isSameDates.value &&
       trainingDateObject.value &&
       vuetifyDate.isBefore(trainingDateObject.value, minPossibleDateTime.value)
     ) {
