@@ -170,7 +170,7 @@ import {
 
 const props = defineProps<{
   isOpened: boolean;
-  training?: IAllTrainingsListItem;
+  training: IAllTrainingsListItem | null;
 }>();
 
 const emit = defineEmits<{

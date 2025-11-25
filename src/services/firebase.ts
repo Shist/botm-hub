@@ -223,6 +223,33 @@ async function updateTrainingToFirebase(
   });
 }
 
+async function deleteTrainingFromFirebase(trainingId: string) {
+  const db = getFirestore();
+  await runTransaction(db, async (transaction) => {
+    const allTrainingsDocRef = doc(db, "trainings", "allTrainings");
+
+    const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
+    const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
+      (allTrainingsDoc.data()?.allTrainings ??
+        []) as IAllTrainingsFirebaseIncomingItem[]
+    ).map((t) => ({
+      ...t,
+      dateTime: t.dateTime.toDate(),
+    }));
+
+    const existingTrainingIndex = allTrainings.findIndex(
+      (t) => t.id === trainingId
+    );
+    if (existingTrainingIndex === -1) {
+      throw new Error(`Качалочка с id = ${trainingId} не найдена в базе!`);
+    } else {
+      allTrainings.splice(existingTrainingIndex, 1);
+    }
+
+    transaction.update(allTrainingsDocRef, { allTrainings });
+  });
+}
+
 async function loadMapsByCategoryFromFirebase(
   category: OsuMapCategory
 ): Promise<IOsuMap[]> {
@@ -306,6 +333,7 @@ export {
   loadAllTrainingsFromFirebase,
   uploadTrainingToFirebase,
   updateTrainingToFirebase,
+  deleteTrainingFromFirebase,
   loadMapsByCategoryFromFirebase,
   uploadMapsToFirebase,
 };

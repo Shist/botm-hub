@@ -39,6 +39,8 @@
               v-for="training in activeTrainingsList"
               :key="training.id"
               :training="training"
+              @onEditTraining="onEditTraining"
+              @onDeleteTraining="onDeleteTraining"
             />
           </v-expansion-panels>
         </v-tabs-window-item>
@@ -72,7 +74,13 @@
     </div>
     <PlanTrainingModal
       :isOpened="isPlanTrainingModalOpened"
-      @closeModal="isPlanTrainingModalOpened = false"
+      :training="selectedTrainingForEditing"
+      @closeModal="onClosePlanTrainingModal"
+    />
+    <DeleteTrainingModal
+      :isOpened="isDeleteTrainingModalOpened"
+      :trainingId="selectedTrainingIdForDeleting"
+      @closeModal="onCLoseDeleteTrainingModal"
     />
   </div>
 </template>
@@ -83,7 +91,9 @@ import { useAuthStore } from "@/stores/auth";
 import { useTrainingsStore } from "@/stores/trainings";
 import TrainingCard from "@/components/TrainingCard.vue";
 import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
+import DeleteTrainingModal from "@/components/DeleteTrainingModal.vue";
 import useToast from "@/composables/useToast";
+import { type IAllTrainingsListItem } from "@/types";
 
 const authStore = useAuthStore();
 const trainingsStore = useTrainingsStore();
@@ -92,7 +102,10 @@ const { setErrorToast } = useToast();
 
 const currTab = ref("plans");
 const isLoading = ref(false);
+const selectedTrainingForEditing = ref<IAllTrainingsListItem | null>(null);
+const selectedTrainingIdForDeleting = ref<string>("");
 const isPlanTrainingModalOpened = ref(false);
+const isDeleteTrainingModalOpened = ref(false);
 
 const userInfo = computed(() => {
   if (
@@ -122,6 +135,23 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+const onEditTraining = (training: IAllTrainingsListItem) => {
+  selectedTrainingForEditing.value = training;
+  isPlanTrainingModalOpened.value = true;
+};
+const onDeleteTraining = (trainingId: string) => {
+  selectedTrainingIdForDeleting.value = trainingId;
+  isDeleteTrainingModalOpened.value = true;
+};
+const onClosePlanTrainingModal = () => {
+  isPlanTrainingModalOpened.value = false;
+  selectedTrainingForEditing.value = null;
+};
+const onCLoseDeleteTrainingModal = () => {
+  isDeleteTrainingModalOpened.value = false;
+  selectedTrainingIdForDeleting.value = "";
+};
 </script>
 
 <style lang="scss" scoped>

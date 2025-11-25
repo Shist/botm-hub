@@ -4,6 +4,7 @@ import {
   loadAllTrainingsFromFirebase,
   uploadTrainingToFirebase,
   updateTrainingToFirebase,
+  deleteTrainingFromFirebase,
 } from "@/services/firebase";
 import {
   OsuMapCategory,
@@ -78,11 +79,21 @@ export const useTrainingsStore = defineStore("trainings", () => {
     }
   };
 
+  const deleteTraining = async (trainingId: string) => {
+    try {
+      await deleteTrainingFromFirebase(trainingId);
+      await loadAllTrainings();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     trainings,
     getAllTrainings,
     loadAllTrainings,
     uploadTraining,
     updateTraining,
+    deleteTraining,
   };
 });

@@ -61,7 +61,7 @@
                     :disabled="isOtherTrainer"
                     height="50"
                     class="training-card__btn training-card__btn_delete"
-                    @click="() => {}"
+                    @click="$emit('onDeleteTraining', training.id)"
                   >
                     Удалить качалочку
                   </v-btn>
@@ -80,7 +80,7 @@
                     :disabled="isOtherTrainer"
                     height="50"
                     class="training-card__btn"
-                    @click="isEditTrainingModalOpened = true"
+                    @click="$emit('onEditTraining', training)"
                   >
                     Изменить качалочку
                   </v-btn>
@@ -131,11 +131,6 @@
         </div>
       </div>
     </template>
-    <PlanTrainingModal
-      :isOpened="isEditTrainingModalOpened"
-      :training="training"
-      @closeModal="isEditTrainingModalOpened = false"
-    />
   </v-expansion-panel>
 </template>
 
@@ -145,7 +140,6 @@ import { useDate } from "vuetify";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
 import UserCard from "@/components/UserCard.vue";
-import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import {
@@ -159,13 +153,17 @@ const props = defineProps<{
   training: IAllTrainingsListItem;
 }>();
 
+defineEmits<{
+  onEditTraining: [training: IAllTrainingsListItem];
+  onDeleteTraining: [trainingId: string];
+}>();
+
 const vuetifyDate = useDate();
 const authStore = useAuthStore();
 const usersStore = useUsersStore();
 
 const timeDiffSeconds = ref(0);
 const timeUpdateIntervalId = ref<number | null>(null);
-const isEditTrainingModalOpened = ref(false);
 
 const isOtherTrainer = computed(() => {
   const currUserUid = authStore.user?.uid ?? null;
