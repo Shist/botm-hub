@@ -20,7 +20,7 @@
         hide-details
         class="skillset-maps-table__content"
       >
-        <template v-slot:[`item.id`]="{ item }">
+        <template #[`item.id`]="{ item }">
           <span
             class="skillset-maps-table__id-label"
             @click="copyToClipboard(item.id)"
@@ -28,10 +28,10 @@
             {{ item.id }}
           </span>
         </template>
-        <template v-slot:[`item.link`]="{ item }">
+        <template #[`item.link`]="{ item }">
           <a :href="item.link" target="_blank">{{ item.link }}</a>
         </template>
-        <template v-slot:[`item.category`]="{ item }">
+        <template #[`item.category`]="{ item }">
           <CategoryBadge
             :category="item.category"
             class="skillset-maps-table__badge"

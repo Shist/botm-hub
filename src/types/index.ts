@@ -106,6 +106,7 @@ export interface IFirebaseError extends Error {
 export interface IAllTrainingsItemBase {
   id: string;
   title: string;
+  trainerUid: string;
   durationMins: number;
   description: string;
   mpLink: string | null;
@@ -113,7 +114,6 @@ export interface IAllTrainingsItemBase {
 }
 
 export interface IAllTrainingsFirebaseItemBase extends IAllTrainingsItemBase {
-  trainerUid: string;
   skillsets: string;
   participantsUids: string;
 }
@@ -129,7 +129,6 @@ export interface IAllTrainingsFirebaseOutgoingItem
 }
 
 export interface IAllTrainingsListItem extends IAllTrainingsItemBase {
-  trainerNick: string;
   skillsets: OsuMapCategory[];
   dateTime: Date;
   participants: IAllUsersListItem[];

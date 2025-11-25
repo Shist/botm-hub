@@ -7,7 +7,7 @@
         text="Для подгрузки аватара требуется osu! ID"
         location="top"
       >
-        <template v-slot:activator="{ props }">
+        <template #activator="{ props }">
           <AppImage
             v-bind="props"
             :imgPath="avatarSrc"

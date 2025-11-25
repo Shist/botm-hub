@@ -25,7 +25,7 @@
               :text="getLeftAmountLabel(usersList.length)"
               location="top"
             >
-              <template v-slot:activator="{ props }">
+              <template #activator="{ props }">
                 <div
                   v-bind="props"
                   class="skillsets-cards-grid__skillset-wrapper"
@@ -82,7 +82,7 @@
               :text="getLeftAmountLabel(usersList.length)"
               location="top"
             >
-              <template v-slot:activator="{ props }">
+              <template #activator="{ props }">
                 <div
                   v-bind="props"
                   class="skillsets-cards-grid__skillset-wrapper"

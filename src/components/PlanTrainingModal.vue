@@ -1,7 +1,7 @@
 <template>
   <AppModal
     :isOpened="isOpened"
-    title="🎯 Запланировать качалочку 🎯"
+    :title="modalTitle"
     :isClosableByClickOutside="false"
     @closeModal="$emit('closeModal')"
   >
@@ -135,13 +135,13 @@
           Отмена
         </v-btn>
         <v-btn
-          :disabled="isPlanBtnDisabled"
+          :disabled="isConfirmBtnDisabled || isTrainingDataSame"
           :loading="isLoading"
           height="50"
           class="plan-training-modal__btn"
-          @click="onPlanTraining"
+          @click="onConfirmTraining"
         >
-          Запланировать
+          {{ confirmBtnLabel }}
         </v-btn>
       </div>
     </template>
@@ -159,6 +159,7 @@ import { useTrainingsStore } from "@/stores/trainings";
 import { MAPS_CATEGORIES } from "@/constants";
 import {
   OsuMapCategory,
+  type IAllTrainingsListItem,
   type IAllTrainingsFirebaseOutgoingItem,
 } from "@/types";
 import {
@@ -169,6 +170,7 @@ import {
 
 const props = defineProps<{
   isOpened: boolean;
+  training?: IAllTrainingsListItem;
 }>();
 
 const emit = defineEmits<{
@@ -180,7 +182,7 @@ const authStore = useAuthStore();
 const usersStore = useUsersStore();
 const trainingsStore = useTrainingsStore();
 
-const { setErrorToast,setSuccessToast } = useToast();
+const { setErrorToast, setSuccessToast } = useToast();
 
 const trainingTitle = ref("");
 const trainingCategories = ref<OsuMapCategory[]>([]);
@@ -194,6 +196,12 @@ const currDate = ref(new Date());
 const timeUpdateIntervalId = ref<number | null>(null);
 const isLoading = ref(false);
 
+const modalTitle = computed(
+  () => `🎯 ${props.training ? "Изменить" : "Запланировать"} качалочку 🎯`
+);
+const confirmBtnLabel = computed(() =>
+  props.training ? "Изменить" : "Запланировать"
+);
 const userInfo = computed(() => {
   if (
     authStore.user?.additionalInfo === "loading" ||
@@ -234,7 +242,7 @@ const minPossibleTimeIso = computed(() => {
     return undefined;
   }
 });
-const isPlanBtnDisabled = computed(() => {
+const isConfirmBtnDisabled = computed(() => {
   return (
     !trainingTitle.value ||
     !trainingCategories.value.length ||
@@ -242,6 +250,18 @@ const isPlanBtnDisabled = computed(() => {
     !trainingTime.value ||
     !trainingDuration.value ||
     !trainingDescription.value
+  );
+});
+const isTrainingDataSame = computed(() => {
+  if (!props.training) return false;
+  return (
+    props.training.title === trainingTitle.value &&
+    JSON.stringify(props.training.skillsets) ===
+      JSON.stringify(trainingCategories.value) &&
+    vuetifyDate.format(props.training.dateTime, "keyboardDateTime") ===
+      vuetifyDate.format(trainingDateObject.value, "keyboardDateTime") &&
+    props.training.durationMins === trainingDuration.value &&
+    props.training.description === trainingDescription.value
   );
 });
 
@@ -252,6 +272,7 @@ watch(
   }
 );
 watch(userInfo, (valueFromStore) => {
+  if (props.training) return;
   const nick = valueFromStore?.nick;
   if (nick) trainingTitle.value = `Качалочка от ${nick}`;
   trainingCategories.value = valueFromStore?.skillsets ?? [];
@@ -266,12 +287,11 @@ watch(trainingDate, (value) => {
   }
 });
 watch(skillsetsDescription, (value) => {
+  if (props.training) return;
   trainingDescription.value = value ? `Тренировка скиллсетов: ${value}` : "";
 });
 
 onMounted(() => {
-  initValues();
-
   timeUpdateIntervalId.value = setInterval(() => {
     currDate.value = new Date();
     if (
@@ -293,16 +313,25 @@ onUnmounted(() => {
 });
 
 const initValues = () => {
-  const nick = userInfo.value?.nick;
-  if (nick) trainingTitle.value = `Качалочка от ${nick}`;
-  trainingCategories.value = userInfo.value?.skillsets ?? [];
-  trainingDate.value =
-    minPossibleDateTime.value.getHours() < 21
-      ? currDate.value
-      : (vuetifyDate.addDays(currDate.value, 1) as Date);
-  trainingTime.value = "21:00";
-  trainingDuration.value = 120;
-  trainingDescription.value = `Тренировка скиллсетов: ${skillsetsDescription.value}`;
+  if (props.training) {
+    trainingTitle.value = props.training.title;
+    trainingCategories.value = props.training.skillsets;
+    trainingDate.value = props.training.dateTime;
+    trainingTime.value = getCurrentTimeIso(props.training.dateTime);
+    trainingDuration.value = props.training.durationMins;
+    trainingDescription.value = props.training.description;
+  } else {
+    const nick = userInfo.value?.nick;
+    if (nick) trainingTitle.value = `Качалочка от ${nick}`;
+    trainingCategories.value = userInfo.value?.skillsets ?? [];
+    trainingDate.value =
+      minPossibleDateTime.value.getHours() < 21
+        ? currDate.value
+        : (vuetifyDate.addDays(currDate.value, 1) as Date);
+    trainingTime.value = "21:00";
+    trainingDuration.value = 120;
+    trainingDescription.value = `Тренировка скиллсетов: ${skillsetsDescription.value}`;
+  }
 };
 
 const onDateClear = () => {
@@ -315,7 +344,7 @@ const onTimeClear = () => {
   isTimeMenuOpened.value = false;
 };
 
-const onPlanTraining = async () => {
+const uploadTraining = async () => {
   if (!authStore.user || !trainingDateObject.value) return;
 
   try {
@@ -345,6 +374,46 @@ const onPlanTraining = async () => {
     setErrorToast(`Не удалось запланировать качалочку: ${msg}`);
   } finally {
     isLoading.value = false;
+  }
+};
+
+const updateTraining = async () => {
+  if (!props.training || !authStore.user || !trainingDateObject.value) return;
+
+  try {
+    isLoading.value = true;
+
+    const training: IAllTrainingsFirebaseOutgoingItem = {
+      id: props.training.id,
+      title: trainingTitle.value,
+      trainerUid: props.training.trainerUid,
+      skillsets: JSON.stringify(trainingCategories.value),
+      dateTime: trainingDateObject.value,
+      durationMins: trainingDuration.value,
+      description: trainingDescription.value,
+      participantsUids: JSON.stringify(
+        props.training.participants.map((p) => p.uid)
+      ),
+      mpLink: null,
+      isArchived: false,
+    };
+
+    await trainingsStore.updateTraining(training);
+    setSuccessToast("🥳🥳🥳 Качалочка успешно изменена!!! 🥳🥳🥳");
+    emit("closeModal");
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось изменить качалочку: ${msg}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const onConfirmTraining = async () => {
+  if (props.training) {
+    await updateTraining();
+  } else {
+    await uploadTraining();
   }
 };
 </script>

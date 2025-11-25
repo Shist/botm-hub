@@ -6,9 +6,7 @@
           <h3 class="training-card__training-name">
             {{ training.title }}
           </h3>
-          <h4 class="training-card__trainer">
-            Тренер: {{ training.trainerNick }}
-          </h4>
+          <h4 class="training-card__trainer">Тренер: {{ trainerNick }}</h4>
         </div>
         <div class="training-card__time-status-wrapper">
           <span v-if="remainingTimeLabel" class="training-card__time-label">
@@ -50,26 +48,45 @@
             </div>
           </div>
           <div class="training-card__btns-wrapper">
-            <v-btn
+            <v-tooltip
               v-if="isTrainingEditable"
-              :disabled="false"
-              :loading="false"
-              height="50"
-              class="training-card__btn training-card__btn_delete"
-              @click="() => {}"
+              :disabled="!isOtherTrainer"
+              text="Нельзя удалять качалочки других тренеров!"
+              location="top"
             >
-              Удалить качалочку
-            </v-btn>
-            <v-btn
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    v-bind="props"
+                    :disabled="isOtherTrainer"
+                    height="50"
+                    class="training-card__btn training-card__btn_delete"
+                    @click="() => {}"
+                  >
+                    Удалить качалочку
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
+            <v-tooltip
               v-if="isTrainingEditable"
-              :disabled="false"
-              :loading="false"
-              height="50"
-              class="training-card__btn"
-              @click="() => {}"
+              :disabled="!isOtherTrainer"
+              text="Нельзя изменять качалочки других тренеров!"
+              location="top"
             >
-              Изменить качалочку
-            </v-btn>
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    :disabled="isOtherTrainer"
+                    height="50"
+                    class="training-card__btn"
+                    @click="isEditTrainingModalOpened = true"
+                  >
+                    Изменить качалочку
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
             <v-btn
               v-if="isArchiveTrainingBtnVisible"
               :disabled="false"
@@ -114,6 +131,11 @@
         </div>
       </div>
     </template>
+    <PlanTrainingModal
+      :isOpened="isEditTrainingModalOpened"
+      :training="training"
+      @closeModal="isEditTrainingModalOpened = false"
+    />
   </v-expansion-panel>
 </template>
 
@@ -123,6 +145,9 @@ import { useDate } from "vuetify";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
 import UserCard from "@/components/UserCard.vue";
+import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useUsersStore } from "@/stores/users";
 import {
   OsuMapCategory,
   TrainingStatus,
@@ -135,10 +160,17 @@ const props = defineProps<{
 }>();
 
 const vuetifyDate = useDate();
+const authStore = useAuthStore();
+const usersStore = useUsersStore();
 
 const timeDiffSeconds = ref(0);
 const timeUpdateIntervalId = ref<number | null>(null);
+const isEditTrainingModalOpened = ref(false);
 
+const isOtherTrainer = computed(() => {
+  const currUserUid = authStore.user?.uid ?? null;
+  return currUserUid !== props.training.trainerUid;
+});
 const currentStatus = computed(() => {
   if (props.training.isArchived) {
     return TrainingStatus.archived;
@@ -152,6 +184,12 @@ const currentStatus = computed(() => {
       return TrainingStatus.completed;
     }
   }
+});
+const trainerNick = computed(() => {
+  return (
+    usersStore.users.find((u) => u.uid === props.training.trainerUid)?.nick ??
+    ""
+  );
 });
 const dateTimeLabel = computed(() => {
   const dateLabel = vuetifyDate.format(
@@ -195,6 +233,8 @@ const isSignUpBtnDisabled = computed(() => {
 });
 
 onMounted(() => {
+  usersStore.getAllUsers();
+
   updateTimeLabel();
   timeUpdateIntervalId.value = setInterval(updateTimeLabel, 1000);
 });
@@ -361,9 +401,15 @@ const updateTimeLabel = () => {
     }
     &_delete {
       background-color: var(--color-training-deletion);
+      &:disabled {
+        background-color: var(--color-training-deletion);
+      }
     }
     &_archive {
       background-color: var(--color-training-archived);
+      &:disabled {
+        background-color: var(--color-training-archived);
+      }
     }
   }
   &__players-info-wrapper {

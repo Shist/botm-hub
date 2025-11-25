@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 import {
   loadAllTrainingsFromFirebase,
   uploadTrainingToFirebase,
+  updateTrainingToFirebase,
 } from "@/services/firebase";
 import {
   OsuMapCategory,
@@ -34,8 +35,7 @@ export const useTrainingsStore = defineStore("trainings", () => {
           return {
             id: training.id,
             title: training.title,
-            trainerNick:
-              allUsers.find((u) => u.uid === training.trainerUid)?.nick ?? "",
+            trainerUid: training.trainerUid,
             skillsets: JSON.parse(training.skillsets) as OsuMapCategory[],
             dateTime: training.dateTime.toDate(),
             durationMins: training.durationMins,
@@ -67,10 +67,22 @@ export const useTrainingsStore = defineStore("trainings", () => {
     }
   };
 
+  const updateTraining = async (
+    training: IAllTrainingsFirebaseOutgoingItem
+  ) => {
+    try {
+      await updateTrainingToFirebase(training);
+      await loadAllTrainings();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     trainings,
     getAllTrainings,
     loadAllTrainings,
     uploadTraining,
+    updateTraining,
   };
 });
