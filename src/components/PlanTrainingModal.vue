@@ -105,9 +105,20 @@
           :min="30"
           :max="960"
           variant="solo"
+          prepend-inner-icon="mdi-timer"
           control-variant="stacked"
           label="Длительность (мин.)"
           placeholder="Укажи длительность качалочки (в минутах)"
+          clearable
+          hide-details
+        />
+        <v-textarea
+          v-model="trainingDescription"
+          variant="solo"
+          prepend-inner-icon="mdi-text"
+          label="Описание"
+          placeholder="Введи описание качалочки"
+          no-resize
           clearable
           hide-details
         />
@@ -122,7 +133,12 @@
         >
           Отмена
         </v-btn>
-        <v-btn height="50" class="plan-training-modal__btn" @click="() => {}">
+        <v-btn
+          :disabled="isPlanBtnDisabled"
+          height="50"
+          class="plan-training-modal__btn"
+          @click="() => {}"
+        >
           Запланировать
         </v-btn>
       </div>
@@ -135,6 +151,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import { useDate } from "vuetify";
 import { useAuthStore } from "@/stores/auth";
+import { MAPS_CATEGORIES } from "@/constants";
 import { OsuMapCategory } from "@/types";
 import {
   getCurrentDateIso,
@@ -160,7 +177,7 @@ const isDateMenuOpened = ref(false);
 const trainingTime = ref<string | null>(null);
 const isTimeMenuOpened = ref(false);
 const trainingDuration = ref(120);
-
+const trainingDescription = ref("");
 const currDate = ref(new Date());
 const timeUpdateIntervalId = ref<number | null>(null);
 
@@ -174,7 +191,11 @@ const userInfo = computed(() => {
     return authStore.user?.additionalInfo ?? null;
   }
 });
-
+const skillsetsDescription = computed(() => {
+  return trainingCategories.value
+    .map((category) => MAPS_CATEGORIES[category])
+    .join(", ");
+});
 const trainingDateObject = computed(() => {
   if (!trainingDate.value || !trainingTime.value) return null;
   let dateObject = vuetifyDate.date(trainingDate.value);
@@ -200,6 +221,16 @@ const minPossibleTimeIso = computed(() => {
     return undefined;
   }
 });
+const isPlanBtnDisabled = computed(() => {
+  return (
+    !trainingTitle.value ||
+    !trainingCategories.value.length ||
+    !trainingDate.value ||
+    !trainingTime.value ||
+    !trainingDuration.value ||
+    !trainingDescription.value
+  );
+});
 
 watch(
   () => props.isOpened,
@@ -220,6 +251,9 @@ watch(trainingDate, (value) => {
   ) {
     trainingTime.value = minPossibleTimeIso.value;
   }
+});
+watch(skillsetsDescription, (value) => {
+  trainingDescription.value = value ? `Тренировка скиллсетов: ${value}` : "";
 });
 
 onMounted(() => {
@@ -255,6 +289,7 @@ const initValues = () => {
       : (vuetifyDate.addDays(currDate.value, 1) as Date);
   trainingTime.value = "21:00";
   trainingDuration.value = 120;
+  trainingDescription.value = `Тренировка скиллсетов: ${skillsetsDescription.value}`;
 };
 
 const onDateClear = () => {

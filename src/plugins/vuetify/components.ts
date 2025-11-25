@@ -1,6 +1,7 @@
 import {
   VBtn,
   VTextField,
+  VTextarea,
   VNumberInput,
   VSelect,
   VDatePicker,
@@ -21,6 +22,7 @@ import {
 export default {
   VBtn,
   VTextField,
+  VTextarea,
   VNumberInput,
   VSelect,
   VDatePicker,
