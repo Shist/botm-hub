@@ -45,35 +45,30 @@ export enum TrainingStatus {
   archived = "archived",
 }
 
-export interface IUserAdditionalInfo {
+export interface IUserAdditionalInfoBase {
+  email: string;
   osuId: string | null;
   nick: string;
-  email: string;
   digitCategory: DigitCategory | null;
+}
+
+export interface IUserLocalAdditionalInfo extends IUserAdditionalInfoBase {
+  skillsets: OsuMapCategory[];
+}
+
+export interface IUserFirebaseAdditionalInfo extends IUserAdditionalInfoBase {
   skillsets: string;
 }
 
 export interface IUser {
   uid: string;
   email: string;
-  additionalInfo:
-    | {
-        osuId: string | null;
-        nick: string;
-        email: string;
-        digitCategory: DigitCategory | null;
-        skillsets: OsuMapCategory[];
-      }
-    | "loading"
-    | "loadingError";
+  additionalInfo: IUserLocalAdditionalInfo | "loading" | "loadingError";
 }
 
-export interface IAllUsersListItem {
+export interface IAllUsersListItem
+  extends Omit<IUserFirebaseAdditionalInfo, "email"> {
   uid: string;
-  osuId: string | null;
-  nick: string;
-  digitCategory: DigitCategory | null;
-  skillsets: string;
 }
 
 export interface IOsuMap {
@@ -108,28 +103,34 @@ export interface IFirebaseError extends Error {
   code: string;
 }
 
-export interface IAllTrainingsFirebaseItem {
+export interface IAllTrainingsItemBase {
   id: string;
   title: string;
-  trainerUid: string;
-  skillsets: string;
-  dateTime: Timestamp;
   durationMins: number;
   description: string;
-  participantsUids: string;
   mpLink: string | null;
   isArchived: boolean;
 }
 
-export interface IAllTrainingsListItem {
-  id: string;
-  title: string;
+export interface IAllTrainingsFirebaseItemBase extends IAllTrainingsItemBase {
+  trainerUid: string;
+  skillsets: string;
+  participantsUids: string;
+}
+
+export interface IAllTrainingsFirebaseIncomingItem
+  extends IAllTrainingsFirebaseItemBase {
+  dateTime: Timestamp;
+}
+
+export interface IAllTrainingsFirebaseOutgoingItem
+  extends IAllTrainingsFirebaseItemBase {
+  dateTime: Date;
+}
+
+export interface IAllTrainingsListItem extends IAllTrainingsItemBase {
   trainerNick: string;
   skillsets: OsuMapCategory[];
   dateTime: Date;
-  durationMins: number;
-  description: string;
   participants: IAllUsersListItem[];
-  mpLink: string | null;
-  isArchived: boolean;
 }

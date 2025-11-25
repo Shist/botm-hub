@@ -7,7 +7,7 @@ import {
   signOutUserFromFirebase,
   loadUserInfoFromFirbase,
 } from "@/services/firebase";
-import { type IUser, type IUserAdditionalInfo } from "@/types";
+import { type IUser, type IUserFirebaseAdditionalInfo } from "@/types";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<IUser | null>(null);
@@ -26,7 +26,7 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const setAdditionalUserInfo = (
-    additionalInfoFields: IUserAdditionalInfo | "loadingError"
+    additionalInfoFields: IUserFirebaseAdditionalInfo | "loadingError"
   ) => {
     if (!user.value) return;
 
@@ -43,9 +43,9 @@ export const useAuthStore = defineStore("auth", () => {
   const signUpUser = async (
     email: string,
     password: string,
-    partialInfo: Pick<IUserAdditionalInfo, "nick" | "email">
+    partialInfo: Pick<IUserFirebaseAdditionalInfo, "nick" | "email">
   ) => {
-    const fullAdditionalInfo: IUserAdditionalInfo = {
+    const fullAdditionalInfo: IUserFirebaseAdditionalInfo = {
       ...partialInfo,
       osuId: null,
       digitCategory: null,
@@ -82,7 +82,7 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const updateUserAdditionalInfo = async (
-    additionalInfo: Omit<IUserAdditionalInfo, "email">
+    additionalInfo: Omit<IUserFirebaseAdditionalInfo, "email">
   ) => {
     if (!user.value) return;
     const newUserInfo = { email: user.value.email, ...additionalInfo };

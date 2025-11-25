@@ -1,9 +1,6 @@
 import { reactive } from "vue";
 import { defineStore } from "pinia";
-import {
-  convertFirestoreTimestampToDate,
-  loadAllTrainingsFromFirbase,
-} from "@/services/firebase";
+import { loadAllTrainingsFromFirbase } from "@/services/firebase";
 import { OsuMapCategory, type IAllTrainingsListItem } from "@/types";
 import { useUsersStore } from "@/stores/users";
 
@@ -30,7 +27,7 @@ export const useTrainingsStore = defineStore("trainings", () => {
             trainerNick:
               allUsers.find((u) => u.uid === training.trainerUid)?.nick ?? "",
             skillsets: JSON.parse(training.skillsets) as OsuMapCategory[],
-            dateTime: convertFirestoreTimestampToDate(training.dateTime),
+            dateTime: training.dateTime.toDate(),
             durationMins: training.durationMins,
             description: training.description,
             participants: allUsers.filter((u) =>

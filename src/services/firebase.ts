@@ -15,13 +15,12 @@ import {
   getDoc,
   updateDoc,
   arrayUnion,
-  Timestamp,
 } from "firebase/firestore/lite";
 import {
-  type IUserAdditionalInfo,
+  type IUserFirebaseAdditionalInfo,
   type OsuMapCategory,
   type IAllUsersListItem,
-  type IAllTrainingsFirebaseItem,
+  type IAllTrainingsFirebaseIncomingItem,
   type IOsuMap,
 } from "@/types";
 
@@ -43,13 +42,9 @@ function onFirebaseAuthStateChanged(
   onAuthStateChanged(auth, initFoo);
 }
 
-function convertFirestoreTimestampToDate(timestamp: Timestamp): Date {
-  return new Date(timestamp.seconds * 1000 + timestamp.nanoseconds / 1000000);
-}
-
 async function updateUserAdditionalInfoToFirebase(
   userUid: string,
-  additionalInfo: IUserAdditionalInfo
+  additionalInfo: IUserFirebaseAdditionalInfo
 ) {
   const db = getFirestore();
   await runTransaction(db, async (transaction) => {
@@ -106,7 +101,7 @@ async function updateUserAdditionalInfoToFirebase(
 async function signUpUserToFirebase(
   email: string,
   password: string,
-  additionalInfo: IUserAdditionalInfo
+  additionalInfo: IUserFirebaseAdditionalInfo
 ) {
   const auth = getAuth();
   let newUserInfo: UserCredential | null = null;
@@ -146,13 +141,13 @@ async function signOutUserFromFirebase() {
   await signOut(auth);
 }
 
-async function loadUserInfoFromFirbase(): Promise<IUserAdditionalInfo> {
+async function loadUserInfoFromFirbase(): Promise<IUserFirebaseAdditionalInfo> {
   const db = getFirestore();
 
   const userDataDoc = doc(db, "users", `${auth.currentUser?.uid}`);
 
   const userDocSnapshot = await getDoc(userDataDoc);
-  const userDocData = userDocSnapshot.data() as IUserAdditionalInfo;
+  const userDocData = userDocSnapshot.data() as IUserFirebaseAdditionalInfo;
 
   return userDocData;
 }
@@ -170,7 +165,7 @@ async function loadAllUsersFromFirbase(): Promise<IAllUsersListItem[]> {
 }
 
 async function loadAllTrainingsFromFirbase(): Promise<
-  IAllTrainingsFirebaseItem[]
+  IAllTrainingsFirebaseIncomingItem[]
 > {
   const db = getFirestore();
 
@@ -179,7 +174,7 @@ async function loadAllTrainingsFromFirbase(): Promise<
   const allTrainingsSnapshot = await getDoc(allTrainingsDoc);
   const allTrainingsDocData = allTrainingsSnapshot.data();
   const allTrainings =
-    allTrainingsDocData?.allTrainings as IAllTrainingsFirebaseItem[];
+    allTrainingsDocData?.allTrainings as IAllTrainingsFirebaseIncomingItem[];
 
   return allTrainings.sort((a, b) => a.dateTime.seconds - b.dateTime.seconds);
 }
@@ -258,7 +253,6 @@ async function uploadMapsToFirebase(maps: Omit<IOsuMap, "link">[]) {
 
 export {
   onFirebaseAuthStateChanged,
-  convertFirestoreTimestampToDate,
   updateUserAdditionalInfoToFirebase,
   signUpUserToFirebase,
   signInUserToFirebase,
