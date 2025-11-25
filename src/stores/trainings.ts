@@ -1,7 +1,14 @@
 import { reactive } from "vue";
 import { defineStore } from "pinia";
-import { loadAllTrainingsFromFirbase } from "@/services/firebase";
-import { OsuMapCategory, type IAllTrainingsListItem } from "@/types";
+import {
+  loadAllTrainingsFromFirebase,
+  uploadTrainingToFirebase,
+} from "@/services/firebase";
+import {
+  OsuMapCategory,
+  type IAllTrainingsListItem,
+  type IAllTrainingsFirebaseOutgoingItem,
+} from "@/types";
 import { useUsersStore } from "@/stores/users";
 
 export const useTrainingsStore = defineStore("trainings", () => {
@@ -9,13 +16,16 @@ export const useTrainingsStore = defineStore("trainings", () => {
 
   const trainings = reactive<IAllTrainingsListItem[]>([]);
 
-  const loadAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
+  const getAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
     if (trainings.length) return trainings;
+    return await loadAllTrainings();
+  };
 
+  const loadAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
     try {
       const allUsers = await usersStore.loadAllUsers();
 
-      const allTrainings = (await loadAllTrainingsFromFirbase()).map(
+      const allTrainings = (await loadAllTrainingsFromFirebase()).map(
         (training) => {
           const participantsUids = JSON.parse(
             training.participantsUids
@@ -46,8 +56,21 @@ export const useTrainingsStore = defineStore("trainings", () => {
     }
   };
 
+  const uploadTraining = async (
+    training: IAllTrainingsFirebaseOutgoingItem
+  ) => {
+    try {
+      await uploadTrainingToFirebase(training);
+      await loadAllTrainings();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     trainings,
+    getAllTrainings,
     loadAllTrainings,
+    uploadTraining,
   };
 });

@@ -5,7 +5,7 @@ import {
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
-  loadUserInfoFromFirbase,
+  loadUserInfoFromFirebase,
 } from "@/services/firebase";
 import { type IUser, type IUserFirebaseAdditionalInfo } from "@/types";
 
@@ -68,7 +68,7 @@ export const useAuthStore = defineStore("auth", () => {
     setBaseUserInfo(authServerData.user.uid, authServerData.user.email ?? "");
 
     try {
-      const userInfo = await loadUserInfoFromFirbase();
+      const userInfo = await loadUserInfoFromFirebase();
       setAdditionalUserInfo(userInfo);
     } catch {
       setAdditionalUserInfo("loadingError");

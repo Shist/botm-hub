@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 import { defineStore } from "pinia";
-import { loadAllUsersFromFirbase } from "@/services/firebase";
+import { loadAllUsersFromFirebase } from "@/services/firebase";
 import { type IAllUsersListItem, DigitCategory } from "@/types";
 
 export const useUsersStore = defineStore("users", () => {
@@ -11,11 +11,14 @@ export const useUsersStore = defineStore("users", () => {
   ): IAllUsersListItem[] =>
     users.filter((user) => user.digitCategory === digitCategory);
 
-  const loadAllUsers = async (): Promise<IAllUsersListItem[]> => {
+  const getAllUsers = async (): Promise<IAllUsersListItem[]> => {
     if (users.length) return users;
+    return await loadAllUsers();
+  };
 
+  const loadAllUsers = async (): Promise<IAllUsersListItem[]> => {
     try {
-      const allUsers = await loadAllUsersFromFirbase();
+      const allUsers = await loadAllUsersFromFirebase();
       users.splice(0, users.length, ...allUsers);
       return allUsers;
     } catch (error) {
@@ -25,6 +28,7 @@ export const useUsersStore = defineStore("users", () => {
 
   return {
     users,
+    getAllUsers,
     loadAllUsers,
     getUsersByDigitCategory,
   };

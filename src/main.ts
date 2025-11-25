@@ -7,7 +7,7 @@ import { useThemeStore } from "@/stores/theme";
 import { type User as IFirebaseUser } from "firebase/auth";
 import {
   onFirebaseAuthStateChanged,
-  loadUserInfoFromFirbase,
+  loadUserInfoFromFirebase,
 } from "@/services/firebase";
 import appComponents from "@/components/ui";
 import vuetifyConfig from "@/plugins/vuetify";
@@ -39,7 +39,7 @@ onFirebaseAuthStateChanged((user: IFirebaseUser | null) => {
   if (user) {
     const { setBaseUserInfo, setAdditionalUserInfo } = useAuthStore();
     setBaseUserInfo(user.uid, user.email ?? "");
-    loadUserInfoFromFirbase()
+    loadUserInfoFromFirebase()
       .then((userInfo) => {
         setAdditionalUserInfo(userInfo);
       })

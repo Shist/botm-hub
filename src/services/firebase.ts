@@ -21,6 +21,7 @@ import {
   type OsuMapCategory,
   type IAllUsersListItem,
   type IAllTrainingsFirebaseIncomingItem,
+  type IAllTrainingsFirebaseOutgoingItem,
   type IOsuMap,
 } from "@/types";
 
@@ -141,7 +142,7 @@ async function signOutUserFromFirebase() {
   await signOut(auth);
 }
 
-async function loadUserInfoFromFirbase(): Promise<IUserFirebaseAdditionalInfo> {
+async function loadUserInfoFromFirebase(): Promise<IUserFirebaseAdditionalInfo> {
   const db = getFirestore();
 
   const userDataDoc = doc(db, "users", `${auth.currentUser?.uid}`);
@@ -152,7 +153,7 @@ async function loadUserInfoFromFirbase(): Promise<IUserFirebaseAdditionalInfo> {
   return userDocData;
 }
 
-async function loadAllUsersFromFirbase(): Promise<IAllUsersListItem[]> {
+async function loadAllUsersFromFirebase(): Promise<IAllUsersListItem[]> {
   const db = getFirestore();
 
   const allUsersDoc = doc(db, "users", "allUsers");
@@ -164,7 +165,7 @@ async function loadAllUsersFromFirbase(): Promise<IAllUsersListItem[]> {
   return allUsers.sort((a, b) => a.nick.localeCompare(b.nick));
 }
 
-async function loadAllTrainingsFromFirbase(): Promise<
+async function loadAllTrainingsFromFirebase(): Promise<
   IAllTrainingsFirebaseIncomingItem[]
 > {
   const db = getFirestore();
@@ -177,6 +178,20 @@ async function loadAllTrainingsFromFirbase(): Promise<
     allTrainingsDocData?.allTrainings as IAllTrainingsFirebaseIncomingItem[];
 
   return allTrainings.sort((a, b) => a.dateTime.seconds - b.dateTime.seconds);
+}
+
+async function uploadTrainingToFirebase(
+  training: IAllTrainingsFirebaseOutgoingItem
+) {
+  const db = getFirestore();
+
+  const allTrainingsDocRef = doc(db, "trainings", "allTrainings");
+
+  await runTransaction(db, async (transaction) => {
+    transaction.update(allTrainingsDocRef, {
+      allTrainings: arrayUnion(training),
+    });
+  });
 }
 
 async function loadMapsByCategoryFromFirebase(
@@ -257,9 +272,10 @@ export {
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
-  loadUserInfoFromFirbase,
-  loadAllUsersFromFirbase,
-  loadAllTrainingsFromFirbase,
+  loadUserInfoFromFirebase,
+  loadAllUsersFromFirebase,
+  loadAllTrainingsFromFirebase,
+  uploadTrainingToFirebase,
   loadMapsByCategoryFromFirebase,
   uploadMapsToFirebase,
 };

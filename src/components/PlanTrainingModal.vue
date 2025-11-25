@@ -127,6 +127,7 @@
     <template #actions>
       <div class="plan-training-modal__modal-btns-wrapper">
         <v-btn
+          :disabled="isLoading"
           height="50"
           class="plan-training-modal__btn plan-training-modal__btn_cancel"
           @click="$emit('closeModal')"
@@ -135,9 +136,10 @@
         </v-btn>
         <v-btn
           :disabled="isPlanBtnDisabled"
+          :loading="isLoading"
           height="50"
           class="plan-training-modal__btn"
-          @click="() => {}"
+          @click="onPlanTraining"
         >
           Запланировать
         </v-btn>
@@ -149,10 +151,16 @@
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
+import useToast from "@/composables/useToast";
 import { useDate } from "vuetify";
 import { useAuthStore } from "@/stores/auth";
+import { useUsersStore } from "@/stores/users";
+import { useTrainingsStore } from "@/stores/trainings";
 import { MAPS_CATEGORIES } from "@/constants";
-import { OsuMapCategory } from "@/types";
+import {
+  OsuMapCategory,
+  type IAllTrainingsFirebaseOutgoingItem,
+} from "@/types";
 import {
   getCurrentDateIso,
   getCurrentTimeIso,
@@ -163,12 +171,16 @@ const props = defineProps<{
   isOpened: boolean;
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
   closeModal: [];
 }>();
 
 const vuetifyDate = useDate();
 const authStore = useAuthStore();
+const usersStore = useUsersStore();
+const trainingsStore = useTrainingsStore();
+
+const { setErrorToast,setSuccessToast } = useToast();
 
 const trainingTitle = ref("");
 const trainingCategories = ref<OsuMapCategory[]>([]);
@@ -180,6 +192,7 @@ const trainingDuration = ref(120);
 const trainingDescription = ref("");
 const currDate = ref(new Date());
 const timeUpdateIntervalId = ref<number | null>(null);
+const isLoading = ref(false);
 
 const userInfo = computed(() => {
   if (
@@ -202,7 +215,7 @@ const trainingDateObject = computed(() => {
   const [hours, minutes] = trainingTime.value.split(":").map(Number);
   dateObject = vuetifyDate.setHours(dateObject, hours ?? 0);
   dateObject = vuetifyDate.setMinutes(dateObject, minutes ?? 0);
-  return dateObject;
+  return dateObject as Date;
 });
 const trainingDateLabel = computed(() => {
   if (!trainingDate.value) return null;
@@ -301,6 +314,39 @@ const onTimeClear = () => {
   trainingTime.value = null;
   isTimeMenuOpened.value = false;
 };
+
+const onPlanTraining = async () => {
+  if (!authStore.user || !trainingDateObject.value) return;
+
+  try {
+    isLoading.value = true;
+
+    const users = await usersStore.getAllUsers();
+    const trainer = users.find((user) => user.uid === authStore.user?.uid);
+
+    const training: IAllTrainingsFirebaseOutgoingItem = {
+      id: crypto.randomUUID(),
+      title: trainingTitle.value,
+      trainerUid: authStore.user.uid,
+      skillsets: JSON.stringify(trainingCategories.value),
+      dateTime: trainingDateObject.value,
+      durationMins: trainingDuration.value,
+      description: trainingDescription.value,
+      participantsUids: trainer?.uid ? JSON.stringify([trainer.uid]) : "[]",
+      mpLink: null,
+      isArchived: false,
+    };
+
+    await trainingsStore.uploadTraining(training);
+    setSuccessToast("🥳🥳🥳 Качалочка успешно запланирована!!! 🥳🥳🥳");
+    emit("closeModal");
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось запланировать качалочку: ${msg}`);
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -318,6 +364,9 @@ const onTimeClear = () => {
   }
   &__btn_cancel {
     background-color: var(--color-btn-cancel-bg);
+    &:disabled {
+      background-color: var(--color-btn-cancel-bg-disabled);
+    }
   }
   &__modal-content-wrapper {
     display: flex;

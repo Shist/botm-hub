@@ -176,7 +176,7 @@ const digitsCategoriesMap = computed(
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await usersStore.loadAllUsers();
+    await usersStore.getAllUsers();
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось загрузить список игроков: ${msg}`);

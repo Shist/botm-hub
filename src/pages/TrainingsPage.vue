@@ -114,7 +114,7 @@ const archivedTrainingsList = computed(() => {
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await trainingsStore.loadAllTrainings();
+    await trainingsStore.getAllTrainings();
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось загрузить список качалочек: ${msg}`);
