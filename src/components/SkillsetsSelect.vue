@@ -22,7 +22,7 @@
 import { computed } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import { OsuMapCategory } from "@/types";
-import { MAPS_CATEGORIES } from "@/constants";
+import { CATEGORIES_SORT_PRIORITIES, MAPS_CATEGORIES } from "@/constants";
 
 const props = defineProps<{
   modelValue: OsuMapCategory[];
@@ -34,7 +34,13 @@ const emit = defineEmits<{
 
 const chosenCategories = computed({
   get: () => props.modelValue,
-  set: (value) => emit("update:modelValue", value),
+  set: (value) =>
+    emit(
+      "update:modelValue",
+      value.sort(
+        (a, b) => CATEGORIES_SORT_PRIORITIES[a] - CATEGORIES_SORT_PRIORITIES[b]
+      )
+    ),
 });
 
 const categoriesOptions = computed(() =>

@@ -75,7 +75,6 @@ import useToast from "@/composables/useToast";
 import useValidationErrorMsg from "@/composables/useValidationErrorMsg";
 import ehCollabImage from "@/assets/images/eh-collab.png";
 import { OsuMapCategory, DigitCategory } from "@/types";
-import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 
 const authStore = useAuthStore();
 
@@ -178,15 +177,11 @@ const onUpdate = async () => {
   try {
     isUpdating.value = true;
 
-    const sortedCategories = [...chosenCategories.value].sort(
-      (a, b) => CATEGORIES_SORT_PRIORITIES[a] - CATEGORIES_SORT_PRIORITIES[b]
-    );
-
     await authStore.updateUserAdditionalInfo({
       osuId: chosenOsuId.value === null ? null : `${chosenOsuId.value}`,
       nick: chosenNick.value ?? "",
       digitCategory: chosenDigit.value,
-      skillsets: JSON.stringify(sortedCategories),
+      skillsets: JSON.stringify(chosenCategories.value),
     });
     setSuccessToast("🥳🥳🥳 Информация успешно обновлена!!! 🥳🥳🥳");
   } catch (error) {
