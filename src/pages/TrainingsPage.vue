@@ -42,6 +42,7 @@
               :currDate="currDate"
               @onEditTraining="onEditTraining"
               @onDeleteTraining="onDeleteTraining"
+              @onArchiveTraining="onArchiveTraining"
             />
           </v-expansion-panels>
         </v-tabs-window-item>
@@ -84,6 +85,11 @@
       :trainingId="selectedTrainingIdForDeleting"
       @closeModal="onCloseDeleteTrainingModal"
     />
+    <ArchiveTrainingModal
+      :isOpened="isArchiveTrainingModalOpened"
+      :trainingId="selectedTrainingIdForArchiving"
+      @closeModal="onCloseArchiveTrainingModal"
+    />
   </div>
 </template>
 
@@ -94,6 +100,7 @@ import { useTrainingsStore } from "@/stores/trainings";
 import TrainingCard from "@/components/TrainingCard.vue";
 import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
 import DeleteTrainingModal from "@/components/DeleteTrainingModal.vue";
+import ArchiveTrainingModal from "@/components/ArchiveTrainingModal.vue";
 import useToast from "@/composables/useToast";
 import { type IAllTrainingsListItem } from "@/types";
 
@@ -108,8 +115,10 @@ const currDate = ref(new Date());
 const currDateUpdateIntervalId = ref<number | null>(null);
 const selectedTrainingForEditing = ref<IAllTrainingsListItem | null>(null);
 const selectedTrainingIdForDeleting = ref<string>("");
+const selectedTrainingIdForArchiving = ref<string>("");
 const isPlanTrainingModalOpened = ref(false);
 const isDeleteTrainingModalOpened = ref(false);
+const isArchiveTrainingModalOpened = ref(false);
 
 const userInfo = computed(() => {
   if (
@@ -160,6 +169,10 @@ const onDeleteTraining = (trainingId: string) => {
   selectedTrainingIdForDeleting.value = trainingId;
   isDeleteTrainingModalOpened.value = true;
 };
+const onArchiveTraining = (trainingId: string) => {
+  selectedTrainingIdForArchiving.value = trainingId;
+  isArchiveTrainingModalOpened.value = true;
+};
 const onClosePlanTrainingModal = () => {
   isPlanTrainingModalOpened.value = false;
   selectedTrainingForEditing.value = null;
@@ -167,6 +180,10 @@ const onClosePlanTrainingModal = () => {
 const onCloseDeleteTrainingModal = () => {
   isDeleteTrainingModalOpened.value = false;
   selectedTrainingIdForDeleting.value = "";
+};
+const onCloseArchiveTrainingModal = () => {
+  isArchiveTrainingModalOpened.value = false;
+  selectedTrainingIdForArchiving.value = "";
 };
 </script>
 

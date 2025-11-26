@@ -40,10 +40,10 @@
             <span v-if="training.isArchived">MP-link:</span>
             <div v-if="training.isArchived">
               <a
-                :href="`https://osu.ppy.sh/community/matches/${training.mpLink}`"
+                :href="`https://osu.ppy.sh/community/matches/${training.mpLinkId}`"
                 target="_blank"
               >
-                {{ training.mpLink }}
+                {{ training.mpLinkId }}
               </a>
             </div>
           </div>
@@ -87,16 +87,25 @@
                 </div>
               </template>
             </v-tooltip>
-            <v-btn
+            <v-tooltip
               v-if="isArchiveTrainingBtnVisible"
-              :disabled="false"
-              :loading="false"
-              height="50"
-              class="training-card__btn training-card__btn_archive"
-              @click="() => {}"
+              :disabled="!isOtherTrainer"
+              text="Нельзя архивировать качалочки других тренеров!"
+              location="top"
             >
-              Заархивировать качалочку
-            </v-btn>
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    :disabled="isOtherTrainer"
+                    height="50"
+                    class="training-card__btn training-card__btn_archive"
+                    @click="$emit('onArchiveTraining', training.id)"
+                  >
+                    Заархивировать качалочку
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
           </div>
         </div>
         <v-divider
@@ -157,6 +166,7 @@ const props = defineProps<{
 defineEmits<{
   onEditTraining: [training: IAllTrainingsListItem];
   onDeleteTraining: [trainingId: string];
+  onArchiveTraining: [trainingId: string];
 }>();
 
 const vuetifyDate = useDate();

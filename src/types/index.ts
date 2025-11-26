@@ -109,7 +109,7 @@ export interface IAllTrainingsItemBase {
   trainerUid: string;
   durationMins: number;
   description: string;
-  mpLink: string | null;
+  mpLinkId: number | null;
   isArchived: boolean;
 }
 

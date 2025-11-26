@@ -417,7 +417,7 @@ const uploadTraining = async () => {
       durationMins: trainingDuration.value,
       description: trainingDescription.value,
       participantsUids: trainer?.uid ? JSON.stringify([trainer.uid]) : "[]",
-      mpLink: null,
+      mpLinkId: null,
       isArchived: false,
     };
 
@@ -449,7 +449,7 @@ const updateTraining = async () => {
       participantsUids: JSON.stringify(
         props.training.participants.map((p) => p.uid)
       ),
-      mpLink: null,
+      mpLinkId: null,
       isArchived: false,
     };
 

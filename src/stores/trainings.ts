@@ -5,6 +5,7 @@ import {
   uploadTrainingToFirebase,
   updateTrainingToFirebase,
   deleteTrainingFromFirebase,
+  archiveTrainingInFirebase,
 } from "@/services/firebase";
 import {
   OsuMapCategory,
@@ -44,7 +45,7 @@ export const useTrainingsStore = defineStore("trainings", () => {
             participants: allUsers.filter((u) =>
               participantsUids.includes(u.uid)
             ),
-            mpLink: training.mpLink,
+            mpLinkId: training.mpLinkId,
             isArchived: training.isArchived,
           };
         }
@@ -88,6 +89,15 @@ export const useTrainingsStore = defineStore("trainings", () => {
     }
   };
 
+  const archiveTraining = async (trainingId: string, mpLinkId: number) => {
+    try {
+      await archiveTrainingInFirebase(trainingId, mpLinkId);
+      await loadAllTrainings();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     trainings,
     getAllTrainings,
@@ -95,5 +105,6 @@ export const useTrainingsStore = defineStore("trainings", () => {
     uploadTraining,
     updateTraining,
     deleteTraining,
+    archiveTraining,
   };
 });
