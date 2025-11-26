@@ -17,101 +17,136 @@
           hide-details
         />
         <SkillsetsSelect v-model="trainingCategories" />
-        <v-menu v-model="isDateMenuOpened" :close-on-content-click="false">
+        <v-tooltip
+          :disabled="!training"
+          text="Изменение даты начала качалочки может изменить её статус!"
+          location="top"
+        >
           <template #activator="{ props }">
-            <v-text-field
+            <div v-bind="props">
+              <v-menu
+                v-model="isDateMenuOpened"
+                :close-on-content-click="false"
+              >
+                <template #activator="{ props }">
+                  <v-text-field
+                    v-bind="props"
+                    :model-value="trainingDateLabel"
+                    variant="solo"
+                    prepend-inner-icon="mdi-calendar"
+                    label="Дата начала качалочки"
+                    placeholder="Укажи дату начала качалочки"
+                    hide-details
+                    readonly
+                  />
+                </template>
+                <v-date-picker
+                  v-model="trainingDate"
+                  :min="minPossibleDateIso"
+                  color="var(--color-date-picker-header)"
+                  title="Укажи дату начала качалочки"
+                  show-adjacent-months
+                  divided
+                >
+                  <template #actions>
+                    <div class="plan-training-modal__modal-btns-wrapper">
+                      <v-btn
+                        height="50"
+                        class="plan-training-modal__btn plan-training-modal__btn_cancel"
+                        @click="onDateClear"
+                      >
+                        Очистить
+                      </v-btn>
+                      <v-btn
+                        height="50"
+                        class="plan-training-modal__btn"
+                        @click="isDateMenuOpened = false"
+                      >
+                        Подтвердить
+                      </v-btn>
+                    </div>
+                  </template>
+                </v-date-picker>
+              </v-menu>
+            </div>
+          </template>
+        </v-tooltip>
+        <v-tooltip
+          :disabled="!training"
+          text="Изменение времени начала качалочки может изменить её статус!"
+          location="top"
+        >
+          <template #activator="{ props }">
+            <div v-bind="props">
+              <v-menu
+                v-model="isTimeMenuOpened"
+                :close-on-content-click="false"
+              >
+                <template #activator="{ props }">
+                  <v-text-field
+                    v-bind="props"
+                    :model-value="trainingTime"
+                    :disabled="isTimerPickerDisabled"
+                    variant="solo"
+                    prepend-inner-icon="mdi-clock"
+                    label="Время начала качалочки"
+                    placeholder="Укажи время начала качалочки"
+                    hide-details
+                    readonly
+                  />
+                </template>
+                <v-time-picker
+                  v-model="trainingTime"
+                  :min="minPossibleTimeIso"
+                  color="var(--color-time-picker-header)"
+                  title="Укажи время начала качалочки"
+                  format="24hr"
+                  divided
+                >
+                  <template #actions>
+                    <div class="plan-training-modal__modal-btns-wrapper">
+                      <v-btn
+                        height="50"
+                        class="plan-training-modal__btn plan-training-modal__btn_cancel"
+                        @click="onTimeClear"
+                      >
+                        Очистить
+                      </v-btn>
+                      <v-btn
+                        height="50"
+                        class="plan-training-modal__btn"
+                        @click="isTimeMenuOpened = false"
+                      >
+                        Подтвердить
+                      </v-btn>
+                    </div>
+                  </template>
+                </v-time-picker>
+              </v-menu>
+            </div>
+          </template>
+        </v-tooltip>
+        <v-tooltip
+          :disabled="!training"
+          text="Изменение длительности качалочки может изменить её статус!"
+          location="top"
+        >
+          <template #activator="{ props }">
+            <v-number-input
               v-bind="props"
-              :model-value="trainingDateLabel"
+              v-model="trainingDuration"
+              :min="30"
+              :max="960"
               variant="solo"
-              prepend-inner-icon="mdi-calendar"
-              label="Дата начала качалочки"
-              placeholder="Укажи дату начала качалочки"
+              prepend-inner-icon="mdi-timer"
+              control-variant="stacked"
+              label="Длительность (мин.)"
+              placeholder="Укажи длительность качалочки (в минутах)"
+              clearable
               hide-details
-              readonly
             />
           </template>
-          <v-date-picker
-            v-model="trainingDate"
-            :min="minPossibleDateIso"
-            color="var(--color-date-picker-header)"
-            title="Укажи дату начала качалочки"
-            show-adjacent-months
-            divided
-          >
-            <template #actions>
-              <div class="plan-training-modal__modal-btns-wrapper">
-                <v-btn
-                  height="50"
-                  class="plan-training-modal__btn plan-training-modal__btn_cancel"
-                  @click="onDateClear"
-                >
-                  Очистить
-                </v-btn>
-                <v-btn
-                  height="50"
-                  class="plan-training-modal__btn"
-                  @click="isDateMenuOpened = false"
-                >
-                  Подтвердить
-                </v-btn>
-              </div>
-            </template>
-          </v-date-picker>
-        </v-menu>
-        <v-menu v-model="isTimeMenuOpened" :close-on-content-click="false">
-          <template #activator="{ props }">
-            <v-text-field
-              v-bind="props"
-              :model-value="trainingTime"
-              :disabled="isTimerPickerDisabled"
-              variant="solo"
-              prepend-inner-icon="mdi-clock"
-              label="Время начала качалочки"
-              placeholder="Укажи время начала качалочки"
-              hide-details
-              readonly
-            />
-          </template>
-          <v-time-picker
-            v-model="trainingTime"
-            :min="minPossibleTimeIso"
-            color="var(--color-time-picker-header)"
-            title="Укажи время начала качалочки"
-            format="24hr"
-            divided
-          >
-            <template #actions>
-              <div class="plan-training-modal__modal-btns-wrapper">
-                <v-btn
-                  height="50"
-                  class="plan-training-modal__btn plan-training-modal__btn_cancel"
-                  @click="onTimeClear"
-                >
-                  Очистить
-                </v-btn>
-                <v-btn
-                  height="50"
-                  class="plan-training-modal__btn"
-                  @click="isTimeMenuOpened = false"
-                >
-                  Подтвердить
-                </v-btn>
-              </div>
-            </template>
-          </v-time-picker>
-        </v-menu>
-        <v-number-input
-          v-model="trainingDuration"
-          :min="30"
-          :max="960"
-          variant="solo"
-          prepend-inner-icon="mdi-timer"
-          control-variant="stacked"
-          label="Длительность (мин.)"
-          placeholder="Укажи длительность качалочки (в минутах)"
-          clearable
-          hide-details
-        />
+        </v-tooltip>
         <v-textarea
           v-model="trainingDescription"
           variant="solo"
