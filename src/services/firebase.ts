@@ -215,9 +215,8 @@ async function updateTrainingToFirebase(
     );
     if (existingTrainingIndex === -1) {
       throw new Error(`Качалочка с id = ${training.id} не найдена в базе!`);
-    } else {
-      allTrainings[existingTrainingIndex] = training;
     }
+    allTrainings[existingTrainingIndex] = training;
 
     transaction.update(allTrainingsDocRef, { allTrainings });
   });
@@ -242,9 +241,8 @@ async function deleteTrainingFromFirebase(trainingId: string) {
     );
     if (existingTrainingIndex === -1) {
       throw new Error(`Качалочка с id = ${trainingId} не найдена в базе!`);
-    } else {
-      allTrainings.splice(existingTrainingIndex, 1);
     }
+    allTrainings.splice(existingTrainingIndex, 1);
 
     transaction.update(allTrainingsDocRef, { allTrainings });
   });
@@ -269,11 +267,95 @@ async function archiveTrainingInFirebase(trainingId: string, mpLinkId: number) {
     );
     if (existingTrainingIndex === -1) {
       throw new Error(`Качалочка с id = ${trainingId} не найдена в базе!`);
-    } else {
-      if (allTrainings[existingTrainingIndex]) {
-        allTrainings[existingTrainingIndex].mpLinkId = mpLinkId;
-        allTrainings[existingTrainingIndex].isArchived = true;
+    }
+    if (allTrainings[existingTrainingIndex]) {
+      allTrainings[existingTrainingIndex].mpLinkId = mpLinkId;
+      allTrainings[existingTrainingIndex].isArchived = true;
+    }
+
+    transaction.update(allTrainingsDocRef, { allTrainings });
+  });
+}
+
+async function subscribeTrainingParticipantInFirebase(
+  trainingId: string,
+  playerUid: string
+) {
+  const db = getFirestore();
+  await runTransaction(db, async (transaction) => {
+    const allTrainingsDocRef = doc(db, "trainings", "allTrainings");
+
+    const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
+    const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
+      (allTrainingsDoc.data()?.allTrainings ??
+        []) as IAllTrainingsFirebaseIncomingItem[]
+    ).map((t) => ({
+      ...t,
+      dateTime: t.dateTime.toDate(),
+    }));
+
+    const existingTrainingIndex = allTrainings.findIndex(
+      (t) => t.id === trainingId
+    );
+    if (existingTrainingIndex === -1) {
+      throw new Error(`Качалочка с id = ${trainingId} не найдена в базе!`);
+    }
+    if (allTrainings[existingTrainingIndex]) {
+      const participantsUids = JSON.parse(
+        allTrainings[existingTrainingIndex].participantsUids
+      ) as string[];
+      if (participantsUids.includes(playerUid)) {
+        throw new Error(
+          `Пользователь с id = ${playerUid} уже зарегистрирован в качалочке с id = ${trainingId}!`
+        );
       }
+      participantsUids.push(playerUid);
+      allTrainings[existingTrainingIndex].participantsUids =
+        JSON.stringify(participantsUids);
+    }
+
+    transaction.update(allTrainingsDocRef, { allTrainings });
+  });
+}
+
+async function unsubscribeTrainingParticipantInFirebase(
+  trainingId: string,
+  playerUid: string
+) {
+  const db = getFirestore();
+  await runTransaction(db, async (transaction) => {
+    const allTrainingsDocRef = doc(db, "trainings", "allTrainings");
+
+    const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
+    const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
+      (allTrainingsDoc.data()?.allTrainings ??
+        []) as IAllTrainingsFirebaseIncomingItem[]
+    ).map((t) => ({
+      ...t,
+      dateTime: t.dateTime.toDate(),
+    }));
+
+    const existingTrainingIndex = allTrainings.findIndex(
+      (t) => t.id === trainingId
+    );
+    if (existingTrainingIndex === -1) {
+      throw new Error(`Качалочка с id = ${trainingId} не найдена в базе!`);
+    }
+    if (allTrainings[existingTrainingIndex]) {
+      const participantsUids = JSON.parse(
+        allTrainings[existingTrainingIndex].participantsUids
+      ) as string[];
+      const existingParticipantIndex = participantsUids.findIndex(
+        (pUid) => pUid === playerUid
+      );
+      if (existingParticipantIndex === -1) {
+        throw new Error(
+          `Пользователь с id = ${playerUid} не зарегистрирован в качалочке с id = ${trainingId}!`
+        );
+      }
+      participantsUids.splice(existingParticipantIndex, 1);
+      allTrainings[existingTrainingIndex].participantsUids =
+        JSON.stringify(participantsUids);
     }
 
     transaction.update(allTrainingsDocRef, { allTrainings });
@@ -365,6 +447,8 @@ export {
   updateTrainingToFirebase,
   deleteTrainingFromFirebase,
   archiveTrainingInFirebase,
+  subscribeTrainingParticipantInFirebase,
+  unsubscribeTrainingParticipantInFirebase,
   loadMapsByCategoryFromFirebase,
   uploadMapsToFirebase,
 };

@@ -50,7 +50,7 @@
           <div class="training-card__btns-wrapper">
             <v-tooltip
               v-if="isTrainingEditable"
-              :disabled="!isOtherTrainer"
+              :disabled="isUserTrainer"
               text="Нельзя удалять качалочки других тренеров!"
               location="top"
             >
@@ -58,9 +58,9 @@
                 <div v-bind="props">
                   <v-btn
                     v-bind="props"
-                    :disabled="isOtherTrainer"
+                    :disabled="!isUserTrainer"
                     height="50"
-                    class="training-card__btn training-card__btn_delete"
+                    class="training-card__btn training-card__btn_negative"
                     @click="$emit('onDeleteTraining', training.id)"
                   >
                     Удалить качалочку
@@ -70,14 +70,14 @@
             </v-tooltip>
             <v-tooltip
               v-if="isTrainingEditable"
-              :disabled="!isOtherTrainer"
+              :disabled="isUserTrainer"
               text="Нельзя изменять качалочки других тренеров!"
               location="top"
             >
               <template #activator="{ props }">
                 <div v-bind="props">
                   <v-btn
-                    :disabled="isOtherTrainer"
+                    :disabled="!isUserTrainer"
                     height="50"
                     class="training-card__btn"
                     @click="$emit('onEditTraining', training)"
@@ -89,14 +89,14 @@
             </v-tooltip>
             <v-tooltip
               v-if="isArchiveTrainingBtnVisible"
-              :disabled="!isOtherTrainer"
+              :disabled="isUserTrainer"
               text="Нельзя архивировать качалочки других тренеров!"
               location="top"
             >
               <template #activator="{ props }">
                 <div v-bind="props">
                   <v-btn
-                    :disabled="isOtherTrainer"
+                    :disabled="!isUserTrainer"
                     height="50"
                     class="training-card__btn training-card__btn_archive"
                     @click="$emit('onArchiveTraining', training.id)"
@@ -128,16 +128,48 @@
             />
             <FreeSlotCard v-for="i in freeSlotsCount" :key="i" />
           </ul>
-          <v-btn
-            v-if="isTrainingEditable"
-            :disabled="isSignUpBtnDisabled"
-            :loading="false"
-            height="50"
-            class="training-card__btn"
-            @click="() => {}"
-          >
-            Записаться
-          </v-btn>
+          <div v-if="isSubscribeBtnVisible">
+            <v-tooltip
+              v-if="!isUserSubscribed"
+              :disabled="!isFullLobby"
+              text="Все слоты для этой качалочки уже заняты!"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    :disabled="isFullLobby"
+                    :loading="isUpdating"
+                    height="50"
+                    class="training-card__btn"
+                    @click="onSubscribe"
+                  >
+                    Записаться
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
+            <v-tooltip
+              v-else
+              :disabled="!isUserTrainer"
+              text="Ты не можешь отписаться, так как ты тренер!"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    :disabled="isUserTrainer"
+                    :loading="isUpdating"
+                    height="50"
+                    class="training-card__btn training-card__btn_negative"
+                    @click="onUnsubscribe"
+                  >
+                    Отписаться
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
+          </div>
         </div>
       </div>
     </template>
@@ -145,7 +177,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useDate } from "vuetify";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
@@ -153,6 +185,8 @@ import UserCard from "@/components/UserCard.vue";
 import FreeSlotCard from "@/components/FreeSlotCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
+import { useTrainingsStore } from "@/stores/trainings";
+import useToast from "@/composables/useToast";
 import {
   OsuMapCategory,
   TrainingStatus,
@@ -174,10 +208,15 @@ defineEmits<{
 const vuetifyDate = useDate();
 const authStore = useAuthStore();
 const usersStore = useUsersStore();
+const trainingsStore = useTrainingsStore();
 
-const isOtherTrainer = computed(() => {
-  const currUserUid = authStore.user?.uid ?? null;
-  return currUserUid !== props.training.trainerUid;
+const { setErrorToast, setSuccessToast } = useToast();
+
+const isUpdating = ref(false);
+
+const userUid = computed(() => authStore.user?.uid ?? null);
+const isUserTrainer = computed(() => {
+  return userUid.value === props.training.trainerUid;
 });
 const timeDiffSeconds = computed(() => {
   return vuetifyDate.getDiff(props.training.dateTime, props.currDate) / 1000;
@@ -240,9 +279,51 @@ const isTrainingEditable = computed(() => {
 const isArchiveTrainingBtnVisible = computed(() => {
   return currentStatus.value === TrainingStatus.completed;
 });
-const isSignUpBtnDisabled = computed(() => {
+const isSubscribeBtnVisible = computed(() => {
+  return (
+    currentStatus.value === TrainingStatus.waiting ||
+    currentStatus.value === TrainingStatus.inProgress
+  );
+});
+const isFullLobby = computed(() => {
   return props.training.participants.length >= 16;
 });
+const isUserSubscribed = computed(() => {
+  return props.training.participants.some((p) => p.uid === userUid.value);
+});
+
+const onSubscribe = async () => {
+  if (!userUid.value) return;
+  try {
+    isUpdating.value = true;
+    await trainingsStore.subscribeParticipantToTraining(
+      props.training.id,
+      userUid.value
+    );
+    setSuccessToast("✏️✅✏️ Ты успешно записался на качалочку!!! ✏️✅✏️");
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось записаться на качалочку: ${msg}`);
+  } finally {
+    isUpdating.value = false;
+  }
+};
+const onUnsubscribe = async () => {
+  if (!userUid.value) return;
+  try {
+    isUpdating.value = true;
+    await trainingsStore.unsubscribeParticipantFromTraining(
+      props.training.id,
+      userUid.value
+    );
+    setSuccessToast("✏️❌✏️ Ты успешно отписался от качалочки!!! ✏️❌✏️");
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось записаться на качалочку: ${msg}`);
+  } finally {
+    isUpdating.value = false;
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -392,7 +473,7 @@ const isSignUpBtnDisabled = computed(() => {
       font-size: 10px;
       line-height: 10px;
     }
-    &_delete {
+    &_negative {
       background-color: var(--color-training-deletion);
       &:disabled {
         background-color: var(--color-training-deletion);

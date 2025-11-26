@@ -29,7 +29,6 @@ export const useUsersStore = defineStore("users", () => {
   return {
     users,
     getAllUsers,
-    loadAllUsers,
     getUsersByDigitCategory,
   };
 });

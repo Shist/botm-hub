@@ -6,6 +6,8 @@ import {
   updateTrainingToFirebase,
   deleteTrainingFromFirebase,
   archiveTrainingInFirebase,
+  subscribeTrainingParticipantInFirebase,
+  unsubscribeTrainingParticipantInFirebase,
 } from "@/services/firebase";
 import {
   OsuMapCategory,
@@ -26,7 +28,7 @@ export const useTrainingsStore = defineStore("trainings", () => {
 
   const loadAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
     try {
-      const allUsers = await usersStore.loadAllUsers();
+      const allUsers = await usersStore.getAllUsers();
 
       const allTrainings = (await loadAllTrainingsFromFirebase()).map(
         (training) => {
@@ -98,13 +100,38 @@ export const useTrainingsStore = defineStore("trainings", () => {
     }
   };
 
+  const subscribeParticipantToTraining = async (
+    trainingId: string,
+    playerUid: string
+  ) => {
+    try {
+      await subscribeTrainingParticipantInFirebase(trainingId, playerUid);
+      await loadAllTrainings();
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const unsubscribeParticipantFromTraining = async (
+    trainingId: string,
+    playerUid: string
+  ) => {
+    try {
+      await unsubscribeTrainingParticipantInFirebase(trainingId, playerUid);
+      await loadAllTrainings();
+    } catch (error) {
+      throw error;
+    }
+  };
+
   return {
     trainings,
     getAllTrainings,
-    loadAllTrainings,
     uploadTraining,
     updateTraining,
     deleteTraining,
     archiveTraining,
+    subscribeParticipantToTraining,
+    unsubscribeParticipantFromTraining,
   };
 });
