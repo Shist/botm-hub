@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import {
   updateUserAdditionalInfoToFirebase,
@@ -7,10 +7,25 @@ import {
   signOutUserFromFirebase,
   loadUserInfoFromFirebase,
 } from "@/services/firebase";
-import { type IUser, type IUserFirebaseAdditionalInfo } from "@/types";
+import {
+  type IUser,
+  type IUserLocalAdditionalInfo,
+  type IUserFirebaseAdditionalInfo,
+} from "@/types";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<IUser | null>(null);
+
+  const userAdditionalInfo = computed<IUserLocalAdditionalInfo | null>(() => {
+    if (
+      user.value?.additionalInfo === "loading" ||
+      user.value?.additionalInfo === "loadingError"
+    ) {
+      return null;
+    } else {
+      return user.value?.additionalInfo ?? null;
+    }
+  });
 
   const setBaseUserInfo = (userUid: string, userEmail: string) => {
     if (user.value) {
@@ -50,6 +65,7 @@ export const useAuthStore = defineStore("auth", () => {
       osuId: null,
       digitCategory: null,
       skillsets: "[]",
+      isTrainer: false,
     };
     const authServerData = await signUpUserToFirebase(
       email,
@@ -82,16 +98,26 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const updateUserAdditionalInfo = async (
-    additionalInfo: Omit<IUserFirebaseAdditionalInfo, "email">
+    additionalInfo: Omit<IUserFirebaseAdditionalInfo, "email" | "isTrainer">
   ) => {
-    if (!user.value) return;
-    const newUserInfo = { email: user.value.email, ...additionalInfo };
+    if (
+      !user.value ||
+      user.value.additionalInfo === "loading" ||
+      user.value.additionalInfo === "loadingError"
+    )
+      return;
+    const newUserInfo = {
+      email: user.value.email,
+      isTrainer: user.value.additionalInfo.isTrainer,
+      ...additionalInfo,
+    };
     await updateUserAdditionalInfoToFirebase(user.value.uid, newUserInfo);
     setAdditionalUserInfo(newUserInfo);
   };
 
   return {
     user,
+    userAdditionalInfo,
     setBaseUserInfo,
     setAdditionalUserInfo,
     signUpUser,

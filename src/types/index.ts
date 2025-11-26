@@ -50,6 +50,7 @@ export interface IUserAdditionalInfoBase {
   osuId: string | null;
   nick: string;
   digitCategory: DigitCategory | null;
+  isTrainer: boolean;
 }
 
 export interface IUserLocalAdditionalInfo extends IUserAdditionalInfoBase {

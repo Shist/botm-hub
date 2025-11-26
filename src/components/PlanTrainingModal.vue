@@ -238,16 +238,7 @@ const modalTitle = computed(
 const confirmBtnLabel = computed(() =>
   props.training ? "Изменить" : "Запланировать"
 );
-const userInfo = computed(() => {
-  if (
-    authStore.user?.additionalInfo === "loading" ||
-    authStore.user?.additionalInfo === "loadingError"
-  ) {
-    return null;
-  } else {
-    return authStore.user?.additionalInfo ?? null;
-  }
-});
+const userInfo = computed(() => authStore.userAdditionalInfo);
 const skillsetsDescription = computed(() => {
   return trainingCategories.value
     .map((category) => MAPS_CATEGORIES[category])

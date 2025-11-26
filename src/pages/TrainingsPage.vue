@@ -13,7 +13,8 @@
           class="trainings-page__tab-window-wrapper"
         >
           <v-btn
-            :disabled="isLoading || !userInfo"
+            v-if="userInfo?.isTrainer"
+            :disabled="isLoading"
             height="50"
             class="trainings-page__btn"
             @click="isPlanTrainingModalOpened = true"
@@ -125,16 +126,7 @@ const isPlanTrainingModalOpened = ref(false);
 const isDeleteTrainingModalOpened = ref(false);
 const isArchiveTrainingModalOpened = ref(false);
 
-const userInfo = computed(() => {
-  if (
-    authStore.user?.additionalInfo === "loading" ||
-    authStore.user?.additionalInfo === "loadingError"
-  ) {
-    return null;
-  } else {
-    return authStore.user?.additionalInfo ?? null;
-  }
-});
+const userInfo = computed(() => authStore.userAdditionalInfo);
 const activeTrainingsList = computed(() => {
   return trainingsStore.trainings.filter((t) => !t.isArchived);
 });

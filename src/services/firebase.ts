@@ -80,6 +80,7 @@ async function updateUserAdditionalInfoToFirebase(
         nick: additionalInfo.nick,
         digitCategory: additionalInfo.digitCategory,
         skillsets: additionalInfo.skillsets,
+        isTrainer: additionalInfo.isTrainer,
       });
     } else {
       (allUsers[existingUserIndex] as IAllUsersListItem).osuId =

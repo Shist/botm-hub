@@ -95,44 +95,16 @@ const digitOptions = computed(() =>
   }))
 );
 const currentOsuId = computed(() => {
-  if (
-    authStore.user?.additionalInfo === "loading" ||
-    authStore.user?.additionalInfo === "loadingError"
-  ) {
-    return null;
-  } else {
-    return authStore.user?.additionalInfo.osuId ?? null;
-  }
+  return authStore.userAdditionalInfo?.osuId ?? null;
 });
 const currentNick = computed(() => {
-  if (
-    authStore.user?.additionalInfo === "loading" ||
-    authStore.user?.additionalInfo === "loadingError"
-  ) {
-    return null;
-  } else {
-    return authStore.user?.additionalInfo.nick ?? null;
-  }
+  return authStore.userAdditionalInfo?.nick ?? null;
 });
 const currentDigit = computed(() => {
-  if (
-    authStore.user?.additionalInfo === "loading" ||
-    authStore.user?.additionalInfo === "loadingError"
-  ) {
-    return null;
-  } else {
-    return authStore.user?.additionalInfo.digitCategory ?? null;
-  }
+  return authStore.userAdditionalInfo?.digitCategory ?? null;
 });
 const currentSkillsets = computed(() => {
-  if (
-    authStore.user?.additionalInfo === "loading" ||
-    authStore.user?.additionalInfo === "loadingError"
-  ) {
-    return [];
-  } else {
-    return authStore.user?.additionalInfo.skillsets ?? [];
-  }
+  return authStore.userAdditionalInfo?.skillsets ?? [];
 });
 const isSomeInfoChanged = computed(() => {
   const osuIdFromStore =

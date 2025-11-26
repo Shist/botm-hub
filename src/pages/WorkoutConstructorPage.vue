@@ -119,16 +119,7 @@ const isUserDataLoading = computed(
   () => authStore.user?.additionalInfo === "loading"
 );
 const userMainCategories = computed(() => {
-  const user = authStore.user;
-  if (
-    !user ||
-    user.additionalInfo === "loading" ||
-    user.additionalInfo === "loadingError"
-  ) {
-    return [];
-  } else {
-    return user.additionalInfo.skillsets;
-  }
+  return authStore.userAdditionalInfo?.skillsets ?? [];
 });
 const isInfoSpecified = computed(
   () =>

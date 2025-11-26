@@ -49,8 +49,8 @@
           </div>
           <div class="training-card__btns-wrapper">
             <v-tooltip
-              v-if="isTrainingEditable"
-              :disabled="isUserTrainer"
+              v-if="isUserTrainer && isTrainingEditable"
+              :disabled="isUserTrainerOfThisTraining"
               text="Нельзя удалять качалочки других тренеров!"
               location="top"
             >
@@ -58,7 +58,7 @@
                 <div v-bind="props">
                   <v-btn
                     v-bind="props"
-                    :disabled="!isUserTrainer"
+                    :disabled="!isUserTrainerOfThisTraining"
                     height="50"
                     class="training-card__btn training-card__btn_negative"
                     @click="$emit('onDeleteTraining', training.id)"
@@ -69,15 +69,15 @@
               </template>
             </v-tooltip>
             <v-tooltip
-              v-if="isTrainingEditable"
-              :disabled="isUserTrainer"
+              v-if="isUserTrainer && isTrainingEditable"
+              :disabled="isUserTrainerOfThisTraining"
               text="Нельзя изменять качалочки других тренеров!"
               location="top"
             >
               <template #activator="{ props }">
                 <div v-bind="props">
                   <v-btn
-                    :disabled="!isUserTrainer"
+                    :disabled="!isUserTrainerOfThisTraining"
                     height="50"
                     class="training-card__btn"
                     @click="$emit('onEditTraining', training)"
@@ -88,15 +88,15 @@
               </template>
             </v-tooltip>
             <v-tooltip
-              v-if="isArchiveTrainingBtnVisible"
-              :disabled="isUserTrainer"
+              v-if="isUserTrainer && isArchiveTrainingBtnVisible"
+              :disabled="isUserTrainerOfThisTraining"
               text="Нельзя архивировать качалочки других тренеров!"
               location="top"
             >
               <template #activator="{ props }">
                 <div v-bind="props">
                   <v-btn
-                    :disabled="!isUserTrainer"
+                    :disabled="!isUserTrainerOfThisTraining"
                     height="50"
                     class="training-card__btn training-card__btn_archive"
                     @click="$emit('onArchiveTraining', training.id)"
@@ -151,14 +151,14 @@
             </v-tooltip>
             <v-tooltip
               v-else
-              :disabled="!isUserTrainer"
+              :disabled="!isUserTrainerOfThisTraining"
               text="Ты не можешь отписаться, так как ты тренер!"
               location="top"
             >
               <template #activator="{ props }">
                 <div v-bind="props">
                   <v-btn
-                    :disabled="isUserTrainer"
+                    :disabled="isUserTrainerOfThisTraining"
                     :loading="isUpdating"
                     height="50"
                     class="training-card__btn training-card__btn_negative"
@@ -215,8 +215,11 @@ const { setErrorToast, setSuccessToast } = useToast();
 const isUpdating = ref(false);
 
 const userUid = computed(() => authStore.user?.uid ?? null);
-const isUserTrainer = computed(() => {
+const isUserTrainerOfThisTraining = computed(() => {
   return userUid.value === props.training.trainerUid;
+});
+const isUserTrainer = computed(() => {
+  return authStore.userAdditionalInfo?.isTrainer ?? false;
 });
 const timeDiffSeconds = computed(() => {
   return vuetifyDate.getDiff(props.training.dateTime, props.currDate) / 1000;
