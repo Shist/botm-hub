@@ -126,6 +126,7 @@
               :osuId="participant.osuId"
               :nick="participant.nick"
             />
+            <FreeSlotCard v-for="i in freeSlotsCount" :key="i" />
           </ul>
           <v-btn
             v-if="isTrainingEditable"
@@ -149,6 +150,7 @@ import { useDate } from "vuetify";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
 import UserCard from "@/components/UserCard.vue";
+import FreeSlotCard from "@/components/FreeSlotCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import {
@@ -228,6 +230,9 @@ const durationLabel = computed(() => {
 });
 const participantsTitle = computed(() => {
   return `Участники (${props.training.participants.length}/16):`;
+});
+const freeSlotsCount = computed(() => {
+  return 16 - props.training.participants.length;
 });
 const isTrainingEditable = computed(() => {
   return currentStatus.value !== TrainingStatus.archived;
@@ -424,7 +429,7 @@ const isSignUpBtnDisabled = computed(() => {
     gap: 10px;
     @media (max-width: $pc-s) {
       grid-template-columns: repeat(1, 1fr);
-      grid-template-rows: repeat(8, 1fr);
+      grid-template-rows: repeat(16, 1fr);
     }
     @include default-text(20px, 20px, var(--color-text));
     @media (max-width: $tablet-l) {
