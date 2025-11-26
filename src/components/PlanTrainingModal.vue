@@ -399,6 +399,21 @@ const onTimeClear = () => {
   isTimeMenuOpened.value = false;
 };
 
+const getValidationErrorMessage = (): string | null => {
+  if (trainingTitle.value.length < 3) {
+    return "Заголовок качалочки не должен быть менее 3 символов!";
+  } else if (trainingTitle.value.length > 70) {
+    return "Заголовок качалочки не должен быть более 70 символов!";
+  } else if (trainingTitle.value.split(" ").some((word) => word.length > 20)) {
+    return "Заголовок качалочки не должен содержать слова длиннее 20 символов!";
+  } else if (trainingDescription.value.length < 3) {
+    return "Описание качалочки не должно быть менее 3 символов!";
+  } else if (trainingDescription.value.length > 400) {
+    return "Описание качалочки не должно быть более 400 символов!";
+  }
+  return null;
+};
+
 const uploadTraining = async () => {
   if (!authStore.user || !trainingDateObject.value) return;
 
@@ -465,6 +480,12 @@ const updateTraining = async () => {
 };
 
 const onConfirmTraining = async () => {
+  const errorMessage = getValidationErrorMessage();
+  if (errorMessage) {
+    setErrorToast(errorMessage);
+    return;
+  }
+
   if (props.training) {
     await updateTraining();
   } else {
