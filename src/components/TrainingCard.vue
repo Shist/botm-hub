@@ -284,8 +284,9 @@ const isArchiveTrainingBtnVisible = computed(() => {
 });
 const isSubscribeBtnVisible = computed(() => {
   return (
-    currentStatus.value === TrainingStatus.waiting ||
-    currentStatus.value === TrainingStatus.inProgress
+    authStore.user &&
+    (currentStatus.value === TrainingStatus.waiting ||
+      currentStatus.value === TrainingStatus.inProgress)
   );
 });
 const isFullLobby = computed(() => {
