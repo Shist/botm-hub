@@ -63,7 +63,7 @@
             <v-text-field
               v-bind="props"
               :model-value="trainingTime"
-              :disabled="!trainingDate"
+              :disabled="isTimerPickerDisabled"
               variant="solo"
               prepend-inner-icon="mdi-clock"
               label="Время начала качалочки"
@@ -234,6 +234,13 @@ const minPossibleDateTime = computed(() => {
 });
 const minPossibleDateIso = computed(() => {
   return getCurrentDateIso(minPossibleDateTime.value);
+});
+const isTimerPickerDisabled = computed(() => {
+  if (!trainingDate.value) return true;
+  return (
+    !vuetifyDate.isSameDay(trainingDate.value, currDate.value) &&
+    vuetifyDate.isBefore(trainingDate.value, currDate.value)
+  );
 });
 const minPossibleTimeIso = computed(() => {
   if (vuetifyDate.isSameDay(trainingDate.value, currDate.value)) {

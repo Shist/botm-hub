@@ -39,6 +39,7 @@
               v-for="training in activeTrainingsList"
               :key="training.id"
               :training="training"
+              :currDate="currDate"
               @onEditTraining="onEditTraining"
               @onDeleteTraining="onDeleteTraining"
             />
@@ -67,6 +68,7 @@
               v-for="training in archivedTrainingsList"
               :key="training.id"
               :training="training"
+              :currDate="currDate"
             />
           </v-expansion-panels>
         </v-tabs-window-item>
@@ -80,13 +82,13 @@
     <DeleteTrainingModal
       :isOpened="isDeleteTrainingModalOpened"
       :trainingId="selectedTrainingIdForDeleting"
-      @closeModal="onCLoseDeleteTrainingModal"
+      @closeModal="onCloseDeleteTrainingModal"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useTrainingsStore } from "@/stores/trainings";
 import TrainingCard from "@/components/TrainingCard.vue";
@@ -102,6 +104,8 @@ const { setErrorToast } = useToast();
 
 const currTab = ref("plans");
 const isLoading = ref(false);
+const currDate = ref(new Date());
+const currDateUpdateIntervalId = ref<number | null>(null);
 const selectedTrainingForEditing = ref<IAllTrainingsListItem | null>(null);
 const selectedTrainingIdForDeleting = ref<string>("");
 const isPlanTrainingModalOpened = ref(false);
@@ -125,6 +129,9 @@ const archivedTrainingsList = computed(() => {
 });
 
 onMounted(async () => {
+  updateCurrDate();
+  currDateUpdateIntervalId.value = setInterval(updateCurrDate, 1000);
+
   try {
     isLoading.value = true;
     await trainingsStore.getAllTrainings();
@@ -135,6 +142,15 @@ onMounted(async () => {
     isLoading.value = false;
   }
 });
+
+onUnmounted(() => {
+  if (currDateUpdateIntervalId.value)
+    clearInterval(currDateUpdateIntervalId.value);
+});
+
+const updateCurrDate = () => {
+  currDate.value = new Date();
+};
 
 const onEditTraining = (training: IAllTrainingsListItem) => {
   selectedTrainingForEditing.value = training;
@@ -148,7 +164,7 @@ const onClosePlanTrainingModal = () => {
   isPlanTrainingModalOpened.value = false;
   selectedTrainingForEditing.value = null;
 };
-const onCLoseDeleteTrainingModal = () => {
+const onCloseDeleteTrainingModal = () => {
   isDeleteTrainingModalOpened.value = false;
   selectedTrainingIdForDeleting.value = "";
 };

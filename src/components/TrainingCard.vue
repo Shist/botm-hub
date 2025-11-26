@@ -135,7 +135,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { computed } from "vue";
 import { useDate } from "vuetify";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
@@ -151,6 +151,7 @@ import { fromMinsToDurationLabel, fromSecondsToDurationLabel } from "@/utils";
 
 const props = defineProps<{
   training: IAllTrainingsListItem;
+  currDate: Date;
 }>();
 
 defineEmits<{
@@ -162,12 +163,12 @@ const vuetifyDate = useDate();
 const authStore = useAuthStore();
 const usersStore = useUsersStore();
 
-const timeDiffSeconds = ref(0);
-const timeUpdateIntervalId = ref<number | null>(null);
-
 const isOtherTrainer = computed(() => {
   const currUserUid = authStore.user?.uid ?? null;
   return currUserUid !== props.training.trainerUid;
+});
+const timeDiffSeconds = computed(() => {
+  return vuetifyDate.getDiff(props.training.dateTime, props.currDate) / 1000;
 });
 const currentStatus = computed(() => {
   if (props.training.isArchived) {
@@ -219,9 +220,7 @@ const participantsTitle = computed(() => {
   return `Участники (${props.training.participants.length}/16):`;
 });
 const isTrainingEditable = computed(() => {
-  return [TrainingStatus.waiting, TrainingStatus.inProgress].includes(
-    currentStatus.value
-  );
+  return currentStatus.value !== TrainingStatus.archived;
 });
 const isArchiveTrainingBtnVisible = computed(() => {
   return currentStatus.value === TrainingStatus.completed;
@@ -229,25 +228,6 @@ const isArchiveTrainingBtnVisible = computed(() => {
 const isSignUpBtnDisabled = computed(() => {
   return props.training.participants.length >= 16;
 });
-
-onMounted(() => {
-  usersStore.getAllUsers();
-
-  updateTimeLabel();
-  timeUpdateIntervalId.value = setInterval(updateTimeLabel, 1000);
-});
-
-onUnmounted(() => {
-  if (timeUpdateIntervalId.value) clearInterval(timeUpdateIntervalId.value);
-});
-
-const updateTimeLabel = () => {
-  timeDiffSeconds.value =
-    vuetifyDate.getDiff(props.training.dateTime, new Date()) / 1000;
-  if (timeDiffSeconds.value < -totalDurationSecs.value) {
-    if (timeUpdateIntervalId.value) clearInterval(timeUpdateIntervalId.value);
-  }
-};
 </script>
 
 <style lang="scss" scoped>
