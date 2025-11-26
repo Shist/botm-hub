@@ -34,7 +34,7 @@
           >
             Пока нет качалочек в планах...
           </h4>
-          <v-expansion-panels v-else>
+          <v-expansion-panels v-model="expandedActiveTrainingsPanel" v-else>
             <TrainingCard
               v-for="training in activeTrainingsList"
               :key="training.id"
@@ -64,7 +64,7 @@
           >
             Пока нет записей в архиве...
           </h4>
-          <v-expansion-panels v-else>
+          <v-expansion-panels v-model="expandedArchivedTrainingsPanel" v-else>
             <TrainingCard
               v-for="training in archivedTrainingsList"
               :key="training.id"
@@ -79,16 +79,19 @@
       :isOpened="isPlanTrainingModalOpened"
       :training="selectedTrainingForEditing"
       @closeModal="onClosePlanTrainingModal"
+      @closeModalAfterRequest="onClosePlanTrainingModalAfterRequest"
     />
     <DeleteTrainingModal
       :isOpened="isDeleteTrainingModalOpened"
       :trainingId="selectedTrainingIdForDeleting"
       @closeModal="onCloseDeleteTrainingModal"
+      @closeModalAfterDeleting="onCloseDeleteTrainingModalAfterDeleting"
     />
     <ArchiveTrainingModal
       :isOpened="isArchiveTrainingModalOpened"
       :trainingId="selectedTrainingIdForArchiving"
       @closeModal="onCloseArchiveTrainingModal"
+      @closeModalAfterArchiving="onCloseArchiveTrainingModalAfterArchiving"
     />
   </div>
 </template>
@@ -110,6 +113,8 @@ const trainingsStore = useTrainingsStore();
 const { setErrorToast } = useToast();
 
 const currTab = ref("plans");
+const expandedActiveTrainingsPanel = ref<number | null>(null);
+const expandedArchivedTrainingsPanel = ref<number | null>(null);
 const isLoading = ref(false);
 const currDate = ref(new Date());
 const currDateUpdateIntervalId = ref<number | null>(null);
@@ -177,13 +182,30 @@ const onClosePlanTrainingModal = () => {
   isPlanTrainingModalOpened.value = false;
   selectedTrainingForEditing.value = null;
 };
+const onClosePlanTrainingModalAfterRequest = (trainingId: string) => {
+  onClosePlanTrainingModal();
+  expandedActiveTrainingsPanel.value = activeTrainingsList.value.findIndex(
+    (t) => t.id === trainingId
+  );
+};
 const onCloseDeleteTrainingModal = () => {
   isDeleteTrainingModalOpened.value = false;
   selectedTrainingIdForDeleting.value = "";
 };
+const onCloseDeleteTrainingModalAfterDeleting = () => {
+  onCloseDeleteTrainingModal();
+  expandedActiveTrainingsPanel.value = null;
+};
 const onCloseArchiveTrainingModal = () => {
   isArchiveTrainingModalOpened.value = false;
   selectedTrainingIdForArchiving.value = "";
+};
+const onCloseArchiveTrainingModalAfterArchiving = (trainingId: string) => {
+  onCloseArchiveTrainingModal();
+  expandedArchivedTrainingsPanel.value = archivedTrainingsList.value.findIndex(
+    (t) => t.id === trainingId
+  );
+  currTab.value = "archive";
 };
 </script>
 

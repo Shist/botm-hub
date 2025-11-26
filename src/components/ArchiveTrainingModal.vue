@@ -73,6 +73,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   closeModal: [];
+  closeModalAfterArchiving: [trainingId: string];
 }>();
 
 const trainingsStore = useTrainingsStore();
@@ -98,8 +99,8 @@ const onConfirmArchiving = async () => {
       props.trainingId,
       chosenMpLinkId.value
     );
-    setSuccessToast("🥳🥳🥳 Качалочка успешно заархивирована!!! 🥳🥳🥳");
-    emit("closeModal");
+    setSuccessToast("🗃️🗃️🗃️ Качалочка успешно заархивирована!!! 🗃️🗃️🗃️");
+    emit("closeModalAfterArchiving", props.trainingId);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось заархивировать качалочку: ${msg}`);

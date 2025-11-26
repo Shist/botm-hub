@@ -210,6 +210,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   closeModal: [];
+  closeModalAfterRequest: [id: string];
 }>();
 
 const vuetifyDate = useDate();
@@ -437,8 +438,8 @@ const uploadTraining = async () => {
     };
 
     await trainingsStore.uploadTraining(training);
-    setSuccessToast("🥳🥳🥳 Качалочка успешно запланирована!!! 🥳🥳🥳");
-    emit("closeModal");
+    setSuccessToast("🤝🤝🤝 Качалочка успешно запланирована!!! 🤝🤝🤝");
+    emit("closeModalAfterRequest", training.id);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось запланировать качалочку: ${msg}`);
@@ -469,8 +470,8 @@ const updateTraining = async () => {
     };
 
     await trainingsStore.updateTraining(training);
-    setSuccessToast("🥳🥳🥳 Качалочка успешно изменена!!! 🥳🥳🥳");
-    emit("closeModal");
+    setSuccessToast("✏️✏️✏️ Качалочка успешно изменена!!! ✏️✏️✏️");
+    emit("closeModalAfterRequest", training.id);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось изменить качалочку: ${msg}`);

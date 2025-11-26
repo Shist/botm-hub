@@ -46,6 +46,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   closeModal: [];
+  closeModalAfterDeleting: [];
 }>();
 
 const trainingsStore = useTrainingsStore();
@@ -58,8 +59,8 @@ const onConfirmDeleting = async () => {
   try {
     isDeleting.value = true;
     await trainingsStore.deleteTraining(props.trainingId);
-    setSuccessToast("Качалочка успешно удалена...");
-    emit("closeModal");
+    setSuccessToast("🗑️🗑️🗑️ Качалочка успешно удалена!!! 🗑️🗑️🗑️");
+    emit("closeModalAfterDeleting");
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось удалить качалочку: ${msg}`);
