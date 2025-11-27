@@ -1,6 +1,17 @@
 <template>
   <ul class="patch-notes">
     <li class="patch-notes__patch-wrapper">
+      <h3 class="patch-notes__patch-version">Версия 2.0.1</h3>
+      <ol class="patch_notes__patch-features-wrapper">
+        <li class="patch_notes__patch-feature">
+          Был замечен баг, что форма для создания/изменения качалочки иногда не
+          влезала в экран браузера устройства (часто мобильного). Теперь задано
+          правило, что если форма не влезает в экран, то появится скроллбар. Сам
+          контент формы составляет 80% от высоты экрана
+        </li>
+      </ol>
+    </li>
+    <li class="patch-notes__patch-wrapper">
       <h3 class="patch-notes__patch-version">Версия 2.0.0</h3>
       <ol class="patch_notes__patch-features-wrapper">
         <li class="patch_notes__patch-feature">

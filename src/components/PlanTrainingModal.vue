@@ -506,6 +506,8 @@ const onConfirmTraining = async () => {
     }
   }
   &__modal-content-wrapper {
+    max-height: 80dvh;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 10px;
