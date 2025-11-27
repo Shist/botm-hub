@@ -1,5 +1,5 @@
 <template>
-  <v-expansion-panel class="training-card">
+  <v-expansion-panel :value="training.id" class="training-card">
     <template #title>
       <div class="training-card__panel-header-wrapper">
         <div class="training-card__titles-wrapper">
@@ -204,6 +204,10 @@ defineEmits<{
   onDeleteTraining: [trainingId: string];
   onArchiveTraining: [trainingId: string];
 }>();
+
+defineExpose({
+  trainingId: props.training.id,
+});
 
 const vuetifyDate = useDate();
 const authStore = useAuthStore();

@@ -41,6 +41,7 @@
               :key="training.id"
               :training="training"
               :currDate="currDate"
+              ref="activeTrainings"
               @onEditTraining="onEditTraining"
               @onDeleteTraining="onDeleteTraining"
               @onArchiveTraining="onArchiveTraining"
@@ -71,6 +72,7 @@
               :key="training.id"
               :training="training"
               :currDate="currDate"
+              ref="archivedTrainings"
             />
           </v-expansion-panels>
         </v-tabs-window-item>
@@ -98,7 +100,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import {
+  ref,
+  computed,
+  onMounted,
+  onUnmounted,
+  useTemplateRef,
+  nextTick,
+} from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useTrainingsStore } from "@/stores/trainings";
 import TrainingCard from "@/components/TrainingCard.vue";
@@ -108,14 +117,17 @@ import ArchiveTrainingModal from "@/components/ArchiveTrainingModal.vue";
 import useToast from "@/composables/useToast";
 import { type IAllTrainingsListItem } from "@/types";
 
+const activeTrainingsRefs = useTemplateRef("activeTrainings");
+const archivedTrainingsRefs = useTemplateRef("archivedTrainings");
+
 const authStore = useAuthStore();
 const trainingsStore = useTrainingsStore();
 
 const { setErrorToast } = useToast();
 
 const currTab = ref("plans");
-const expandedActiveTrainingsPanel = ref<number | null>(null);
-const expandedArchivedTrainingsPanel = ref<number | null>(null);
+const expandedActiveTrainingsPanel = ref<string | null>(null);
+const expandedArchivedTrainingsPanel = ref<string | null>(null);
 const isLoading = ref(false);
 const currDate = ref(new Date());
 const currDateUpdateIntervalId = ref<number | null>(null);
@@ -158,6 +170,20 @@ const updateCurrDate = () => {
   currDate.value = new Date();
 };
 
+const scrollToChangedTrainingPanel = async (
+  isActiveTab: boolean,
+  trainingId: string
+) => {
+  await nextTick();
+  const trainingsRefs = isActiveTab
+    ? activeTrainingsRefs
+    : archivedTrainingsRefs;
+  const changedPanel = trainingsRefs.value?.find(
+    (activePanel) => activePanel?.trainingId === trainingId
+  );
+  changedPanel?.$el.scrollIntoView({ behavior: "smooth", block: "start" });
+};
+
 const onEditTraining = (training: IAllTrainingsListItem) => {
   selectedTrainingForEditing.value = training;
   isPlanTrainingModalOpened.value = true;
@@ -176,9 +202,8 @@ const onClosePlanTrainingModal = () => {
 };
 const onClosePlanTrainingModalAfterRequest = (trainingId: string) => {
   onClosePlanTrainingModal();
-  expandedActiveTrainingsPanel.value = activeTrainingsList.value.findIndex(
-    (t) => t.id === trainingId
-  );
+  expandedActiveTrainingsPanel.value = trainingId;
+  scrollToChangedTrainingPanel(true, trainingId);
 };
 const onCloseDeleteTrainingModal = () => {
   isDeleteTrainingModalOpened.value = false;
@@ -194,10 +219,9 @@ const onCloseArchiveTrainingModal = () => {
 };
 const onCloseArchiveTrainingModalAfterArchiving = (trainingId: string) => {
   onCloseArchiveTrainingModal();
-  expandedArchivedTrainingsPanel.value = archivedTrainingsList.value.findIndex(
-    (t) => t.id === trainingId
-  );
+  expandedArchivedTrainingsPanel.value = trainingId;
   currTab.value = "archive";
+  scrollToChangedTrainingPanel(false, trainingId);
 };
 </script>
 
