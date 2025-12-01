@@ -94,9 +94,9 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useThemeStore } from "@/stores/theme";
 import useToast from "@/composables/useToast";
-import useFirebaseErrorMsg from "@/composables/useFirebaseErrorMsg";
 import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
 import PatchNotes from "@/components/PatchNotes.vue";
+import { getFirebaseErrorMsg } from "@/utils";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
 const router = useRouter();
@@ -105,7 +105,6 @@ const authStore = useAuthStore();
 const themeStore = useThemeStore();
 
 const { setErrorToast } = useToast();
-const { getErrorMsg } = useFirebaseErrorMsg();
 
 const isMenuOpened = ref(false);
 const isPatchNotesModalOpened = ref(false);
@@ -171,7 +170,7 @@ const onLogOutBtnClicked = async () => {
     router.push({ name: "sign-in" });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      const errorMsg = getErrorMsg(error);
+      const errorMsg = getFirebaseErrorMsg(error);
       setErrorToast(errorMsg);
     }
   }

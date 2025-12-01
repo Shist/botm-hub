@@ -46,5 +46,7 @@ onFirebaseAuthStateChanged((user: IFirebaseUser | null) => {
       .catch(() => {
         setAdditionalUserInfo("loadingError");
       });
+  } else {
+    useAuthStore().user = null;
   }
 });

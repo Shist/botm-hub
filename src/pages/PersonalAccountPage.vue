@@ -72,14 +72,13 @@ import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
-import useValidationErrorMsg from "@/composables/useValidationErrorMsg";
+import { getNickValidationError } from "@/utils";
 import ehCollabImage from "@/assets/images/eh-collab.png";
 import { OsuMapCategory, DigitCategory } from "@/types";
 
 const authStore = useAuthStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
-const { getNickValidationError } = useValidationErrorMsg();
 
 const chosenOsuId = ref<number | null>(null);
 const chosenNick = ref<string | null>(null);

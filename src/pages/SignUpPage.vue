@@ -91,16 +91,13 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import useToast from "@/composables/useToast";
-import useFirebaseErrorMsg from "@/composables/useFirebaseErrorMsg";
-import useValidationErrorMsg from "@/composables/useValidationErrorMsg";
+import { getFirebaseErrorMsg, getSignUpValidationError } from "@/utils";
 
 const router = useRouter();
 
 const authStore = useAuthStore();
 
 const { setLoadingToast, setSuccessToast, setErrorToast } = useToast();
-const { getSignUpValidationError } = useValidationErrorMsg();
-const { getErrorMsg } = useFirebaseErrorMsg();
 
 const email = ref("");
 const nick = ref("");
@@ -138,7 +135,7 @@ const onConfirmBtnClicked = async () => {
     router.replace({ name: "main" });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      const errorMsg = getErrorMsg(error);
+      const errorMsg = getFirebaseErrorMsg(error);
       setErrorToast(errorMsg);
     }
   } finally {

@@ -1,3 +1,62 @@
+import { type IFirebaseError, type ISignUpStateRef } from "@/types";
+
+export function getFirebaseErrorMsg(error: IFirebaseError | Error): string {
+  if (!("code" in error)) {
+    return error.message;
+  }
+  switch (error.code) {
+    case "auth/invalid-email":
+      return "Указанный вами адрес электронной почты не зарегистрирован!";
+    case "auth/missing-password":
+      return "Вы не указали пароль!";
+    case "auth/invalid-credential":
+      return "Указанные вами учетные данные неверны. Перепроверьте указанный адрес электронной почты и пароль!";
+    case "auth/email-already-in-use":
+      return "Указанный вами адрес электронной почты уже зарегистрирован. Войдите или зарегистрируйте другой.";
+    default:
+      return error.message;
+  }
+}
+
+export function getNickValidationError(nick: string): string | null {
+  if (!nick) {
+    return "Ник не может быть пустым!";
+  } else if (nick.length < 3) {
+    return "Ник не может быть короче 3 символов!";
+  } else if (nick.length > 15) {
+    return "Ник не может быть длиннее 15 символов!";
+  }
+  return null;
+}
+
+export function getSignUpValidationError({
+  email,
+  nick,
+  password,
+  repeatPassword,
+}: ISignUpStateRef): string | null {
+  if (!email.value) {
+    return "Электронная почта не может быть пустой!";
+  } else if (!/^[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,}$/i.test(email.value)) {
+    return "Введенный вами адрес электронной почты недействителен!";
+  }
+
+  const nickError = getNickValidationError(nick.value);
+  if (nickError) return nickError;
+
+  if (password.value.length < 8) {
+    return "Пароль не может быть короче 8 символов!";
+  } else if (password.value.length > 28) {
+    return "Пароль не может быть длиннее 28 символов!";
+  } else if (!/^(?=.*[a-z])(?=.*\d).+$/i.test(password.value)) {
+    return "Пароль должен содержать как минимум одну букву и одну цифру!";
+  } else if (password.value !== repeatPassword.value) {
+    return "Введенные пароли не совпадают!";
+  }
+
+  return null;
+}
+
 export function getScrollbarWidth(): number {
   const scrollDiv = document.createElement("div");
   scrollDiv.className = "scrollbar-measure";
