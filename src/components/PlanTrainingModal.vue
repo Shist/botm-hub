@@ -27,6 +27,7 @@
               <v-menu
                 v-model="isDateMenuOpened"
                 :close-on-content-click="false"
+                content-class="vuetify-date-time-picker-wrapper"
               >
                 <template #activator="{ props }">
                   <v-text-field
@@ -43,13 +44,15 @@
                 <v-date-picker
                   v-model="trainingDate"
                   :min="minPossibleDateIso"
+                  min-width="320"
+                  width="320"
                   color="var(--color-date-picker-header)"
                   title="Укажи дату начала качалочки"
                   show-adjacent-months
                   divided
                 >
                   <template #actions>
-                    <div class="plan-training-modal__modal-btns-wrapper">
+                    <div class="plan-training-modal__date-time-btns-wrapper">
                       <v-btn
                         height="50"
                         class="plan-training-modal__btn plan-training-modal__btn_cancel"
@@ -81,6 +84,7 @@
               <v-menu
                 v-model="isTimeMenuOpened"
                 :close-on-content-click="false"
+                content-class="vuetify-date-time-picker-wrapper"
               >
                 <template #activator="{ props }">
                   <v-text-field
@@ -98,13 +102,15 @@
                 <v-time-picker
                   v-model="trainingTime"
                   :min="minPossibleTimeIso"
+                  min-width="320"
+                  width="320"
                   color="var(--color-time-picker-header)"
                   title="Укажи время начала качалочки"
                   format="24hr"
                   divided
                 >
                   <template #actions>
-                    <div class="plan-training-modal__modal-btns-wrapper">
+                    <div class="plan-training-modal__date-time-btns-wrapper">
                       <v-btn
                         height="50"
                         class="plan-training-modal__btn plan-training-modal__btn_cancel"
@@ -517,6 +523,13 @@ const onConfirmTraining = async () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  &__date-time-btns-wrapper {
+    width: 100%;
+    display: flex;
+    & > * {
+      flex: 1 1 calc(50% - 5px);
+    }
   }
   &__modal-btns-wrapper {
     width: 100%;
