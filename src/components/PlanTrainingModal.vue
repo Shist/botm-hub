@@ -3,7 +3,7 @@
     :isOpened="isOpened"
     :title="modalTitle"
     :isClosableByClickOutside="false"
-    @closeModal="$emit('closeModal')"
+    @closeModal="onCloseModal"
   >
     <template #default>
       <div class="plan-training-modal__modal-content-wrapper">
@@ -165,7 +165,7 @@
           :disabled="isLoading"
           height="50"
           class="plan-training-modal__btn plan-training-modal__btn_cancel"
-          @click="$emit('closeModal')"
+          @click="onCloseModal"
         >
           Отмена
         </v-btn>
@@ -379,6 +379,12 @@ const initValues = () => {
     trainingDuration.value = 120;
     trainingDescription.value = `Тренировка скиллсетов: ${skillsetsDescription.value}`;
   }
+};
+
+const onCloseModal = () => {
+  isDateMenuOpened.value = false;
+  isTimeMenuOpened.value = false;
+  emit("closeModal");
 };
 
 const onDateClear = () => {
