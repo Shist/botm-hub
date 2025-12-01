@@ -7,7 +7,7 @@
     <AppImage
       :imgPath="`https://a.ppy.sh/${osuId}?.png`"
       :imgAlt="`Аватар ${nick}`"
-      isRounded
+      isAvatar
       class="user-card__avatar"
     />
     <span class="user-card__nick">

@@ -1,11 +1,14 @@
 <template>
   <div>
-    <div v-if="currImgState === 'loading'" class="img-skeleton">
+    <div
+      v-if="currImgState === 'loading'"
+      class="img-skeleton"
+      :class="{ 'avatar-img': isAvatar }"
+    >
       <img
         src="@/assets/images/img-loading.png"
         alt="Изображение загружается"
         class="img-skeleton__img-loading-icon"
-        :class="{ 'rounded-img': isRounded }"
       />
     </div>
     <img
@@ -13,7 +16,7 @@
       :src="imgSrc"
       :alt="imgAlt"
       class="main-img"
-      :class="{ 'rounded-img': isRounded }"
+      :class="{ 'avatar-img': isAvatar }"
       @load="handleImageSrcLoad"
       @error="handleImageSrcError"
     />
@@ -22,9 +25,9 @@
         src="@/assets/images/img-error.png"
         alt="Ошибка при загрузке изображения"
         class="img-error__icon"
-        :class="{ 'rounded-img': isRounded }"
+        :class="{ 'avatar-img': isAvatar }"
       />
-      <span class="img-error__message">
+      <span v-if="!isAvatar" class="img-error__message">
         Во время загрузки изображения произошла ошибка
       </span>
     </div>
@@ -37,7 +40,7 @@ import { ref, type Ref, onMounted, watch } from "vue";
 const props = defineProps<{
   imgPath: string;
   imgAlt: string;
-  isRounded?: boolean;
+  isAvatar?: boolean;
 }>();
 
 const currImgState = ref("loading");
@@ -67,7 +70,7 @@ watch(
 </script>
 
 <style lang="scss" scoped>
-.rounded-img {
+.avatar-img {
   border-radius: 50%;
 }
 
@@ -106,11 +109,13 @@ watch(
   display: flex;
   flex-direction: column;
   align-items: center;
+  row-gap: 20px;
   border-radius: 10px;
   &__icon {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 20px;
+    width: 100%;
+    &:not(.avatar-img) {
+      max-width: 100px;
+    }
   }
   &__message {
     @include default-text(20px, 20px, var(--color-error));
