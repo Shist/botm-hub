@@ -450,6 +450,9 @@ const onUnsubscribe = async () => {
         justify-self: center;
         text-align: center;
       }
+      :nth-child(even) {
+        text-align: center;
+      }
     }
   }
   &__training-description {
