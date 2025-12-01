@@ -1,5 +1,7 @@
 import type { OsuMapCategory } from "@/types";
 
+export const SHIST_UID = "mjFMxVxnVrdAuYf0wYHY7Zb3KRl2";
+
 export const MAPS_CATEGORIES: Record<OsuMapCategory, string> = {
   nm1: "NM1 (Raw Aim)",
   nm2: "NM2 (Flow Tapping)",

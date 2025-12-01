@@ -57,8 +57,7 @@
                       <UserCard
                         v-for="user in usersList"
                         :key="user.uid"
-                        :osuId="user.osuId"
-                        :nick="user.nick"
+                        :user="user"
                       />
                     </template>
                   </div>
@@ -114,8 +113,7 @@
                       <UserCard
                         v-for="user in usersList"
                         :key="user.uid"
-                        :osuId="user.osuId"
-                        :nick="user.nick"
+                        :user="user"
                       />
                     </template>
                   </div>
@@ -132,7 +130,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
-import UserCard from "@/components/UserCard.vue";
+import UserCard from "@/components/user-card/UserCard.vue";
 import useToast from "@/composables/useToast";
 import { DigitCategory, OsuMapCategory, type IAllUsersListItem } from "@/types";
 import { MAPS_CATEGORIES, CATEGORIES_COLORS } from "@/constants";

@@ -123,9 +123,16 @@
             <UserCard
               v-for="participant in training.participants"
               :key="participant.uid"
-              :osuId="participant.osuId"
-              :nick="participant.nick"
-            />
+              :user="participant"
+            >
+              <span class="training-card__participant-role-label">
+                {{
+                  participant.uid === training.trainerUid
+                    ? "⭐ Тренер ⭐"
+                    : "👤 Участник 👤"
+                }}
+              </span>
+            </UserCard>
             <FreeSlotCard v-for="i in freeSlotsCount" :key="i" />
           </ul>
           <div v-if="isSubscribeBtnVisible">
@@ -181,7 +188,7 @@ import { ref, computed } from "vue";
 import { useDate } from "vuetify";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
-import UserCard from "@/components/UserCard.vue";
+import UserCard from "@/components/user-card/UserCard.vue";
 import FreeSlotCard from "@/components/FreeSlotCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
@@ -503,7 +510,7 @@ const onUnsubscribe = async () => {
     flex-direction: column;
     gap: 10px;
   }
-  .training-card__players-title {
+  &__players-title {
     @include default-headline(24px, 24px, var(--color-text));
     @media (max-width: $tablet-l) {
       font-size: 20px;
@@ -514,7 +521,7 @@ const onUnsubscribe = async () => {
       line-height: 16px;
     }
   }
-  .training-card__players-list {
+  &__players-list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(8, 1fr);
@@ -523,6 +530,17 @@ const onUnsubscribe = async () => {
       grid-template-columns: repeat(1, 1fr);
       grid-template-rows: repeat(16, 1fr);
     }
+    @include default-text(20px, 20px, var(--color-text));
+    @media (max-width: $tablet-l) {
+      font-size: 16px;
+      line-height: 16px;
+    }
+    @media (max-width: $phone-l) {
+      font-size: 14px;
+      line-height: 14px;
+    }
+  }
+  &__participant-role-label {
     @include default-text(20px, 20px, var(--color-text));
     @media (max-width: $tablet-l) {
       font-size: 16px;
