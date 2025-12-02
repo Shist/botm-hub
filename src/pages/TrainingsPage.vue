@@ -143,7 +143,9 @@ const activeTrainingsList = computed(() => {
   return trainingsStore.trainings.filter((t) => !t.isArchived);
 });
 const archivedTrainingsList = computed(() => {
-  return trainingsStore.trainings.filter((t) => t.isArchived);
+  return trainingsStore.trainings
+    .filter((t) => t.isArchived)
+    .sort((a, b) => b.dateTime.getTime() - a.dateTime.getTime());
 });
 
 onMounted(async () => {
