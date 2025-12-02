@@ -217,6 +217,7 @@ onMounted(async () => {
   }
   &__tab-window-wrapper {
     padding: 10px;
+    overflow-x: auto;
   }
 }
 
@@ -224,12 +225,12 @@ onMounted(async () => {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  gap: 10px;
-  @media (max-width: $pc-l) {
+  gap: 8px;
+  @media (max-width: $pc-xl) {
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(7, 1fr);
   }
-  @media (max-width: $tablet-s) {
+  @media (max-width: $tablet-m) {
     grid-template-columns: repeat(1, 1fr);
     grid-template-rows: repeat(21, 1fr);
   }
