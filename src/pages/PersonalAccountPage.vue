@@ -16,7 +16,10 @@
           />
         </template>
       </v-tooltip>
-      <div class="personal-account-page__inputs-wrapper">
+      <v-form
+        v-model="isFormValid"
+        class="personal-account-page__inputs-wrapper"
+      >
         <v-number-input
           v-model="chosenOsuId"
           :min="0"
@@ -31,12 +34,14 @@
         />
         <v-text-field
           v-model="chosenNick"
+          :counter="15"
+          :rules="[rules.min(3), rules.max(15)]"
           variant="solo"
           prepend-inner-icon="mdi-account"
           label="osu! Ник"
           placeholder="Введи свой osu! ник"
+          persistent-counter
           clearable
-          hide-details
         />
         <v-select
           v-model="chosenDigit"
@@ -49,10 +54,10 @@
           hide-details
         />
         <SkillsetsSelect v-model="chosenCategories" />
-      </div>
+      </v-form>
     </div>
     <v-btn
-      :disabled="!isSomeInfoChanged"
+      :disabled="!isFormValid || !isSomeInfoChanged"
       :loading="isUpdating"
       height="50"
       class="personal-account-page__confirm-btn"
@@ -72,13 +77,14 @@ import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
-import { getNickValidationError } from "@/utils";
+import useFormValidation from "@/composables/useFormValidation";
 import ehCollabImage from "@/assets/images/eh-collab.png";
 import { OsuMapCategory, DigitCategory } from "@/types";
 
 const authStore = useAuthStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
+const { isFormValid, rules } = useFormValidation();
 
 const chosenOsuId = ref<number | null>(null);
 const chosenNick = ref<string | null>(null);
@@ -139,12 +145,6 @@ onMounted(() => {
 });
 
 const onUpdate = async () => {
-  const nickErrorMsg = getNickValidationError(chosenNick.value ?? "");
-  if (nickErrorMsg) {
-    setErrorToast(nickErrorMsg);
-    return;
-  }
-
   try {
     isUpdating.value = true;
 
@@ -189,8 +189,8 @@ const onUpdate = async () => {
     }
   }
   &__avatar {
-    width: 256px;
-    height: 256px;
+    max-width: 276px;
+    width: 100%;
   }
   &__inputs-wrapper {
     flex-grow: 1;
