@@ -22,7 +22,7 @@
       >
         <v-number-input
           v-model="chosenOsuId"
-          :min="0"
+          :min="1"
           :max="1000000000"
           variant="solo"
           control-variant="hidden"

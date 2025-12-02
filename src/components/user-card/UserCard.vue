@@ -1,9 +1,5 @@
 <template>
-  <a
-    :href="`https://osu.ppy.sh/users/${user.nick}`"
-    target="_blank"
-    class="user-card"
-  >
+  <router-link :to="`/players/${user.uid}`" class="user-card">
     <slot />
     <div class="user-card__constant-info-wrapper">
       <div class="user-card__tags-wrapper">
@@ -23,35 +19,21 @@
         </span>
       </div>
     </div>
-  </a>
+  </router-link>
 </template>
 
 <script setup lang="ts">
+import { toRef } from "vue";
+import useUserTags from "@/composables/useUserTags";
 import IconAdmin from "@/components/user-card/IconAdmin.vue";
-import IconDigitFour from "@/components/user-card/IconDigitFour.vue";
-import IconDigitFive from "@/components/user-card/IconDigitFive.vue";
-import IconDigitSix from "@/components/user-card/IconDigitSix.vue";
 import IconTrainer from "@/components/user-card/IconTrainer.vue";
-import { SHIST_UID } from "@/constants";
-import { DigitCategory, type IAllUsersListItem } from "@/types";
-import { computed } from "vue";
+import { type IAllUsersListItem } from "@/types";
 
 const props = defineProps<{ user: IAllUsersListItem }>();
 
-const isShist = computed(() => props.user.uid === SHIST_UID);
-const digitIconComponent = computed(() => {
-  switch (props.user.digitCategory) {
-    case DigitCategory.fourDigit:
-      return IconDigitFour;
-    case DigitCategory.fiveDigit:
-      return IconDigitFive;
-    case DigitCategory.sixDigit:
-      return IconDigitSix;
-    default:
-      return null;
-  }
-});
-const isTrainer = computed(() => props.user.isTrainer);
+const { isShist, digitIconComponent, isTrainer } = useUserTags(
+  toRef(props.user)
+);
 </script>
 
 <style lang="scss" scoped>

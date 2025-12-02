@@ -4,6 +4,7 @@ import SignInPage from "@/pages/SignInPage.vue";
 import SignUpPage from "@/pages/SignUpPage.vue";
 import PersonalAccountPage from "@/pages/PersonalAccountPage.vue";
 import PlayersPage from "@/pages/PlayersPage.vue";
+import PlayerByUidPage from "@/pages/PlayerByUidPage.vue";
 import SkillsetsMapsPage from "@/pages/skillsets-maps-pages/SkillsetsMapsPage.vue";
 import NM1MapsPage from "@/pages/skillsets-maps-pages/nm/NM1MapsPage.vue";
 import NM2MapsPage from "@/pages/skillsets-maps-pages/nm/NM2MapsPage.vue";
@@ -60,6 +61,11 @@ const router = createRouter({
       path: "/players",
       name: "players",
       component: PlayersPage,
+    },
+    {
+      path: "/players/:uid",
+      name: "player-by-uid",
+      component: PlayerByUidPage,
     },
     {
       path: "/skillsets-maps",
