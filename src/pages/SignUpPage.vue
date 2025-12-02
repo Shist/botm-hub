@@ -1,74 +1,69 @@
 <template>
   <div class="sign-up-page">
-    <form action="#" class="sign-up-page__form">
+    <v-form v-model="isFormValid" class="sign-up-page__form">
       <h2 class="sign-up-page__headline">Регистрация</h2>
-      <div class="control-wrapper sign-up-page__email-control-wrapper">
-        <label class="control-wrapper__email-input-label" for="emailInput">
-          Почта:
-        </label>
-        <input
-          v-model="email"
-          type="email"
-          name="email"
-          class="control-wrapper__email-input"
-          id="emailInput"
-          placeholder="Ввести почту..."
-          required
-        />
-      </div>
-      <div class="control-wrapper sign-up-page__nick-control-wrapper">
-        <label class="control-wrapper__nick-input-label" for="nickInput">
-          osu! ник:
-        </label>
-        <input
-          v-model="nick"
-          type="nick"
-          name="nick"
-          class="control-wrapper__nick-input"
-          id="nickInput"
-          placeholder="Ввести osu! ник..."
-          required
-        />
-      </div>
-      <div class="control-wrapper sign-up-page__password-control-wrapper">
-        <label
-          class="control-wrapper__password-input-label"
-          for="passwordInput"
-        >
-          Пароль:
-        </label>
-        <input
-          v-model="password"
-          type="password"
-          name="password"
-          class="control-wrapper__password-input"
-          id="passwordInput"
-          placeholder="Ввести пароль..."
-          autocomplete="on"
-          required
-        />
-      </div>
-      <div
-        class="control-wrapper sign-up-page__repeat-password-control-wrapper"
-      >
-        <label
-          class="control-wrapper__repeat-password-input-label"
-          for="repeatPasswordInput"
-        >
-          Повтор пароля:
-        </label>
-        <input
-          v-model="repeatPassword"
-          type="password"
-          name="repeat-password"
-          class="control-wrapper__repeat-password-input"
-          id="repeatPasswordInput"
-          placeholder="Ввести пароль ещё раз..."
-          autocomplete="on"
-          required
-        />
-      </div>
+      <v-text-field
+        v-model="email"
+        :counter="254"
+        :rules="[rules.min(5), rules.max(254), rules.isValidEmail]"
+        type="email"
+        autocomplete="email"
+        variant="solo"
+        prepend-inner-icon="mdi-email"
+        label="Почта"
+        placeholder="Введи свою почту"
+        persistent-counter
+        clearable
+        class="sign-up-page__email-field"
+      />
+      <v-text-field
+        v-model="nick"
+        :counter="15"
+        :rules="[rules.min(3), rules.max(15)]"
+        autocomplete="username"
+        variant="solo"
+        prepend-inner-icon="mdi-account"
+        label="osu! Ник"
+        placeholder="Введи свой osu! ник"
+        persistent-counter
+        clearable
+        class="sign-up-page__nick-field"
+      />
+      <v-text-field
+        v-model="password"
+        :counter="28"
+        :rules="[rules.min(8), rules.max(28), rules.isStrongPassword]"
+        type="password"
+        autocomplete="new-password"
+        variant="solo"
+        prepend-inner-icon="mdi-lock"
+        label="Пароль"
+        placeholder="Введи свой пароль"
+        persistent-counter
+        clearable
+        class="sign-up-page__password-field"
+      />
+      <v-text-field
+        v-model="repeatPassword"
+        :counter="28"
+        :rules="[
+          rules.min(8),
+          rules.max(28),
+          rules.isStrongPassword,
+          rules.isPasswordSame(password),
+        ]"
+        type="password"
+        autocomplete="new-password"
+        variant="solo"
+        prepend-inner-icon="mdi-lock-check"
+        label="Повтор пароля"
+        placeholder="Введи свой пароль ещё раз"
+        persistent-counter
+        clearable
+        class="sign-up-page__repeat-password-field"
+      />
       <v-btn
+        :disabled="!isFormValid"
         :loading="isLoading"
         height="50"
         class="sign-up-page__confirm-btn"
@@ -76,7 +71,7 @@
       >
         Зарегистрировать аккаунт
       </v-btn>
-    </form>
+    </v-form>
     <h3 class="sign-up-page__sign-up-suggestion-headline">Уже есть аккаунт?</h3>
     <v-btn :disabled="isLoading" height="50" class="sign-up-page__sign-in-btn">
       <router-link to="/sign-in" class="sign-up-page__sign-in-btn-label">
@@ -91,13 +86,15 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import useToast from "@/composables/useToast";
-import { getFirebaseErrorMsg, getSignUpValidationError } from "@/utils";
+import useFormValidation from "@/composables/useFormValidation";
+import { getFirebaseErrorMsg } from "@/utils";
 
 const router = useRouter();
 
 const authStore = useAuthStore();
 
 const { setLoadingToast, setSuccessToast, setErrorToast } = useToast();
+const { isFormValid, rules } = useFormValidation();
 
 const email = ref("");
 const nick = ref("");
@@ -107,18 +104,6 @@ const repeatPassword = ref("");
 const isLoading = ref(false);
 
 const onConfirmBtnClicked = async () => {
-  const errorMsg = getSignUpValidationError({
-    email,
-    nick,
-    password,
-    repeatPassword,
-  });
-
-  if (errorMsg) {
-    setErrorToast(errorMsg);
-    return;
-  }
-
   isLoading.value = true;
   setLoadingToast("Регистрация...");
 
@@ -156,30 +141,29 @@ const onConfirmBtnClicked = async () => {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     background-color: var(--color-auth-form-bg);
     border-radius: 20px;
-    .sign-up-page__headline {
-      @include default-headline(42px, 42px, var(--color-text));
-      margin-bottom: 30px;
-      text-align: center;
-      @media (max-width: $phone-l) {
-        font-size: 32px;
-        line-height: 32px;
-      }
+  }
+  &__headline {
+    @include default-headline(42px, 42px, var(--color-text));
+    margin-bottom: 30px;
+    text-align: center;
+    @media (max-width: $phone-l) {
+      font-size: 32px;
+      line-height: 32px;
     }
-    .sign-up-page__email-control-wrapper,
-    .sign-up-page__nick-control-wrapper,
-    .sign-up-page__password-control-wrapper {
-      margin-bottom: 20px;
-    }
-    .sign-up-page__repeat-password-control-wrapper {
-      margin-bottom: 40px;
-    }
-    .sign-up-page__confirm-btn {
-      align-self: center;
-      @include default-btn(500px, var(--color-btn-text), var(--color-btn-bg));
-    }
+  }
+  &__email-field,
+  &__nick-field,
+  &__password-field {
+    margin-bottom: 10px;
+  }
+  &__repeat-password-field {
+    margin-bottom: 25px;
+  }
+  &__confirm-btn {
+    align-self: center;
+    @include default-btn(500px, var(--color-btn-text), var(--color-btn-bg));
   }
   &__sign-up-suggestion-headline {
     @include default-text(20px, 20px, var(--color-text));
@@ -191,30 +175,6 @@ const onConfirmBtnClicked = async () => {
   &__sign-in-btn-label {
     color: var(--color-btn-text);
     text-decoration: none;
-  }
-}
-
-.control-wrapper {
-  max-width: 500px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  &__email-input-label,
-  &__nick-input-label,
-  &__password-input-label,
-  &__repeat-password-input-label {
-    @include default-text(24px, 24px, var(--color-text));
-    padding-bottom: 5px;
-    @media (max-width: $phone-l) {
-      font-size: 20px;
-      line-height: 20px;
-    }
-  }
-  &__email-input,
-  &__nick-input,
-  &__password-input,
-  &__repeat-password-input {
-    @extend %default-input;
   }
 }
 </style>

@@ -1,40 +1,37 @@
 <template>
   <div class="sign-in-page">
-    <form action="#" class="sign-in-page__form">
+    <v-form v-model="isFormValid" class="sign-in-page__form">
       <h2 class="sign-in-page__headline">Вход</h2>
-      <div class="control-wrapper sign-in-page__email-control-wrapper">
-        <label class="control-wrapper__email-input-label" for="emailInput">
-          Почта:
-        </label>
-        <input
-          v-model="email"
-          type="email"
-          name="email"
-          class="control-wrapper__email-input"
-          id="emailInput"
-          placeholder="Ввести почту..."
-          required
-        />
-      </div>
-      <div class="control-wrapper sign-in-page__password-control-wrapper">
-        <label
-          class="control-wrapper__password-input-label"
-          for="passwordInput"
-        >
-          Пароль:
-        </label>
-        <input
-          v-model="password"
-          type="password"
-          name="password"
-          class="control-wrapper__password-input"
-          id="passwordInput"
-          placeholder="Ввести пароль..."
-          autocomplete="on"
-          required
-        />
-      </div>
+      <v-text-field
+        v-model="email"
+        :counter="254"
+        :rules="[rules.min(5), rules.max(254), rules.isValidEmail]"
+        type="email"
+        autocomplete="email"
+        variant="solo"
+        prepend-inner-icon="mdi-email"
+        label="Почта"
+        placeholder="Введи свою почту"
+        persistent-counter
+        clearable
+        class="sign-in-page__email-field"
+      />
+      <v-text-field
+        v-model="password"
+        :counter="28"
+        :rules="[rules.min(8), rules.max(28), rules.isStrongPassword]"
+        type="password"
+        autocomplete="current-password"
+        variant="solo"
+        prepend-inner-icon="mdi-lock"
+        label="Пароль"
+        placeholder="Введи свой пароль"
+        persistent-counter
+        clearable
+        class="sign-in-page__password-field"
+      />
       <v-btn
+        :disabled="!isFormValid"
         :loading="isLoading"
         height="50"
         class="sign-in-page__confirm-btn"
@@ -42,7 +39,7 @@
       >
         Войти в аккаунт
       </v-btn>
-    </form>
+    </v-form>
     <h3 class="sign-in-page__sign-up-suggestion-headline">Eщё нет аккаунта?</h3>
     <v-btn :disabled="isLoading" height="50" class="sign-in-page__sign-up-btn">
       <router-link to="/sign-up" class="sign-in-page__sign-up-btn-label">
@@ -57,6 +54,7 @@ import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import useToast from "@/composables/useToast";
+import useFormValidation from "@/composables/useFormValidation";
 import { getFirebaseErrorMsg } from "@/utils";
 
 const router = useRouter();
@@ -64,6 +62,7 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 const { setLoadingToast, setErrorToast, removeCurrToast } = useToast();
+const { isFormValid, rules } = useFormValidation();
 
 const email = ref("");
 const password = ref("");
@@ -105,28 +104,27 @@ const onConfirmBtnClicked = async () => {
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     background-color: var(--color-auth-form-bg);
     border-radius: 20px;
-    .sign-in-page__headline {
-      @include default-headline(42px, 42px, var(--color-text));
-      margin-bottom: 30px;
-      text-align: center;
-      @media (max-width: $phone-l) {
-        font-size: 32px;
-        line-height: 32px;
-      }
+  }
+  &__headline {
+    @include default-headline(42px, 42px, var(--color-text));
+    margin-bottom: 30px;
+    text-align: center;
+    @media (max-width: $phone-l) {
+      font-size: 32px;
+      line-height: 32px;
     }
-    .sign-in-page__email-control-wrapper {
-      margin-bottom: 20px;
-    }
-    .sign-in-page__password-control-wrapper {
-      margin-bottom: 40px;
-    }
-    .sign-in-page__confirm-btn {
-      align-self: center;
-      @include default-btn(500px, var(--color-btn-text), var(--color-btn-bg));
-    }
+  }
+  &__email-field {
+    margin-bottom: 10px;
+  }
+  &__password-field {
+    margin-bottom: 25px;
+  }
+  &__confirm-btn {
+    align-self: center;
+    @include default-btn(500px, var(--color-btn-text), var(--color-btn-bg));
   }
   &__sign-up-suggestion-headline {
     @include default-text(20px, 20px, var(--color-text));
@@ -138,35 +136,6 @@ const onConfirmBtnClicked = async () => {
   &__sign-up-btn-label {
     color: var(--color-btn-text);
     text-decoration: none;
-  }
-}
-
-.control-wrapper {
-  max-width: 500px;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  &__email-input-label {
-    @include default-text(24px, 24px, var(--color-text));
-    padding-bottom: 5px;
-    @media (max-width: $phone-l) {
-      font-size: 20px;
-      line-height: 20px;
-    }
-  }
-  &__email-input {
-    @extend %default-input;
-  }
-  &__password-input-label {
-    @include default-text(24px, 24px, var(--color-text));
-    padding-bottom: 5px;
-    @media (max-width: $phone-l) {
-      font-size: 20px;
-      line-height: 20px;
-    }
-  }
-  &__password-input {
-    @extend %default-input;
   }
 }
 </style>

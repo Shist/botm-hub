@@ -36,6 +36,7 @@
           v-model="chosenNick"
           :counter="15"
           :rules="[rules.min(3), rules.max(15)]"
+          autocomplete="username"
           variant="solo"
           prepend-inner-icon="mdi-account"
           label="osu! Ник"
