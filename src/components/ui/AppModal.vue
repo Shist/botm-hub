@@ -121,7 +121,7 @@ watch(
     flex-direction: column;
     row-gap: 15px;
     max-width: 650px;
-    max-height: 80dvh;
+    max-height: 90dvh;
     background-color: var(--color-modal-bg);
     border-radius: 10px;
     border: none;

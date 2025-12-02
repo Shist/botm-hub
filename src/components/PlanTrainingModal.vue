@@ -6,15 +6,20 @@
     @closeModal="onCloseModal"
   >
     <template #default>
-      <div class="plan-training-modal__modal-content-wrapper">
+      <v-form
+        v-model="isFormValid"
+        class="plan-training-modal__modal-content-wrapper"
+      >
         <v-text-field
           v-model="trainingTitle"
+          :counter="70"
+          :rules="[rules.min(3), rules.max(70), rules.wordsNotMoreThan(20)]"
           variant="solo"
           prepend-inner-icon="mdi-format-title"
           label="Заголовок"
           placeholder="Введи заголовок качалочки"
+          persistent-counter
           clearable
-          hide-details
         />
         <SkillsetsSelect v-model="trainingCategories" />
         <v-tooltip
@@ -155,15 +160,17 @@
         </v-tooltip>
         <v-textarea
           v-model="trainingDescription"
+          :counter="400"
+          :rules="[rules.min(3), rules.max(400)]"
           variant="solo"
           prepend-inner-icon="mdi-text"
           label="Описание"
           placeholder="Введи описание качалочки"
+          persistent-counter
           no-resize
           clearable
-          hide-details
         />
-      </div>
+      </v-form>
     </template>
     <template #actions>
       <div class="plan-training-modal__modal-btns-wrapper">
@@ -193,6 +200,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
+import useFormValidation from "@/composables/useFormValidation";
 import { useDate } from "vuetify";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
@@ -225,6 +233,7 @@ const usersStore = useUsersStore();
 const trainingsStore = useTrainingsStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
+const { isFormValid, rules } = useFormValidation();
 
 const trainingTitle = ref("");
 const trainingCategories = ref<OsuMapCategory[]>([]);
@@ -284,12 +293,11 @@ const minPossibleTimeIso = computed(() => {
 });
 const isConfirmBtnDisabled = computed(() => {
   return (
-    !trainingTitle.value ||
+    !isFormValid.value ||
     !trainingCategories.value.length ||
     !trainingDate.value ||
     !trainingTime.value ||
-    !trainingDuration.value ||
-    !trainingDescription.value
+    !trainingDuration.value
   );
 });
 const isSameDates = computed(() => {
@@ -403,21 +411,6 @@ const onTimeClear = () => {
   isTimeMenuOpened.value = false;
 };
 
-const getValidationErrorMessage = (): string | null => {
-  if (trainingTitle.value.length < 3) {
-    return "Заголовок качалочки не должен быть менее 3 символов!";
-  } else if (trainingTitle.value.length > 70) {
-    return "Заголовок качалочки не должен быть более 70 символов!";
-  } else if (trainingTitle.value.split(" ").some((word) => word.length > 20)) {
-    return "Заголовок качалочки не должен содержать слова длиннее 20 символов!";
-  } else if (trainingDescription.value.length < 3) {
-    return "Описание качалочки не должно быть менее 3 символов!";
-  } else if (trainingDescription.value.length > 400) {
-    return "Описание качалочки не должно быть более 400 символов!";
-  }
-  return null;
-};
-
 const uploadTraining = async () => {
   if (!authStore.user || !trainingDateObject.value) return;
 
@@ -484,12 +477,6 @@ const updateTraining = async () => {
 };
 
 const onConfirmTraining = async () => {
-  const errorMessage = getValidationErrorMessage();
-  if (errorMessage) {
-    setErrorToast(errorMessage);
-    return;
-  }
-
   if (props.training) {
     await updateTraining();
   } else {
@@ -518,7 +505,6 @@ const onConfirmTraining = async () => {
     }
   }
   &__modal-content-wrapper {
-    max-height: 80dvh;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
