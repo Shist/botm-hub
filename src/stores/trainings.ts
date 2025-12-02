@@ -127,6 +127,7 @@ export const useTrainingsStore = defineStore("trainings", () => {
   return {
     trainings,
     getAllTrainings,
+    loadAllTrainings,
     uploadTraining,
     updateTraining,
     deleteTraining,

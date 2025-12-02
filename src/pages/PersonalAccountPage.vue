@@ -76,6 +76,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { useUsersStore } from "@/stores/users";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
@@ -83,6 +84,7 @@ import ehCollabImage from "@/assets/images/eh-collab.png";
 import { OsuMapCategory, DigitCategory } from "@/types";
 
 const authStore = useAuthStore();
+const usersStore = useUsersStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
 const { isFormValid, rules } = useFormValidation();
@@ -155,6 +157,7 @@ const onUpdate = async () => {
       digitCategory: chosenDigit.value,
       skillsets: JSON.stringify(chosenCategories.value),
     });
+    await usersStore.loadAllUsers();
     setSuccessToast("🥳🥳🥳 Информация успешно обновлена!!! 🥳🥳🥳");
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
