@@ -1,12 +1,12 @@
 import { reactive } from "vue";
 import { defineStore } from "pinia";
 import { loadMapsByCategoryFromFirebase } from "@/services/firebase";
+import { LoadingState } from "@/types/global";
 import {
-  LoadingState,
   type OsuMapCategory,
   type IOsuMap,
   type IOsuMapsCategoryState,
-} from "@/types";
+} from "@/types/osumaps";
 
 export const useMapsStore = defineStore("maps", () => {
   const maps = reactive<Record<OsuMapCategory, IOsuMapsCategoryState>>({

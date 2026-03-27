@@ -194,11 +194,8 @@ import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useTrainingsStore } from "@/stores/trainings";
 import useToast from "@/composables/useToast";
-import {
-  OsuMapCategory,
-  TrainingStatus,
-  type IAllTrainingsListItem,
-} from "@/types";
+import { OsuMapCategory } from "@/types/osumaps";
+import { TrainingStatus, type IAllTrainingsListItem } from "@/types/trainings";
 import { fromMinsToDurationLabel, fromSecondsToDurationLabel } from "@/utils";
 
 const props = defineProps<{

@@ -117,7 +117,7 @@ import PlanTournamentModal from "@/components/PlanTournamentModal.vue";
 import DeleteTournamentModal from "@/components/DeleteTournamentModal.vue";
 import ArchiveTournamentModal from "@/components/ArchiveTournamentModal.vue";
 import useToast from "@/composables/useToast";
-import { type IAllTournamentsListItem } from "@/types";
+import { type IAllTournamentsListItem } from "@/types/tournaments";
 
 const activeTournamentsRefs = useTemplateRef("activeTournaments");
 const archivedTournamentsRefs = useTemplateRef("archivedTournaments");

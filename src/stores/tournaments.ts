@@ -7,14 +7,13 @@ import {
   deleteTournamentFromFirebase,
   archiveTournamentInFirebase,
 } from "@/services/firebase";
+import { type IAllUsersListItem, type IUnregisteredUser } from "@/types/users";
 import {
-  type IAllUsersListItem,
-  type IUnregisteredUser,
   type IRosterInfo,
   type ITournamentDatesInfo,
   type IAllTournamentsListItem,
   type IAllTournamentsFirebaseOutgoingItem,
-} from "@/types";
+} from "@/types/tournaments";
 import { useUsersStore } from "@/stores/users";
 
 export const useTournamentsStore = defineStore("tournaments", () => {

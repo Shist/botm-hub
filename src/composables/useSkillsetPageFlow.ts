@@ -1,7 +1,8 @@
 import { computed, onMounted } from "vue";
 import { useMapsStore } from "@/stores/maps";
 import useToast from "@/composables/useToast";
-import { LoadingState, OsuMapCategory } from "@/types";
+import { LoadingState } from "@/types/global";
+import { OsuMapCategory } from "@/types/osumaps";
 
 export default function useSkillsetPageFlow(category: OsuMapCategory) {
   const mapsStore = useMapsStore();

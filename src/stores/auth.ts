@@ -11,7 +11,7 @@ import {
   type IUser,
   type IUserLocalAdditionalInfo,
   type IUserFirebaseAdditionalInfo,
-} from "@/types";
+} from "@/types/users";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<IUser | null>(null);

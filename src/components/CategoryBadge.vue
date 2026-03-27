@@ -6,7 +6,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { OsuMapCategory } from "@/types";
+import { OsuMapCategory } from "@/types/osumaps";
 
 const props = defineProps<{
   category: OsuMapCategory;

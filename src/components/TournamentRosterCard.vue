@@ -94,8 +94,8 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import UserCard from "@/components/user-card/UserCard.vue";
-import { isRegisteredPlayer } from "@/types";
-import { type IRosterInfo, type IAllUsersListItem } from "@/types";
+import { type IAllUsersListItem, isRegisteredPlayer } from "@/types/users";
+import { type IRosterInfo } from "@/types/tournaments";
 
 const props = defineProps<{
   roster: IRosterInfo<IAllUsersListItem>;

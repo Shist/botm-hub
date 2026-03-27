@@ -9,11 +9,11 @@ import {
   subscribeTrainingParticipantInFirebase,
   unsubscribeTrainingParticipantInFirebase,
 } from "@/services/firebase";
+import { OsuMapCategory } from "@/types/osumaps";
 import {
-  OsuMapCategory,
   type IAllTrainingsListItem,
   type IAllTrainingsFirebaseOutgoingItem,
-} from "@/types";
+} from "@/types/trainings";
 import { useUsersStore } from "@/stores/users";
 
 export const useTrainingsStore = defineStore("trainings", () => {

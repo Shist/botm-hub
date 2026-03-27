@@ -46,7 +46,7 @@
 import { ref, reactive, computed } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
-import { OsuMapCategory, type IOsuMap } from "@/types";
+import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 
 const props = defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();

@@ -132,7 +132,8 @@ import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import UserCard from "@/components/user-card/UserCard.vue";
 import useToast from "@/composables/useToast";
-import { DigitCategory, OsuMapCategory, type IAllUsersListItem } from "@/types";
+import { DigitCategory, type IAllUsersListItem } from "@/types/users";
+import { OsuMapCategory } from "@/types/osumaps";
 import { MAPS_CATEGORIES, CATEGORIES_COLORS } from "@/constants";
 import { getLeftAmountLabel } from "@/utils";
 

@@ -12,7 +12,7 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import { type IAllTournamentsListItem } from "@/types";
+import { type IAllTournamentsListItem } from "@/types/tournaments";
 
 const props = defineProps<{
   isOpened: boolean;

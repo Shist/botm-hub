@@ -198,7 +198,10 @@ import { useDate } from "vuetify";
 import TournamentStatusBadge from "@/components/TournamentStatusBadge.vue";
 import TournamentRosterCard from "@/components/TournamentRosterCard.vue";
 import { useAuthStore } from "@/stores/auth";
-import { TournamentStatus, type IAllTournamentsListItem } from "@/types";
+import {
+  TournamentStatus,
+  type IAllTournamentsListItem,
+} from "@/types/tournaments";
 import { fromSecondsToDurationLabel } from "@/utils";
 import { STAGES_SORT_PRIORITIES } from "@/constants";
 

@@ -1,7 +1,7 @@
 import { reactive } from "vue";
 import { defineStore } from "pinia";
 import { loadAllUsersFromFirebase } from "@/services/firebase";
-import { type IAllUsersListItem, DigitCategory } from "@/types";
+import { type IAllUsersListItem, DigitCategory } from "@/types/users";
 
 export const useUsersStore = defineStore("users", () => {
   const users = reactive<IAllUsersListItem[]>([]);

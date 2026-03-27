@@ -21,7 +21,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import CategoryBadge from "@/components/CategoryBadge.vue";
-import { OsuMapCategory } from "@/types";
+import { OsuMapCategory } from "@/types/osumaps";
 import { CATEGORIES_SORT_PRIORITIES, MAPS_CATEGORIES } from "@/constants";
 
 const props = defineProps<{

@@ -81,7 +81,8 @@ import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
 import ehCollabImage from "@/assets/images/eh-collab.png";
-import { OsuMapCategory, DigitCategory } from "@/types";
+import { DigitCategory } from "@/types/users";
+import { OsuMapCategory } from "@/types/osumaps";
 
 const authStore = useAuthStore();
 const usersStore = useUsersStore();

@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TrainingStatus } from "@/types";
+import { TrainingStatus } from "@/types/trainings";
 
 const props = defineProps<{
   status: TrainingStatus;

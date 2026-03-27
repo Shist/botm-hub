@@ -1,4 +1,4 @@
-import type { OsuMapCategory } from "@/types";
+import type { OsuMapCategory } from "@/types/osumaps";
 
 export const SHIST_UID = "mjFMxVxnVrdAuYf0wYHY7Zb3KRl2";
 

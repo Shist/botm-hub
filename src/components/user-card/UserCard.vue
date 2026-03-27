@@ -27,7 +27,7 @@ import { toRef } from "vue";
 import useUserTags from "@/composables/useUserTags";
 import IconAdmin from "@/components/user-card/IconAdmin.vue";
 import IconTrainer from "@/components/user-card/IconTrainer.vue";
-import { type IAllUsersListItem } from "@/types";
+import { type IAllUsersListItem } from "@/types/users";
 
 const props = defineProps<{ user: IAllUsersListItem }>();
 

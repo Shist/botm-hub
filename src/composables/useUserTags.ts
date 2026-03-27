@@ -3,7 +3,7 @@ import IconDigitFour from "@/components/user-card/IconDigitFour.vue";
 import IconDigitFive from "@/components/user-card/IconDigitFive.vue";
 import IconDigitSix from "@/components/user-card/IconDigitSix.vue";
 import { SHIST_UID } from "@/constants";
-import { DigitCategory, type IAllUsersListItem } from "@/types";
+import { DigitCategory, type IAllUsersListItem } from "@/types/users";
 
 export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
   const isShist = computed(() => {

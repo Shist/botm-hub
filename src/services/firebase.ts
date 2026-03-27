@@ -18,14 +18,17 @@ import {
 } from "firebase/firestore/lite";
 import {
   type IUserFirebaseAdditionalInfo,
-  type OsuMapCategory,
   type IAllUsersListItem,
+} from "@/types/users";
+import { type OsuMapCategory, type IOsuMap } from "@/types/osumaps";
+import {
   type IAllTrainingsFirebaseIncomingItem,
   type IAllTrainingsFirebaseOutgoingItem,
-  type IOsuMap,
+} from "@/types/trainings";
+import {
   type IAllTournamentsFirebaseIncomingItem,
   type IAllTournamentsFirebaseOutgoingItem,
-} from "@/types";
+} from "@/types/tournaments";
 
 const firebaseApp = initializeApp({
   apiKey: import.meta.env.VITE_API_KEY,

@@ -76,7 +76,8 @@ import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/CategoryBadge.vue";
 import IconAdmin from "@/components/user-card/IconAdmin.vue";
 import IconTrainer from "@/components/user-card/IconTrainer.vue";
-import { OsuMapCategory, type IAllUsersListItem } from "@/types";
+import { type IAllUsersListItem } from "@/types/users";
+import { OsuMapCategory } from "@/types/osumaps";
 
 const route = useRoute();
 

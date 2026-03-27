@@ -100,7 +100,8 @@ import { useAuthStore } from "@/stores/auth";
 import SkillsetMapsTable from "@/components/SkillsetMapsTable.vue";
 import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
-import { LoadingState, OsuMapCategory, type IOsuMap } from "@/types";
+import { LoadingState } from "@/types/global";
+import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import { fromDurationToSeconds, fromTotalSecondsToLabel } from "@/utils";
 
 const mapsStore = useMapsStore();

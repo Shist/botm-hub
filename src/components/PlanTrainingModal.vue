@@ -206,11 +206,11 @@ import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useTrainingsStore } from "@/stores/trainings";
 import { MAPS_CATEGORIES } from "@/constants";
+import { OsuMapCategory } from "@/types/osumaps";
 import {
-  OsuMapCategory,
   type IAllTrainingsListItem,
   type IAllTrainingsFirebaseOutgoingItem,
-} from "@/types";
+} from "@/types/trainings";
 import {
   getCurrentDateIso,
   getCurrentTimeIso,

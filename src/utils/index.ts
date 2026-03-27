@@ -1,4 +1,4 @@
-import { type IFirebaseError } from "@/types";
+import { type IFirebaseError } from "@/types/global";
 
 export function getFirebaseErrorMsg(error: IFirebaseError | Error): string {
   if (!("code" in error)) {

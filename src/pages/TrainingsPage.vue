@@ -115,7 +115,7 @@ import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
 import DeleteTrainingModal from "@/components/DeleteTrainingModal.vue";
 import ArchiveTrainingModal from "@/components/ArchiveTrainingModal.vue";
 import useToast from "@/composables/useToast";
-import { type IAllTrainingsListItem } from "@/types";
+import { type IAllTrainingsListItem } from "@/types/trainings";
 
 const activeTrainingsRefs = useTemplateRef("activeTrainings");
 const archivedTrainingsRefs = useTemplateRef("archivedTrainings");

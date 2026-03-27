@@ -9,7 +9,7 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { TournamentStatus } from "@/types";
+import { TournamentStatus } from "@/types/tournaments";
 
 const props = defineProps<{
   status: TournamentStatus;
