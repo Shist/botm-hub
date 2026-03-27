@@ -7,6 +7,13 @@ export default function useFormValidation() {
     min: (minLength: number) => (givenValue: string | null) =>
       (givenValue ?? "").length >= minLength ||
       `Требуется не менее ${minLength} символов!`,
+    optionalMin: (minLength: number) => (givenValue: string | null) => {
+      if (!givenValue) return true;
+      return (
+        givenValue.length >= minLength ||
+        `Требуется не менее ${minLength} символов!`
+      );
+    },
     max: (maxLength: number) => (givenValue: string | null) =>
       (givenValue ?? "").length <= maxLength ||
       `Требуется не более ${maxLength} символов!`,

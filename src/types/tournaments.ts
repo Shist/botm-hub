@@ -1,12 +1,18 @@
 import { Timestamp } from "firebase/firestore/lite";
 import type { IAllUsersListItem, IUnregisteredUser } from "@/types/users";
 
+export const TOURNAMENT_FORMATS = ["4v4", "3v3", "2v2", "1v1"] as const;
+export const TOURNAMENT_TEAM_SIZES = [8, 4, 3, 2, 1] as const;
+
 export enum TournamentStatus {
   announced = "announced",
   active = "active",
   completed = "completed",
   archived = "archived",
 }
+
+export type TournamentFormat = (typeof TOURNAMENT_FORMATS)[number];
+export type TournamentTeamSize = (typeof TOURNAMENT_TEAM_SIZES)[number];
 
 export interface IRosterInfo<RegisteredUserInfoType> {
   id: string;
@@ -57,8 +63,8 @@ export interface IAllTournamentsItemBase {
   title: string;
   rankRange: string;
   description: string;
-  format: "4v4" | "3v3" | "2v2" | "1v1";
-  teamSize: 8 | 4 | 3 | 2 | 1;
+  format: TournamentFormat;
+  teamSize: TournamentTeamSize;
   isDoubleElimination: boolean;
   forumPostLink: string | null;
   mainSheetLink: string | null;

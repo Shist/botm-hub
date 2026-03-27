@@ -184,7 +184,7 @@
             />
           </v-expansion-panels>
           <span v-else class="tournament-card__no-links-label mt-2">
-            Игроки пока не заявлены
+            (Игроки пока не заявлены)
           </span>
         </div>
       </div>

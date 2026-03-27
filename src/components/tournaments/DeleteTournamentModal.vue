@@ -59,7 +59,7 @@ const onConfirmDeleting = async () => {
   try {
     isDeleting.value = true;
     await tournamentsStore.deleteTournament(props.tournamentId);
-    setSuccessToast("🗑️🗑️🗑️ Запись о турнире успешно удалена!!! 🗑️🗑️🗑️");
+    setSuccessToast("🏆🗑️🏆 Запись о турнире успешно удалена!!! 🏆🗑️🏆");
     emit("closeModalAfterDeleting");
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;

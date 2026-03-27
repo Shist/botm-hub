@@ -167,8 +167,9 @@
           label="Описание"
           placeholder="Введи описание качалочки"
           persistent-counter
-          no-resize
           clearable
+          auto-grow
+          rows="3"
         />
       </v-form>
     </template>
