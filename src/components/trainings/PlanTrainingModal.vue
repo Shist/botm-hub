@@ -198,7 +198,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
+import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
 import { useDate } from "vuetify";

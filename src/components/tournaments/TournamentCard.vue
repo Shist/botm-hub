@@ -195,8 +195,8 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useDate } from "vuetify";
-import TournamentStatusBadge from "@/components/TournamentStatusBadge.vue";
-import TournamentRosterCard from "@/components/TournamentRosterCard.vue";
+import TournamentStatusBadge from "@/components/tournaments/TournamentStatusBadge.vue";
+import TournamentRosterCard from "@/components/tournaments/TournamentRosterCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import {
   TournamentStatus,

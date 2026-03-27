@@ -1,7 +1,7 @@
 import { computed, type Ref } from "vue";
-import IconDigitFour from "@/components/user-card/IconDigitFour.vue";
-import IconDigitFive from "@/components/user-card/IconDigitFive.vue";
-import IconDigitSix from "@/components/user-card/IconDigitSix.vue";
+import IconDigitFour from "@/components/users/user-icons/IconDigitFour.vue";
+import IconDigitFive from "@/components/users/user-icons/IconDigitFive.vue";
+import IconDigitSix from "@/components/users/user-icons/IconDigitSix.vue";
 import { SHIST_UID } from "@/constants";
 import { DigitCategory, type IAllUsersListItem } from "@/types/users";
 

@@ -130,7 +130,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
-import UserCard from "@/components/user-card/UserCard.vue";
+import UserCard from "@/components/users/UserCard.vue";
 import useToast from "@/composables/useToast";
 import { DigitCategory, type IAllUsersListItem } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";

@@ -37,8 +37,8 @@
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useThemeStore } from "@/stores/theme";
 import { useScrollbarPaddingStore } from "@/stores/scrollbar-padding";
-import TheHeader from "@/components/TheHeader.vue";
-import TheFooter from "@/components/TheFooter.vue";
+import TheHeader from "@/components/layout/TheHeader.vue";
+import TheFooter from "@/components/layout/TheFooter.vue";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
 const APP_VERSION = "2.2.0";

@@ -186,10 +186,10 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useDate } from "vuetify";
-import CategoryBadge from "@/components/CategoryBadge.vue";
-import TrainingStatusBadge from "@/components/TrainingStatusBadge.vue";
-import UserCard from "@/components/user-card/UserCard.vue";
-import FreeSlotCard from "@/components/FreeSlotCard.vue";
+import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
+import TrainingStatusBadge from "@/components/trainings/TrainingStatusBadge.vue";
+import UserCard from "@/components/users/UserCard.vue";
+import FreeSlotCard from "@/components/trainings/FreeSlotCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useTrainingsStore } from "@/stores/trainings";

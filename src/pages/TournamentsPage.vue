@@ -112,10 +112,10 @@ import {
 } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useTournamentsStore } from "@/stores/tournaments";
-import TournamentCard from "@/components/TournamentCard.vue";
-import PlanTournamentModal from "@/components/PlanTournamentModal.vue";
-import DeleteTournamentModal from "@/components/DeleteTournamentModal.vue";
-import ArchiveTournamentModal from "@/components/ArchiveTournamentModal.vue";
+import TournamentCard from "@/components/tournaments/TournamentCard.vue";
+import PlanTournamentModal from "@/components/tournaments/PlanTournamentModal.vue";
+import DeleteTournamentModal from "@/components/tournaments/DeleteTournamentModal.vue";
+import ArchiveTournamentModal from "@/components/tournaments/ArchiveTournamentModal.vue";
 import useToast from "@/composables/useToast";
 import { type IAllTournamentsListItem } from "@/types/tournaments";
 

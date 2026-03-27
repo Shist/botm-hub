@@ -77,7 +77,7 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
-import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
+import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
 import ehCollabImage from "@/assets/images/eh-collab.png";

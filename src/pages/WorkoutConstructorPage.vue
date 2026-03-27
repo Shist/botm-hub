@@ -97,8 +97,8 @@
 import { ref, reactive, computed, watch } from "vue";
 import { useMapsStore } from "@/stores/maps";
 import { useAuthStore } from "@/stores/auth";
-import SkillsetMapsTable from "@/components/SkillsetMapsTable.vue";
-import SkillsetsSelect from "@/components/SkillsetsSelect.vue";
+import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
+import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import { LoadingState } from "@/types/global";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";

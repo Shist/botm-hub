@@ -110,10 +110,10 @@ import {
 } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useTrainingsStore } from "@/stores/trainings";
-import TrainingCard from "@/components/TrainingCard.vue";
-import PlanTrainingModal from "@/components/PlanTrainingModal.vue";
-import DeleteTrainingModal from "@/components/DeleteTrainingModal.vue";
-import ArchiveTrainingModal from "@/components/ArchiveTrainingModal.vue";
+import TrainingCard from "@/components/trainings/TrainingCard.vue";
+import PlanTrainingModal from "@/components/trainings/PlanTrainingModal.vue";
+import DeleteTrainingModal from "@/components/trainings/DeleteTrainingModal.vue";
+import ArchiveTrainingModal from "@/components/trainings/ArchiveTrainingModal.vue";
 import useToast from "@/composables/useToast";
 import { type IAllTrainingsListItem } from "@/types/trainings";
 

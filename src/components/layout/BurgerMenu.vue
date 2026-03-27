@@ -94,8 +94,8 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
 import { useThemeStore } from "@/stores/theme";
 import useToast from "@/composables/useToast";
-import ThemeSwitcher from "@/components/ThemeSwitcher.vue";
-import PatchNotes from "@/components/PatchNotes.vue";
+import ThemeSwitcher from "@/components/layout/ThemeSwitcher.vue";
+import PatchNotes from "@/components/layout/PatchNotes.vue";
 import { getFirebaseErrorMsg } from "@/utils";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 

@@ -73,9 +73,9 @@ import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
 import useUserTags from "@/composables/useUserTags";
 import useToast from "@/composables/useToast";
-import CategoryBadge from "@/components/CategoryBadge.vue";
-import IconAdmin from "@/components/user-card/IconAdmin.vue";
-import IconTrainer from "@/components/user-card/IconTrainer.vue";
+import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
+import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
+import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
 import { type IAllUsersListItem } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
 

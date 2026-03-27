@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
-import CategoryBadge from "@/components/CategoryBadge.vue";
+import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";

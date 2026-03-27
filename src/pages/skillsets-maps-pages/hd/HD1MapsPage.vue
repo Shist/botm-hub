@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import SkillsetMapsTable from "@/components/SkillsetMapsTable.vue";
+import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
 import { OsuMapCategory } from "@/types/osumaps";
 import useSkillsetPageFlow from "@/composables/useSkillsetPageFlow";
 import { MAPS_CATEGORIES } from "@/constants";

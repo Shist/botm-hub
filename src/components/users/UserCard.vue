@@ -25,8 +25,8 @@
 <script setup lang="ts">
 import { toRef } from "vue";
 import useUserTags from "@/composables/useUserTags";
-import IconAdmin from "@/components/user-card/IconAdmin.vue";
-import IconTrainer from "@/components/user-card/IconTrainer.vue";
+import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
+import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
 import { type IAllUsersListItem } from "@/types/users";
 
 const props = defineProps<{ user: IAllUsersListItem }>();

@@ -93,7 +93,7 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
-import UserCard from "@/components/user-card/UserCard.vue";
+import UserCard from "@/components/users/UserCard.vue";
 import { type IAllUsersListItem, isRegisteredPlayer } from "@/types/users";
 import { type IRosterInfo } from "@/types/tournaments";
 

@@ -16,7 +16,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue";
-import BurgerMenu from "@/components/BurgerMenu.vue";
+import BurgerMenu from "@/components/layout/BurgerMenu.vue";
 
 const headerRef = ref<HTMLElement | null>(null);
 

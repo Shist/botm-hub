@@ -23,7 +23,7 @@
 
 <script setup lang="ts">
 import { uploadMapsToFirebase } from "@/services/firebase/osumaps";
-import mapsArr from "@/components/maps-upload/maps.json";
+import mapsArr from "@/components/osumaps/maps-upload/maps.json";
 import { type IOsuMap } from "@/types/osumaps";
 
 const uploadMaps = async () => {
