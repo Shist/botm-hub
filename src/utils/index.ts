@@ -99,12 +99,34 @@ export function fromMinsToDurationLabel(mins: number) {
 }
 
 export function fromSecondsToDurationLabel(totalSeconds: number): string {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = Math.floor((totalSeconds % 3600) % 60);
-  return [
+  const SECONDS_IN_DAY = 86400;
+
+  const days = Math.floor(totalSeconds / SECONDS_IN_DAY);
+  const remainingSeconds = totalSeconds % SECONDS_IN_DAY;
+
+  const hours = Math.floor(remainingSeconds / 3600);
+  const minutes = Math.floor((remainingSeconds % 3600) / 60);
+  const seconds = Math.floor(remainingSeconds % 60);
+
+  const timeString = [
     `${hours.toString().padStart(2, "0")}`,
     `${minutes.toString().padStart(2, "0")}`,
     `${seconds.toString().padStart(2, "0")}`,
   ].join(":");
+
+  if (days > 0) {
+    const mod10 = days % 10;
+    const mod100 = days % 100;
+
+    let dayWord = "дней";
+    if (mod10 === 1 && mod100 !== 11) {
+      dayWord = "день";
+    } else if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) {
+      dayWord = "дня";
+    }
+
+    return `${days} ${dayWord}, ${timeString}`;
+  }
+
+  return timeString;
 }
