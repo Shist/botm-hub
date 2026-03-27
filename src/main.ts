@@ -5,10 +5,8 @@ import { createPinia } from "pinia";
 import { useAuthStore } from "@/stores/auth";
 import { useThemeStore } from "@/stores/theme";
 import { type User as IFirebaseUser } from "firebase/auth";
-import {
-  onFirebaseAuthStateChanged,
-  loadUserInfoFromFirebase,
-} from "@/services/firebase";
+import { onFirebaseAuthStateChanged } from "@/services/firebase/config";
+import { loadUserInfoFromFirebase } from "@/services/firebase/users";
 import appComponents from "@/components/ui";
 import vuetifyConfig from "@/plugins/vuetify";
 import Vue3Toasity from "vue3-toastify";

@@ -6,7 +6,7 @@ import {
   updateTournamentToFirebase,
   deleteTournamentFromFirebase,
   archiveTournamentInFirebase,
-} from "@/services/firebase";
+} from "@/services/firebase/tournaments";
 import { type IAllUsersListItem, type IUnregisteredUser } from "@/types/users";
 import {
   type IRosterInfo,

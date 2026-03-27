@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 import { defineStore } from "pinia";
-import { loadMapsByCategoryFromFirebase } from "@/services/firebase";
+import { loadMapsByCategoryFromFirebase } from "@/services/firebase/osumaps";
 import { LoadingState } from "@/types/global";
 import {
   type OsuMapCategory,

@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { uploadMapsToFirebase } from "@/services/firebase";
+import { uploadMapsToFirebase } from "@/services/firebase/osumaps";
 import mapsArr from "@/components/maps-upload/maps.json";
 import { type IOsuMap } from "@/types/osumaps";
 

@@ -6,7 +6,7 @@ import {
   signInUserToFirebase,
   signOutUserFromFirebase,
   loadUserInfoFromFirebase,
-} from "@/services/firebase";
+} from "@/services/firebase/users";
 import {
   type IUser,
   type IUserLocalAdditionalInfo,

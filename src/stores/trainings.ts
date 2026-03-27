@@ -8,7 +8,7 @@ import {
   archiveTrainingInFirebase,
   subscribeTrainingParticipantInFirebase,
   unsubscribeTrainingParticipantInFirebase,
-} from "@/services/firebase";
+} from "@/services/firebase/trainings";
 import { OsuMapCategory } from "@/types/osumaps";
 import {
   type IAllTrainingsListItem,
