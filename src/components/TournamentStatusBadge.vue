@@ -1,0 +1,55 @@
+<template>
+  <span
+    class="tournament-status-badge"
+    :class="`tournament-status-badge_${status}`"
+  >
+    {{ statusLabel }}
+  </span>
+</template>
+
+<script setup lang="ts">
+import { computed } from "vue";
+import { TournamentStatus } from "@/types";
+
+const props = defineProps<{
+  status: TournamentStatus;
+}>();
+
+const statusLabel = computed(() =>
+  `${props.status}`.replace(/-/g, " ").toUpperCase()
+);
+</script>
+
+<style lang="scss" scoped>
+.tournament-status-badge {
+  @include default-headline(16px, 16px, var(--color-text-white));
+  padding: 4px;
+  display: flex;
+  justify-content: center;
+  width: 120px;
+  border-radius: 10px;
+  @media (max-width: $phone-l) {
+    font-size: 12px;
+    line-height: 12px;
+    padding: 3px;
+    border-radius: 7px;
+  }
+  @media (max-width: $phone-m) {
+    font-size: 10px;
+    line-height: 10px;
+    border-radius: 6px;
+  }
+  &_announced {
+    background-color: var(--color-tournament-announced);
+  }
+  &_active {
+    background-color: var(--color-tournament-active);
+  }
+  &_completed {
+    background-color: var(--color-tournament-completed);
+  }
+  &_archived {
+    background-color: var(--color-tournament-archived);
+  }
+}
+</style>

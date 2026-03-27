@@ -42,7 +42,7 @@
             to="/tournaments"
             class="main-page__btn main-page__btn_tournaments"
           >
-            Текущие Турниры и Наши Ростеры
+            Турниры и Наши Ростеры
           </router-link>
         </li>
         <li>

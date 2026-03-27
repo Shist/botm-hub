@@ -386,6 +386,7 @@ const onUnsubscribe = async () => {
     margin-right: 20px;
     display: flex;
     flex-direction: column;
+    align-items: flex-end;
     gap: 10px;
   }
   &__time-label {
@@ -465,7 +466,9 @@ const onUnsubscribe = async () => {
   &__training-description {
     padding: 5px;
     height: 150px;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-break: break-word;
     background-color: var(--color-text-area-bg);
   }
   &__categories-wrapper {

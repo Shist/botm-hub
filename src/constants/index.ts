@@ -73,3 +73,18 @@ export const CATEGORIES_COLORS = {
   fm3: "#277d2b",
   tb: "#d4ac7c",
 };
+
+export const STAGES_SORT_PRIORITIES = {
+  "Grand Finals": 1,
+  Finals: 2,
+  Semifinals: 3,
+  Quarterfinals: 4,
+  "Round of 16": 5,
+  "Round of 32": 6,
+  "Groups Stage": 7,
+  "Swiss Stage 3": 8,
+  "Swiss Stage 2": 9,
+  "Swiss Stage 1": 10,
+  DNQ: 11,
+  "Not Specified": 12,
+};
