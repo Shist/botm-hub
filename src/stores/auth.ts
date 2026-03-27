@@ -66,6 +66,7 @@ export const useAuthStore = defineStore("auth", () => {
       digitCategory: null,
       skillsets: "[]",
       isTrainer: false,
+      isRedactor: false,
     };
     const authServerData = await signUpUserToFirebase(
       email,
@@ -98,7 +99,10 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const updateUserAdditionalInfo = async (
-    additionalInfo: Omit<IUserFirebaseAdditionalInfo, "email" | "isTrainer">
+    additionalInfo: Omit<
+      IUserFirebaseAdditionalInfo,
+      "email" | "isTrainer" | "isRedactor"
+    >
   ) => {
     if (
       !user.value ||
@@ -109,6 +113,7 @@ export const useAuthStore = defineStore("auth", () => {
     const newUserInfo = {
       email: user.value.email,
       isTrainer: user.value.additionalInfo.isTrainer,
+      isRedactor: user.value.additionalInfo.isRedactor,
       ...additionalInfo,
     };
     await updateUserAdditionalInfoToFirebase(user.value.uid, newUserInfo);
