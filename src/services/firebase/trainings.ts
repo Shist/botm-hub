@@ -19,8 +19,8 @@ async function loadAllTrainingsFromFirebase(): Promise<
 
   const allTrainingsSnapshot = await getDoc(allTrainingsDoc);
   const allTrainingsDocData = allTrainingsSnapshot.data();
-  const allTrainings =
-    allTrainingsDocData?.allTrainings as IAllTrainingsFirebaseIncomingItem[];
+  const allTrainings: IAllTrainingsFirebaseIncomingItem[] =
+    allTrainingsDocData?.allTrainings;
 
   return allTrainings.sort((a, b) => a.dateTime.seconds - b.dateTime.seconds);
 }
@@ -48,9 +48,8 @@ async function updateTrainingToFirebase(
 
     const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
     const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
-      (allTrainingsDoc.data()?.allTrainings ??
-        []) as IAllTrainingsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTrainingsDoc.data()?.allTrainings ?? []
+    ).map((t: IAllTrainingsFirebaseIncomingItem) => ({
       ...t,
       dateTime: t.dateTime.toDate(),
     }));
@@ -74,9 +73,8 @@ async function deleteTrainingFromFirebase(trainingId: string) {
 
     const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
     const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
-      (allTrainingsDoc.data()?.allTrainings ??
-        []) as IAllTrainingsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTrainingsDoc.data()?.allTrainings ?? []
+    ).map((t: IAllTrainingsFirebaseIncomingItem) => ({
       ...t,
       dateTime: t.dateTime.toDate(),
     }));
@@ -100,9 +98,8 @@ async function archiveTrainingInFirebase(trainingId: string, mpLinkId: number) {
 
     const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
     const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
-      (allTrainingsDoc.data()?.allTrainings ??
-        []) as IAllTrainingsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTrainingsDoc.data()?.allTrainings ?? []
+    ).map((t: IAllTrainingsFirebaseIncomingItem) => ({
       ...t,
       dateTime: t.dateTime.toDate(),
     }));
@@ -132,9 +129,8 @@ async function subscribeTrainingParticipantInFirebase(
 
     const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
     const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
-      (allTrainingsDoc.data()?.allTrainings ??
-        []) as IAllTrainingsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTrainingsDoc.data()?.allTrainings ?? []
+    ).map((t: IAllTrainingsFirebaseIncomingItem) => ({
       ...t,
       dateTime: t.dateTime.toDate(),
     }));
@@ -173,9 +169,8 @@ async function unsubscribeTrainingParticipantInFirebase(
 
     const allTrainingsDoc = await transaction.get(allTrainingsDocRef);
     const allTrainings: IAllTrainingsFirebaseOutgoingItem[] = (
-      (allTrainingsDoc.data()?.allTrainings ??
-        []) as IAllTrainingsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTrainingsDoc.data()?.allTrainings ?? []
+    ).map((t: IAllTrainingsFirebaseIncomingItem) => ({
       ...t,
       dateTime: t.dateTime.toDate(),
     }));

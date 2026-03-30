@@ -7,7 +7,11 @@ import {
   deleteTournamentFromFirebase,
   archiveTournamentInFirebase,
 } from "@/services/firebase/tournaments";
-import { type IAllUsersListItem, type IUnregisteredUser } from "@/types/users";
+import {
+  isRegisteredPlayer,
+  type IAllUsersListItem,
+  type IUnregisteredUser,
+} from "@/types/users";
 import {
   type IRosterInfo,
   type ITournamentDatesInfo,
@@ -39,7 +43,7 @@ export const useTournamentsStore = defineStore("tournaments", () => {
               return {
                 ...rosterInfo,
                 players: rosterInfo.players.reduce(
-                  (acc, player) => {
+                  (acc: (IAllUsersListItem | IUnregisteredUser)[], player) => {
                     if (typeof player === "string") {
                       const userInfo = allUsers.find((u) => u.uid === player);
                       if (userInfo) acc.push(userInfo);
@@ -48,7 +52,7 @@ export const useTournamentsStore = defineStore("tournaments", () => {
                     }
                     return acc;
                   },
-                  [] as (IAllUsersListItem | IUnregisteredUser)[]
+                  []
                 ),
               };
             });
@@ -126,6 +130,68 @@ export const useTournamentsStore = defineStore("tournaments", () => {
     }
   };
 
+  const getUpdatedTournament = (
+    tournament: IAllTournamentsListItem,
+    updatedRosterInfo: IRosterInfo<IAllUsersListItem>[]
+  ) => {
+    return {
+      ...tournament,
+      rostersInfo: updatedRosterInfo.map((r) => ({
+        ...r,
+        players: r.players.map((p) => (isRegisteredPlayer(p) ? p.uid : p)),
+      })),
+    };
+  };
+
+  const addRoster = async (
+    tournamentId: string,
+    roster: IRosterInfo<IAllUsersListItem>
+  ) => {
+    const tournament = tournaments.find((t) => t.id === tournamentId);
+    if (!tournament) {
+      throw new Error(`Турнир с id = ${tournamentId} не найден в базе!`);
+    }
+
+    const newRostersInfo = tournament.rostersInfo.concat(roster);
+    const updatedTournament = getUpdatedTournament(tournament, newRostersInfo);
+
+    await updateTournamentToFirebase(updatedTournament);
+    await loadAllTournaments();
+  };
+
+  const updateRoster = async (
+    tournamentId: string,
+    updatedRoster: IRosterInfo<IAllUsersListItem>
+  ) => {
+    const tournament = tournaments.find((t) => t.id === tournamentId);
+    if (!tournament) {
+      throw new Error(`Турнир с id = ${tournamentId} не найден в базе!`);
+    }
+
+    const newRostersInfo = tournament.rostersInfo.map((r) =>
+      r.id === updatedRoster.id ? updatedRoster : r
+    );
+    const updatedTournament = getUpdatedTournament(tournament, newRostersInfo);
+
+    await updateTournamentToFirebase(updatedTournament);
+    await loadAllTournaments();
+  };
+
+  const deleteRoster = async (tournamentId: string, rosterId: string) => {
+    const tournament = tournaments.find((t) => t.id === tournamentId);
+    if (!tournament) {
+      throw new Error(`Турнир с id = ${tournamentId} не найден в базе!`);
+    }
+
+    const newRostersInfo = tournament.rostersInfo.filter(
+      (r) => r.id !== rosterId
+    );
+    const updatedTournament = getUpdatedTournament(tournament, newRostersInfo);
+
+    await updateTournamentToFirebase(updatedTournament);
+    await loadAllTournaments();
+  };
+
   return {
     tournaments,
     getAllTournaments,
@@ -134,5 +200,8 @@ export const useTournamentsStore = defineStore("tournaments", () => {
     updateTournament,
     deleteTournament,
     archiveTournament,
+    addRoster,
+    updateRoster,
+    deleteRoster,
   };
 });

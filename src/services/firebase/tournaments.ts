@@ -19,8 +19,8 @@ async function loadAllTournamentsFromFirebase(): Promise<
 
   const allTournamentsSnapshot = await getDoc(allTournamentsDoc);
   const allTournamentsDocData = allTournamentsSnapshot.data();
-  const allTournaments =
-    allTournamentsDocData?.allTournaments as IAllTournamentsFirebaseIncomingItem[];
+  const allTournaments: IAllTournamentsFirebaseIncomingItem[] =
+    allTournamentsDocData?.allTournaments;
 
   return allTournaments.sort(
     (a, b) => a.datesInfo.startDate.seconds - b.datesInfo.startDate.seconds
@@ -50,9 +50,8 @@ async function updateTournamentToFirebase(
 
     const allTournamentsDoc = await transaction.get(allTournamentsDocRef);
     const allTournaments: IAllTournamentsFirebaseOutgoingItem[] = (
-      (allTournamentsDoc.data()?.allTournaments ??
-        []) as IAllTournamentsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTournamentsDoc.data()?.allTournaments ?? []
+    ).map((t: IAllTournamentsFirebaseIncomingItem) => ({
       ...t,
       datesInfo: {
         startDate: t.datesInfo.startDate.toDate(),
@@ -79,9 +78,8 @@ async function deleteTournamentFromFirebase(tournamentId: string) {
 
     const allTournamentsDoc = await transaction.get(allTournamentsDocRef);
     const allTournaments: IAllTournamentsFirebaseOutgoingItem[] = (
-      (allTournamentsDoc.data()?.allTournaments ??
-        []) as IAllTournamentsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTournamentsDoc.data()?.allTournaments ?? []
+    ).map((t: IAllTournamentsFirebaseIncomingItem) => ({
       ...t,
       datesInfo: {
         startDate: t.datesInfo.startDate.toDate(),
@@ -108,9 +106,8 @@ async function archiveTournamentInFirebase(tournamentId: string) {
 
     const allTournamentsDoc = await transaction.get(allTournamentsDocRef);
     const allTournaments: IAllTournamentsFirebaseOutgoingItem[] = (
-      (allTournamentsDoc.data()?.allTournaments ??
-        []) as IAllTournamentsFirebaseIncomingItem[]
-    ).map((t) => ({
+      allTournamentsDoc.data()?.allTournaments ?? []
+    ).map((t: IAllTournamentsFirebaseIncomingItem) => ({
       ...t,
       datesInfo: {
         startDate: t.datesInfo.startDate.toDate(),
