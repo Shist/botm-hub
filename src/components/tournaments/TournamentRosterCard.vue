@@ -246,122 +246,131 @@ const embedRosterRevealUrl = computed(() => {
     border-radius: 6px;
     font-size: 16px;
     font-weight: bold;
-    color: var(--color-text);
     background-color: rgba(0, 0, 0, 0.2);
-    border: 2px solid rgba(var(--v-theme-on-surface), 0.1);
     transition: all 0.3s ease;
     @include default-text(16px, 16px, var(--color-text));
     &_gold {
       color: #ffd700;
-      border-color: #ffd700;
+      border: 2px solid #ffd700;
       text-shadow:
         0 0 6px rgba(255, 215, 0, 1),
         0 0 12px rgba(255, 215, 0, 0.8);
       box-shadow:
         0 0 12px rgba(255, 215, 0, 0.4),
         inset 0 0 8px rgba(255, 215, 0, 0.2);
+      .light-theme & {
+        color: #b39700;
+        border-color: #b39700;
+        text-shadow: none;
+        box-shadow: inset 0 0 8px rgba(179, 151, 0, 0.2);
+        background-color: rgba(0, 0, 0, 0.05);
+      }
     }
     &_silver {
       color: #e0e0e0;
-      border-color: #e0e0e0;
+      border: 2px solid #e0e0e0;
       text-shadow:
         0 0 6px rgba(224, 224, 224, 1),
         0 0 12px rgba(224, 224, 224, 0.8);
       box-shadow:
         0 0 12px rgba(224, 224, 224, 0.4),
         inset 0 0 8px rgba(224, 224, 224, 0.2);
+      .light-theme & {
+        color: #757575;
+        border-color: #757575;
+        text-shadow: none;
+        box-shadow: inset 0 0 8px rgba(117, 117, 117, 0.2);
+        background-color: rgba(0, 0, 0, 0.05);
+      }
     }
     &_bronze {
       color: #ff9e5e;
-      border-color: #cd7f32;
+      border: 2px solid #cd7f32;
       text-shadow:
         0 0 6px rgba(205, 127, 50, 1),
         0 0 12px rgba(205, 127, 50, 0.8);
       box-shadow:
         0 0 12px rgba(205, 127, 50, 0.4),
         inset 0 0 8px rgba(205, 127, 50, 0.2);
+      .light-theme & {
+        color: #a05a1c;
+        border-color: #a05a1c;
+        text-shadow: none;
+        box-shadow: inset 0 0 8px rgba(160, 90, 28, 0.2);
+        background-color: rgba(0, 0, 0, 0.05);
+      }
     }
     &_place-4 {
-      color: hsl(55, 100%, 75%);
-      border-color: hsla(55, 100%, 75%, 0.5);
+      @include colored-badge(55, 100%);
     }
     &_place-5-6 {
-      color: hsl(75, 90%, 75%);
-      border-color: hsla(75, 90%, 75%, 0.5);
+      @include colored-badge(75, 90%);
     }
     &_place-7-8 {
-      color: hsl(100, 80%, 75%);
-      border-color: hsla(100, 80%, 75%, 0.5);
+      @include colored-badge(100, 80%);
     }
     &_place-9-12 {
-      color: hsl(130, 80%, 75%);
-      border-color: hsla(130, 80%, 75%, 0.5);
+      @include colored-badge(130, 80%);
     }
     &_place-13-16 {
-      color: hsl(160, 80%, 75%);
-      border-color: hsla(160, 80%, 75%, 0.5);
+      @include colored-badge(160, 80%);
     }
     &_place-17-24 {
-      color: hsl(190, 80%, 75%);
-      border-color: hsla(190, 80%, 75%, 0.5);
+      @include colored-badge(190, 80%);
     }
     &_place-25-32 {
-      color: hsl(220, 80%, 75%);
-      border-color: hsla(220, 80%, 75%, 0.5);
+      @include colored-badge(220, 80%);
     }
     &_place-33-64 {
-      color: hsl(250, 80%, 75%);
-      border-color: hsla(250, 80%, 75%, 0.5);
+      @include colored-badge(250, 80%);
     }
     &_place-65-plus {
       color: hsl(0, 0%, 65%);
-      border-color: hsla(0, 0%, 65%, 0.3);
+      border: 2px solid hsla(0, 0%, 65%, 0.3);
       opacity: 0.7;
+      .light-theme & {
+        color: hsl(0, 0%, 35%);
+        border-color: hsla(0, 0%, 35%, 0.5);
+      }
     }
     &_stage-grand-finals {
-      color: hsl(350, 100%, 65%);
-      border-color: hsla(350, 100%, 65%, 0.5);
+      @include colored-badge(350, 100%);
     }
     &_stage-finals {
-      color: hsl(10, 100%, 65%);
-      border-color: hsla(10, 100%, 65%, 0.5);
+      @include colored-badge(10, 100%);
     }
     &_stage-semis {
-      color: hsl(25, 100%, 65%);
-      border-color: hsla(25, 100%, 65%, 0.5);
+      @include colored-badge(25, 100%);
     }
     &_stage-quarters {
-      color: hsl(40, 100%, 65%);
-      border-color: hsla(40, 100%, 65%, 0.5);
+      @include colored-badge(40, 100%);
     }
     &_stage-r16 {
-      color: hsl(55, 100%, 70%);
-      border-color: hsla(55, 100%, 70%, 0.5);
+      @include colored-badge(55, 100%);
     }
     &_stage-r32 {
-      color: hsl(100, 80%, 75%);
-      border-color: hsla(100, 80%, 75%, 0.5);
+      @include colored-badge(100, 80%);
     }
     &_stage-groups {
-      color: hsl(180, 80%, 75%);
-      border-color: hsla(180, 80%, 75%, 0.5);
+      @include colored-badge(180, 80%);
     }
     &_stage-swiss-3 {
-      color: hsl(210, 80%, 75%);
-      border-color: hsla(210, 80%, 75%, 0.5);
+      @include colored-badge(210, 80%);
     }
     &_stage-swiss-2 {
-      color: hsl(240, 80%, 75%);
-      border-color: hsla(240, 80%, 75%, 0.5);
+      @include colored-badge(240, 80%);
     }
     &_stage-swiss-1 {
-      color: hsl(270, 80%, 75%);
-      border-color: hsla(270, 80%, 75%, 0.5);
+      @include colored-badge(270, 80%);
     }
     &_stage-dnq {
       color: hsl(0, 0%, 65%);
-      border-color: hsla(0, 0%, 65%, 0.3);
+      border: 2px solid hsla(0, 0%, 65%, 0.3);
       opacity: 0.7;
+      .light-theme & {
+        color: hsl(0, 0%, 35%);
+        border-color: hsla(0, 0%, 35%, 0.5);
+      }
     }
   }
   &__players-grid {

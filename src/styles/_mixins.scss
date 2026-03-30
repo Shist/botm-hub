@@ -88,3 +88,13 @@
   border-radius: $border-radius;
   animation: pulse 0.7s ease-in-out 0s infinite;
 }
+
+@mixin colored-badge($hue, $sat) {
+  color: hsl($hue, $sat, 75%);
+  border: 2px solid hsla($hue, $sat, 75%, 0.5);
+  .light-theme & {
+    color: hsl($hue, $sat, 35%);
+    border-color: hsla($hue, $sat, 35%, 0.8);
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+}
