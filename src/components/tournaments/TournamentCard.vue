@@ -181,11 +181,24 @@
               v-for="roster in sortedRosters"
               :key="roster.id"
               :roster="roster"
+              @onEditRoster="(id) => $emit('onEditRoster', tournament.id, id)"
+              @onDeleteRoster="
+                (id) => $emit('onDeleteRoster', tournament.id, id)
+              "
             />
           </v-expansion-panels>
-          <span v-else class="tournament-card__no-links-label mt-2">
+          <span v-else class="tournament-card__no-links-label">
             (Игроки пока не заявлены)
           </span>
+          <v-btn
+            v-if="isUserRedactor && isTournamentEditable"
+            height="50"
+            class="tournament-card__btn tournament-card__btn_add-roster"
+            prepend-icon="mdi-plus-circle-outline"
+            @click="$emit('onAddRoster', tournament.id)"
+          >
+            Добавить команду
+          </v-btn>
         </div>
       </div>
     </template>
@@ -214,6 +227,9 @@ defineEmits<{
   onEditTournament: [tournament: IAllTournamentsListItem];
   onDeleteTournament: [tournamentId: string];
   onArchiveTournament: [tournamentId: string];
+  onAddRoster: [tournamentId: string];
+  onEditRoster: [tournamentId: string, rosterId: string];
+  onDeleteRoster: [tournamentId: string, rosterId: string];
 }>();
 
 defineExpose({
@@ -523,6 +539,13 @@ const sortedRosters = computed(() => {
       background-color: var(--color-tournament-archived);
       &:disabled {
         background-color: var(--color-tournament-archived);
+      }
+    }
+    &_add-roster {
+      background-color: var(--color-tournament-roster-add);
+      color: var(--color-text-white);
+      &:hover {
+        filter: brightness(1.1);
       }
     }
   }

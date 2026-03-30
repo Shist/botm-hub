@@ -2,27 +2,46 @@
   <v-expansion-panel :value="roster.id" class="tournament-roster-card">
     <template #title>
       <div class="tournament-roster-card__header-content">
-        <h5 class="tournament-roster-card__team-name">
-          {{ roster.teamName }}
-        </h5>
+        <div class="tournament-roster-card__name-and-badges">
+          <h5 class="tournament-roster-card__team-name">
+            {{ roster.teamName }}
+          </h5>
+          <div
+            v-if="roster.achievedPlace || roster.achievedStage"
+            class="tournament-roster-card__achievements-wrapper"
+          >
+            <span
+              v-if="roster.achievedPlace"
+              class="tournament-roster-card__badge"
+              :class="placeBadgeClass"
+            >
+              Достигнутое Место: #{{ roster.achievedPlace }}
+            </span>
+            <span
+              v-if="roster.achievedStage"
+              class="tournament-roster-card__badge"
+              :class="stageBadgeClass"
+            >
+              Достигнутая Стадия: {{ roster.achievedStage }}
+            </span>
+          </div>
+        </div>
         <div
-          v-if="roster.achievedPlace || roster.achievedStage"
-          class="tournament-roster-card__achievements-wrapper"
+          v-if="isUserRedactor"
+          class="tournament-roster-card__redactor-actions"
         >
-          <span
-            v-if="roster.achievedPlace"
-            class="tournament-roster-card__badge"
-            :class="placeBadgeClass"
-          >
-            Достигнутое Место: #{{ roster.achievedPlace }}
-          </span>
-          <span
-            v-if="roster.achievedStage"
-            class="tournament-roster-card__badge"
-            :class="stageBadgeClass"
-          >
-            Достигнутая Стадия: {{ roster.achievedStage }}
-          </span>
+          <v-btn
+            icon="mdi-pencil"
+            variant="text"
+            color="var(--color-tournament-roster-edit)"
+            @click.stop="emit('onEditRoster', roster.id)"
+          />
+          <v-btn
+            icon="mdi-delete"
+            variant="text"
+            color="var(--color-tournament-roster-delete)"
+            @click.stop="emit('onDeleteRoster', roster.id)"
+          />
         </div>
       </div>
     </template>
@@ -93,6 +112,7 @@
 
 <script lang="ts" setup>
 import { computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
 import UserCard from "@/components/users/UserCard.vue";
 import { type IAllUsersListItem, isRegisteredPlayer } from "@/types/users";
 import { type IRosterInfo } from "@/types/tournaments";
@@ -100,6 +120,17 @@ import { type IRosterInfo } from "@/types/tournaments";
 const props = defineProps<{
   roster: IRosterInfo<IAllUsersListItem>;
 }>();
+
+const emit = defineEmits<{
+  onEditRoster: [rosterId: string];
+  onDeleteRoster: [rosterId: string];
+}>();
+
+const authStore = useAuthStore();
+
+const isUserRedactor = computed(
+  () => authStore.userAdditionalInfo?.isRedactor ?? false
+);
 
 const placeBadgeClass = computed(() => {
   if (!props.roster.achievedPlace) return "";
@@ -177,11 +208,26 @@ const embedRosterRevealUrl = computed(() => {
 .tournament-roster-card {
   background-color: var(--color-roster-card-bg);
   &__header-content {
+    width: 100%;
     padding-right: 8px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: space-between;
+    align-items: center;
     gap: 8px;
+    @media (max-width: $phone-l) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+  }
+  &__name-and-badges {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  &__redactor-actions {
+    display: flex;
+    gap: 4px;
   }
   &__team-name {
     @include default-headline(24px, 24px, var(--color-text));
