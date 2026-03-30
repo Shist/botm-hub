@@ -116,9 +116,14 @@ const placeBadgeClass = computed(() => {
     return "tournament-roster-card__badge_place-9-12";
   if (place === "13-16" || place === "9-16")
     return "tournament-roster-card__badge_place-13-16";
-  if (place === "17-24" || place === "9-24")
+  if (place === "17-22" || place === "17-24" || place === "9-24")
     return "tournament-roster-card__badge_place-17-24";
-  if (place === "25-32" || place === "17-32")
+  if (
+    place === "23-28" ||
+    place === "29-32" ||
+    place === "25-32" ||
+    place === "17-32"
+  )
     return "tournament-roster-card__badge_place-25-32";
   if (place === "33-64" || place === "17-64")
     return "tournament-roster-card__badge_place-33-64";
