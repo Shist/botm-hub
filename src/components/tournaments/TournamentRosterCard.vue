@@ -27,21 +27,53 @@
           </div>
         </div>
         <div
-          v-if="isUserRedactor"
+          v-if="isUserRedactor && isEditable"
           class="tournament-roster-card__redactor-actions"
         >
-          <v-btn
-            icon="mdi-pencil"
-            variant="text"
-            color="var(--color-tournament-roster-edit)"
-            @click.stop="emit('onEditRoster', roster.id)"
-          />
-          <v-btn
-            icon="mdi-delete"
-            variant="text"
-            color="var(--color-tournament-roster-delete)"
-            @click.stop="emit('onDeleteRoster', roster.id)"
-          />
+          <v-tooltip
+            :disabled="isRecordOwner"
+            :text="`Нельзя изменять команды в записях турниров других редакторов. Для внесения правок обратись к ${recordOwnerNick}`"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <div v-bind="props">
+                <v-btn
+                  :class="{
+                    'tournament-roster-card__action-disabled': !isRecordOwner,
+                  }"
+                  :ripple="isRecordOwner"
+                  icon="mdi-pencil"
+                  variant="text"
+                  color="var(--color-tournament-roster-edit)"
+                  @click.stop="
+                    isRecordOwner ? emit('onEditRoster', roster.id) : null
+                  "
+                />
+              </div>
+            </template>
+          </v-tooltip>
+          <v-tooltip
+            :disabled="isRecordOwner"
+            :text="`Нельзя удалять команды в записях турниров других редакторов. Для внесения правок обратись к ${recordOwnerNick}`"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <div v-bind="props">
+                <v-btn
+                  :class="{
+                    'tournament-roster-card__action-disabled': !isRecordOwner,
+                  }"
+                  :ripple="isRecordOwner"
+                  icon="mdi-delete"
+                  variant="text"
+                  color="var(--color-tournament-roster-delete)"
+                  @click.stop="
+                    isRecordOwner ? emit('onDeleteRoster', roster.id) : null
+                  "
+                />
+              </div>
+            </template>
+          </v-tooltip>
         </div>
       </div>
     </template>
@@ -119,6 +151,9 @@ import { type IRosterInfo } from "@/types/tournaments";
 
 const props = defineProps<{
   roster: IRosterInfo<IAllUsersListItem>;
+  isEditable: boolean;
+  isRecordOwner: boolean;
+  recordOwnerNick: string;
 }>();
 
 const emit = defineEmits<{
@@ -228,6 +263,9 @@ const embedRosterRevealUrl = computed(() => {
   &__redactor-actions {
     display: flex;
     gap: 4px;
+  }
+  &__action-disabled {
+    opacity: 0.5;
   }
   &__team-name {
     @include default-headline(24px, 24px, var(--color-text));

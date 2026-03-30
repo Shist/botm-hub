@@ -136,32 +136,65 @@
               </span>
             </div>
           </div>
-          <div class="tournament-card__btns-wrapper">
-            <v-btn
-              v-if="isUserRedactor && isTournamentEditable"
-              v-bind="props"
-              height="50"
-              class="tournament-card__btn tournament-card__btn_negative"
-              @click="$emit('onDeleteTournament', tournament.id)"
+          <div
+            v-if="isUserRedactor && isTournamentEditable"
+            class="tournament-card__btns-wrapper"
+          >
+            <v-tooltip
+              :disabled="isRecordOwner"
+              :text="`Нельзя удалять записи о турнирах других редакторов. Для внесения правок обратись к ${recordOwnerNick}`"
+              location="top"
             >
-              Удалить запись о турнире
-            </v-btn>
-            <v-btn
-              v-if="isUserRedactor && isTournamentEditable"
-              height="50"
-              class="tournament-card__btn"
-              @click="$emit('onEditTournament', tournament)"
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    :disabled="!isRecordOwner"
+                    height="50"
+                    class="tournament-card__btn tournament-card__btn_negative"
+                    @click="$emit('onDeleteTournament', tournament.id)"
+                  >
+                    Удалить запись о турнире
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
+            <v-tooltip
+              :disabled="isRecordOwner"
+              :text="`Нельзя изменять записи о турнирах других редакторов. Для внесения правок обратись к ${recordOwnerNick}`"
+              location="top"
             >
-              Изменить запись о турнире
-            </v-btn>
-            <v-btn
-              v-if="isUserRedactor && isArchiveTournamentBtnVisible"
-              height="50"
-              class="tournament-card__btn tournament-card__btn_archive"
-              @click="$emit('onArchiveTournament', tournament.id)"
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    :disabled="!isRecordOwner"
+                    height="50"
+                    class="tournament-card__btn"
+                    @click="$emit('onEditTournament', tournament)"
+                  >
+                    Изменить запись о турнире
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
+            <v-tooltip
+              v-if="isArchiveTournamentBtnVisible"
+              :disabled="isRecordOwner"
+              :text="`Нельзя архивировать записи о турнирах других редакторов. Для внесения правок обратись к ${recordOwnerNick}`"
+              location="top"
             >
-              Заархивировать запись о турнире
-            </v-btn>
+              <template #activator="{ props }">
+                <div v-bind="props">
+                  <v-btn
+                    :disabled="!isRecordOwner"
+                    height="50"
+                    class="tournament-card__btn tournament-card__btn_archive"
+                    @click="$emit('onArchiveTournament', tournament.id)"
+                  >
+                    Заархивировать запись о турнире
+                  </v-btn>
+                </div>
+              </template>
+            </v-tooltip>
           </div>
         </div>
         <v-divider
@@ -181,6 +214,9 @@
               v-for="roster in sortedRosters"
               :key="roster.id"
               :roster="roster"
+              :is-editable="isTournamentEditable"
+              :is-record-owner="isRecordOwner"
+              :record-owner-nick="recordOwnerNick"
               @onEditRoster="(id) => $emit('onEditRoster', tournament.id, id)"
               @onDeleteRoster="
                 (id) => $emit('onDeleteRoster', tournament.id, id)
@@ -190,15 +226,26 @@
           <span v-else class="tournament-card__no-links-label">
             (Игроки пока не заявлены)
           </span>
-          <v-btn
+          <v-tooltip
             v-if="isUserRedactor && isTournamentEditable"
-            height="50"
-            class="tournament-card__btn tournament-card__btn_add-roster"
-            prepend-icon="mdi-plus-circle-outline"
-            @click="$emit('onAddRoster', tournament.id)"
+            :disabled="isRecordOwner"
+            :text="`Нельзя добавлять команды в записи турниров других редакторов. Для внесения правок обратись к ${recordOwnerNick}`"
+            location="top"
           >
-            Добавить команду
-          </v-btn>
+            <template #activator="{ props: tooltipProps }">
+              <div v-bind="isRecordOwner ? undefined : tooltipProps">
+                <v-btn
+                  :disabled="!isRecordOwner"
+                  height="50"
+                  class="tournament-card__btn tournament-card__btn_add-roster"
+                  prepend-icon="mdi-plus-circle-outline"
+                  @click="$emit('onAddRoster', tournament.id)"
+                >
+                  Добавить команду
+                </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
         </div>
       </div>
     </template>
@@ -208,9 +255,10 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useDate } from "vuetify";
+import { useAuthStore } from "@/stores/auth";
+import { useUsersStore } from "@/stores/users";
 import TournamentStatusBadge from "@/components/tournaments/TournamentStatusBadge.vue";
 import TournamentRosterCard from "@/components/tournaments/TournamentRosterCard.vue";
-import { useAuthStore } from "@/stores/auth";
 import {
   TournamentStatus,
   type IAllTournamentsListItem,
@@ -238,6 +286,7 @@ defineExpose({
 
 const vuetifyDate = useDate();
 const authStore = useAuthStore();
+const usersStore = useUsersStore();
 
 const expandedRosterPanel = ref<string | null>(
   props.tournament.rostersInfo.length === 1
@@ -247,6 +296,15 @@ const expandedRosterPanel = ref<string | null>(
 
 const isUserRedactor = computed(() => {
   return authStore.userAdditionalInfo?.isRedactor ?? false;
+});
+const isRecordOwner = computed(() => {
+  return authStore.user?.uid === props.tournament.redactorUid;
+});
+const recordOwnerNick = computed(() => {
+  const creator = usersStore.users.find(
+    (u) => u.uid === props.tournament.redactorUid
+  );
+  return creator ? creator.nick : "(ник не найден)";
 });
 const timeDiffSeconds = computed(() => {
   return (
@@ -546,6 +604,9 @@ const sortedRosters = computed(() => {
       color: var(--color-text-white);
       &:hover {
         filter: brightness(1.1);
+      }
+      &:disabled {
+        background-color: var(--color-tournament-roster-add);
       }
     }
   }
