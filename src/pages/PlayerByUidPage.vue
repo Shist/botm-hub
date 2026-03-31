@@ -44,6 +44,7 @@
           <span>Особые тэги:</span>
           <div class="player-by-uid-page__tags-wrapper">
             <IconAdmin v-if="isShist" />
+            <IconRedactor v-if="isRedactor" />
             <IconTrainer v-if="isTrainer" />
             <component :is="digitIconComponent" />
             <span v-if="!hasSomeTags" class="player-by-uid-page__no-tags-label">
@@ -75,6 +76,7 @@ import useUserTags from "@/composables/useUserTags";
 import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
+import IconRedactor from "@/components/users/user-icons/IconRedactor.vue";
 import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
 import { type IAllUsersListItem } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
@@ -98,7 +100,8 @@ const playerSkillsets = computed<OsuMapCategory[]>(() => {
   return JSON.parse(playerInfo.value?.skillsets ?? "");
 });
 
-const { isShist, digitIconComponent, isTrainer } = useUserTags(playerInfo);
+const { isShist, isRedactor, isTrainer, digitIconComponent } =
+  useUserTags(playerInfo);
 const hasSomeTags = computed(
   () => isShist.value || !!digitIconComponent.value || isTrainer.value
 );

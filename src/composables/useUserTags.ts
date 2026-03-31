@@ -11,6 +11,16 @@ export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
     return userRef.value.uid === SHIST_UID;
   });
 
+  const isRedactor = computed(() => {
+    if (!userRef.value) return false;
+    return userRef.value.isRedactor;
+  });
+
+  const isTrainer = computed(() => {
+    if (!userRef.value) return false;
+    return userRef.value.isTrainer;
+  });
+
   const digitIconComponent = computed(() => {
     if (!userRef.value) return null;
     switch (userRef.value.digitCategory) {
@@ -25,10 +35,5 @@ export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
     }
   });
 
-  const isTrainer = computed(() => {
-    if (!userRef.value) return false;
-    return userRef.value.isTrainer;
-  });
-
-  return { isShist, digitIconComponent, isTrainer };
+  return { isShist, isRedactor, isTrainer, digitIconComponent };
 }

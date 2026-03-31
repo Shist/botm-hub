@@ -4,6 +4,7 @@
     <div class="user-card__constant-info-wrapper">
       <div class="user-card__tags-wrapper">
         <IconAdmin v-if="isShist" />
+        <IconRedactor v-if="isRedactor" />
         <IconTrainer v-if="isTrainer" />
         <component :is="digitIconComponent" />
       </div>
@@ -26,12 +27,13 @@
 import { toRef } from "vue";
 import useUserTags from "@/composables/useUserTags";
 import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
+import IconRedactor from "@/components/users/user-icons/IconRedactor.vue";
 import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
 import { type IAllUsersListItem } from "@/types/users";
 
 const props = defineProps<{ user: IAllUsersListItem }>();
 
-const { isShist, digitIconComponent, isTrainer } = useUserTags(
+const { isShist, isRedactor, isTrainer, digitIconComponent } = useUserTags(
   toRef(props.user)
 );
 </script>
