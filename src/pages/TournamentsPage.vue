@@ -49,6 +49,7 @@
               @onArchiveTournament="onArchiveTournament"
               @onAddRoster="onAddRoster"
               @onEditRoster="onEditRoster"
+              @onDeleteRoster="onDeleteRoster"
             />
           </v-expansion-panels>
         </v-tabs-window-item>
@@ -107,6 +108,13 @@
       @closeModal="onClosePlanRosterModal"
       @closeModalAfterRequest="onClosePlanRosterModalAfterRequest"
     />
+    <DeleteTournamentRosterModal
+      :isOpened="isDeleteRosterModalOpened"
+      :tournamentId="selectedTournamentIdForRoster"
+      :rosterId="selectedRosterIdForDeleting"
+      @closeModal="onCloseDeleteRosterModal"
+      @closeModalAfterDeleting="onCloseDeleteRosterModalAfterDeleting"
+    />
   </div>
 </template>
 
@@ -126,6 +134,7 @@ import PlanTournamentModal from "@/components/tournaments/PlanTournamentModal.vu
 import DeleteTournamentModal from "@/components/tournaments/DeleteTournamentModal.vue";
 import ArchiveTournamentModal from "@/components/tournaments/ArchiveTournamentModal.vue";
 import PlanTournamentRosterModal from "@/components/tournaments/PlanTournamentRosterModal.vue";
+import DeleteTournamentRosterModal from "@/components/tournaments/DeleteTournamentRosterModal.vue";
 import useToast from "@/composables/useToast";
 import {
   type IAllTournamentsListItem,
@@ -157,7 +166,9 @@ const selectedTournamentIdForRoster = ref<string>("");
 const selectedRosterForEditing = ref<IRosterInfo<IAllUsersListItem> | null>(
   null
 );
+const selectedRosterIdForDeleting = ref<string>("");
 const isPlanRosterModalOpened = ref(false);
+const isDeleteRosterModalOpened = ref(false);
 
 const userInfo = computed(() => authStore.userAdditionalInfo);
 const activeTournamentsList = computed(() => {
@@ -244,6 +255,11 @@ const onEditRoster = (tournamentId: string, rosterId: string) => {
   };
   isPlanRosterModalOpened.value = true;
 };
+const onDeleteRoster = (tournamentId: string, rosterId: string) => {
+  selectedTournamentIdForRoster.value = tournamentId;
+  selectedRosterIdForDeleting.value = rosterId;
+  isDeleteRosterModalOpened.value = true;
+};
 const onClosePlanTournamentModal = () => {
   isRecordTournamentModalOpened.value = false;
   selectedTournamentForEditing.value = null;
@@ -279,6 +295,18 @@ const onClosePlanRosterModal = () => {
 const onClosePlanRosterModalAfterRequest = () => {
   onClosePlanRosterModal();
   scrollToChangedTournamentPanel(true, selectedTournamentIdForRoster.value);
+};
+const onCloseDeleteRosterModal = () => {
+  isDeleteRosterModalOpened.value = false;
+  selectedTournamentIdForRoster.value = "";
+  selectedRosterIdForDeleting.value = "";
+};
+const onCloseDeleteRosterModalAfterDeleting = () => {
+  onCloseDeleteRosterModal();
+  scrollToChangedTournamentPanel(
+    currTab.value === "current",
+    selectedTournamentIdForRoster.value
+  );
 };
 </script>
 
