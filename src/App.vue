@@ -14,7 +14,7 @@
           class="new-patch-modal-img"
         />
         <p class="new-patch-label">
-          Вышла новая версия веб-приложения BOTM Hub - 2.2.0! Вы можете
+          Вышла новая версия веб-приложения BOTM Hub - 3.0.0! Вы можете
           взглянуть на полный список изменений по кнопке `Последние обновления`,
           находящейся в бургер-меню. Это окно больше не будет показываться, пока
           не выйдет новый патч или пока вы не почистите кэш браузера.
@@ -41,7 +41,7 @@ import TheHeader from "@/components/layout/TheHeader.vue";
 import TheFooter from "@/components/layout/TheFooter.vue";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
-const APP_VERSION = "2.2.0";
+const APP_VERSION = "3.0.0";
 
 const scrollbarPaddingStore = useScrollbarPaddingStore();
 
