@@ -84,33 +84,49 @@
           :key="`player-${index}`"
         >
           <template v-if="player">
-            <UserCard v-if="isRegisteredPlayer(player)" :user="player" />
-            <a
-              v-else
-              :href="`https://osu.ppy.sh/users/${player.osuId}`"
-              target="_blank"
-              class="tournament-roster-card__unregistered-card"
-            >
-              <div class="tournament-roster-card__unregistered-constant-info">
-                <div class="tournament-roster-card__unregistered-avatar-nick">
-                  <AppImage
-                    :imgPath="`https://a.ppy.sh/${player.osuId}?.png`"
-                    :imgAlt="`Аватар ${player.nick}`"
-                    isAvatar
-                    class="tournament-roster-card__unregistered-avatar"
-                  />
-                  <span class="tournament-roster-card__unregistered-nick">
-                    {{ player.nick }}
-                  </span>
-                  <v-icon
-                    icon="mdi-open-in-new"
-                    size="x-small"
-                    color="grey"
-                    class="tournament-roster-card__unregistered-player-link-icon"
-                  />
+            <div class="tournament-roster-card__player-wrapper">
+              <v-tooltip
+                v-if="index === 0"
+                text="Капитан команды"
+                location="top"
+              >
+                <template #activator="{ props }">
+                  <div
+                    v-bind="props"
+                    class="tournament-roster-card__captain-badge"
+                  >
+                    <v-icon icon="mdi-crown" size="small" />
+                  </div>
+                </template>
+              </v-tooltip>
+              <UserCard v-if="isRegisteredPlayer(player)" :user="player" />
+              <a
+                v-else
+                :href="`https://osu.ppy.sh/users/${player.osuId}`"
+                target="_blank"
+                class="tournament-roster-card__unregistered-card"
+              >
+                <div class="tournament-roster-card__unregistered-constant-info">
+                  <div class="tournament-roster-card__unregistered-avatar-nick">
+                    <AppImage
+                      :imgPath="`https://a.ppy.sh/${player.osuId}?.png`"
+                      :imgAlt="`Аватар ${player.nick}`"
+                      isAvatar
+                      class="tournament-roster-card__unregistered-avatar"
+                    />
+                    <span class="tournament-roster-card__unregistered-nick">
+                      {{ player.nick }}
+                    </span>
+                    <v-icon
+                      icon="mdi-open-in-new"
+                      size="x-small"
+                      color="grey"
+                      class="tournament-roster-card__unregistered-player-link-icon"
+                    />
+                  </div>
                 </div>
-              </div>
-            </a>
+              </a>
+            </div>
           </template>
         </template>
         <div
@@ -441,6 +457,38 @@ const embedRosterRevealUrl = computed(() => {
     @media (max-width: $phone-l) {
       font-size: 14px;
       line-height: 14px;
+    }
+  }
+  &__player-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    & > * {
+      flex-grow: 1;
+    }
+  }
+  &__captain-badge {
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 26px;
+    height: 26px;
+    background-color: var(--color-roster-card-bg);
+    border-radius: 50%;
+    z-index: 2;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    transform: rotate(12deg);
+    .v-icon {
+      color: var(--color-tournament-roster-captain);
+    }
+    .light-theme & {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+      .v-icon {
+        color: var(--color-tournament-roster-captain);
+      }
     }
   }
   &__hashed-slot {
