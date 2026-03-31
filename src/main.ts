@@ -1,50 +1,55 @@
-import { createApp, type App as IApp } from "vue";
+import { createApp } from "vue";
 import App from "@/App.vue";
 import router from "@/router";
 import { createPinia } from "pinia";
+import "@mdi/font/css/materialdesignicons.css";
+import "@/styles/reset.css";
+import "vuetify/styles";
+import "vue3-toastify/dist/index.css";
 import { useAuthStore } from "@/stores/auth";
 import { useThemeStore } from "@/stores/theme";
-import { type User as IFirebaseUser } from "firebase/auth";
 import { onFirebaseAuthStateChanged } from "@/services/firebase/config";
 import { loadUserInfoFromFirebase } from "@/services/firebase/users";
 import appComponents from "@/components/ui";
 import vuetifyConfig from "@/plugins/vuetify";
 import Vue3Toasity from "vue3-toastify";
-import "vue3-toastify/dist/index.css";
 
-let app: IApp | null = null;
+const app = createApp(App);
+const pinia = createPinia();
 
-onFirebaseAuthStateChanged((user: IFirebaseUser | null) => {
-  if (!app) {
-    app = createApp(App);
+Object.keys(appComponents).forEach((name) => {
+  const component = appComponents[name];
+  if (component) app.component(name, component);
+});
 
-    Object.keys(appComponents).forEach((name) => {
-      const component = appComponents[name];
-      if (component) app!.component(name, component);
-    });
+app.use(pinia);
+app.use(router);
+app.use(vuetifyConfig);
+app.use(Vue3Toasity, {
+  clearOnUrlChange: false,
+  theme: useThemeStore().currTheme,
+});
 
-    app
-      .use(router)
-      .use(createPinia())
-      .use(vuetifyConfig)
-      .use(Vue3Toasity, {
-        clearOnUrlChange: false,
-        theme: useThemeStore().currTheme,
-      })
-      .mount("#app");
-  }
+let isMounted = false;
+
+onFirebaseAuthStateChanged((user) => {
+  const authStore = useAuthStore();
 
   if (user) {
-    const { setBaseUserInfo, setAdditionalUserInfo } = useAuthStore();
-    setBaseUserInfo(user.uid, user.email ?? "");
+    authStore.setBaseUserInfo(user.uid, user.email ?? "");
     loadUserInfoFromFirebase()
       .then((userInfo) => {
-        setAdditionalUserInfo(userInfo);
+        authStore.setAdditionalUserInfo(userInfo);
       })
       .catch(() => {
-        setAdditionalUserInfo("loadingError");
+        authStore.setAdditionalUserInfo("loadingError");
       });
   } else {
-    useAuthStore().user = null;
+    authStore.user = null;
+  }
+
+  if (!isMounted) {
+    isMounted = true;
+    app.mount("#app");
   }
 });
