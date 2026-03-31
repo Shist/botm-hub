@@ -290,7 +290,7 @@
           auto-grow
           rows="3"
         />
-        <v-expansion-panels class="mb-2">
+        <v-expansion-panels class="plan-tournament-modal__links-panels-wrapper">
           <v-expansion-panel title="Ссылки (Опционально)">
             <template #text>
               <div class="plan-tournament-modal__links-wrapper">
@@ -794,6 +794,9 @@ const onConfirmTournament = async () => {
   }
   &__switch {
     margin-left: 10px;
+  }
+  &__links-panels-wrapper {
+    margin-bottom: 8px;
   }
   &__links-wrapper {
     display: flex;

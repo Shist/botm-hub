@@ -47,6 +47,8 @@
               @onEditTournament="onEditTournament"
               @onDeleteTournament="onDeleteTournament"
               @onArchiveTournament="onArchiveTournament"
+              @onAddRoster="onAddRoster"
+              @onEditRoster="onEditRoster"
             />
           </v-expansion-panels>
         </v-tabs-window-item>
@@ -98,6 +100,13 @@
       @closeModal="onCloseArchiveTournamentModal"
       @closeModalAfterArchiving="onCloseArchiveTournamentModalAfterArchiving"
     />
+    <PlanTournamentRosterModal
+      :isOpened="isPlanRosterModalOpened"
+      :tournamentId="selectedTournamentIdForRoster"
+      :roster="selectedRosterForEditing"
+      @closeModal="onClosePlanRosterModal"
+      @closeModalAfterRequest="onClosePlanRosterModalAfterRequest"
+    />
   </div>
 </template>
 
@@ -116,8 +125,13 @@ import TournamentCard from "@/components/tournaments/TournamentCard.vue";
 import PlanTournamentModal from "@/components/tournaments/PlanTournamentModal.vue";
 import DeleteTournamentModal from "@/components/tournaments/DeleteTournamentModal.vue";
 import ArchiveTournamentModal from "@/components/tournaments/ArchiveTournamentModal.vue";
+import PlanTournamentRosterModal from "@/components/tournaments/PlanTournamentRosterModal.vue";
 import useToast from "@/composables/useToast";
-import { type IAllTournamentsListItem } from "@/types/tournaments";
+import {
+  type IAllTournamentsListItem,
+  type IRosterInfo,
+} from "@/types/tournaments";
+import { type IAllUsersListItem } from "@/types/users";
 
 const activeTournamentsRefs = useTemplateRef("activeTournaments");
 const archivedTournamentsRefs = useTemplateRef("archivedTournaments");
@@ -139,6 +153,11 @@ const selectedTournamentIdForArchiving = ref<string>("");
 const isRecordTournamentModalOpened = ref(false);
 const isDeleteTournamentModalOpened = ref(false);
 const isArchiveTournamentModalOpened = ref(false);
+const selectedTournamentIdForRoster = ref<string>("");
+const selectedRosterForEditing = ref<IRosterInfo<IAllUsersListItem> | null>(
+  null
+);
+const isPlanRosterModalOpened = ref(false);
 
 const userInfo = computed(() => authStore.userAdditionalInfo);
 const activeTournamentsList = computed(() => {
@@ -206,6 +225,25 @@ const onArchiveTournament = (tournamentId: string) => {
   selectedTournamentIdForArchiving.value = tournamentId;
   isArchiveTournamentModalOpened.value = true;
 };
+const onAddRoster = (tournamentId: string) => {
+  selectedTournamentIdForRoster.value = tournamentId;
+  selectedRosterForEditing.value = null;
+  isPlanRosterModalOpened.value = true;
+};
+const onEditRoster = (tournamentId: string, rosterId: string) => {
+  selectedTournamentIdForRoster.value = tournamentId;
+  const tournament = tournamentsStore.tournaments.find(
+    (t) => t.id === tournamentId
+  );
+  if (!tournament) return;
+  const roster = tournament.rostersInfo.find((r) => r.id === rosterId);
+  if (!roster) return;
+  selectedRosterForEditing.value = {
+    ...roster,
+    players: [...roster.players],
+  };
+  isPlanRosterModalOpened.value = true;
+};
 const onClosePlanTournamentModal = () => {
   isRecordTournamentModalOpened.value = false;
   selectedTournamentForEditing.value = null;
@@ -232,6 +270,15 @@ const onCloseArchiveTournamentModalAfterArchiving = (tournamentId: string) => {
   expandedArchivedTournamentsPanel.value = tournamentId;
   currTab.value = "archive";
   scrollToChangedTournamentPanel(false, tournamentId);
+};
+const onClosePlanRosterModal = () => {
+  isPlanRosterModalOpened.value = false;
+  selectedRosterForEditing.value = null;
+  selectedTournamentIdForRoster.value = "";
+};
+const onClosePlanRosterModalAfterRequest = () => {
+  onClosePlanRosterModal();
+  scrollToChangedTournamentPanel(true, selectedTournamentIdForRoster.value);
 };
 </script>
 

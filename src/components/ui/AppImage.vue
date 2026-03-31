@@ -1,11 +1,12 @@
 <template>
   <div>
     <div
-      v-if="currImgState === 'loading'"
+      v-if="currImgState === 'loading' && showSkeleton"
       class="img-skeleton"
       :class="{ 'avatar-img': isAvatar }"
     >
       <img
+        v-if="!isAvatar"
         src="@/assets/images/img-loading.png"
         alt="Изображение загружается"
         class="img-skeleton__img-loading-icon"
@@ -35,7 +36,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Ref, onMounted, watch } from "vue";
+import { ref, type Ref, onMounted, onUnmounted, watch } from "vue";
 
 const props = defineProps<{
   imgPath: string;
@@ -45,6 +46,8 @@ const props = defineProps<{
 
 const currImgState = ref("loading");
 const imgSrc: Ref<string | undefined> = ref(undefined);
+const showSkeleton = ref(false);
+let skeletonTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const handleImageSrcLoad = () => {
   currImgState.value = "loaded";
@@ -56,15 +59,40 @@ const handleImageSrcError = () => {
   }
 };
 
+const initLoading = (newSrc: string) => {
+  if (!newSrc) return;
+
+  imgSrc.value = newSrc;
+  currImgState.value = "loading";
+  showSkeleton.value = false;
+
+  if (skeletonTimeout) clearTimeout(skeletonTimeout);
+
+  skeletonTimeout = setTimeout(() => {
+    if (currImgState.value === "loading") {
+      showSkeleton.value = true;
+    }
+  }, 50);
+};
+
 onMounted(() => {
-  imgSrc.value = props.imgPath;
+  initLoading(props.imgPath);
+});
+
+onUnmounted(() => {
+  if (skeletonTimeout) clearTimeout(skeletonTimeout);
 });
 
 watch(
   () => props.imgPath,
   (newSrc) => {
-    imgSrc.value = newSrc;
-    currImgState.value = "loading";
+    if (newSrc) {
+      initLoading(newSrc);
+    } else {
+      if (skeletonTimeout) clearTimeout(skeletonTimeout);
+      showSkeleton.value = false;
+      currImgState.value = "loading";
+    }
   }
 );
 </script>
@@ -73,25 +101,35 @@ watch(
 .avatar-img {
   border-radius: 50%;
 }
-
 .main-img {
   width: 100%;
   max-width: 100%;
 }
-
 .img-skeleton {
-  padding: 20%;
-  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: var(--color-skeleton-bg);
   animation: pulse 1.5s ease-in-out infinite;
-  &__img-loading-icon {
+  &.avatar-img {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    padding: 0;
+  }
+  &:not(.avatar-img) {
+    padding: 20%;
     width: 100%;
   }
+  &__img-loading-icon {
+    width: 100%;
+    &.avatar-img & {
+      width: 50%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+  }
 }
-
 @keyframes pulse {
   0% {
     opacity: 0.8;
@@ -103,7 +141,6 @@ watch(
     opacity: 0.8;
   }
 }
-
 .img-error {
   align-self: center;
   display: flex;

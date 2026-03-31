@@ -217,6 +217,7 @@
               :is-editable="isTournamentEditable"
               :is-record-owner="isRecordOwner"
               :record-owner-nick="recordOwnerNick"
+              :team-size="tournament.teamSize"
               @onEditRoster="(id) => $emit('onEditRoster', tournament.id, id)"
               @onDeleteRoster="
                 (id) => $emit('onDeleteRoster', tournament.id, id)
@@ -238,7 +239,7 @@
                   :disabled="!isRecordOwner"
                   height="50"
                   class="tournament-card__btn tournament-card__btn_add-roster"
-                  prepend-icon="mdi-plus-circle-outline"
+                  prepend-icon="mdi-plus"
                   @click="$emit('onAddRoster', tournament.id)"
                 >
                   Добавить команду

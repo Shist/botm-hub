@@ -189,7 +189,7 @@ import { useDate } from "vuetify";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import TrainingStatusBadge from "@/components/trainings/TrainingStatusBadge.vue";
 import UserCard from "@/components/users/UserCard.vue";
-import FreeSlotCard from "@/components/trainings/FreeSlotCard.vue";
+import FreeSlotCard from "@/components/users/FreeSlotCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useTrainingsStore } from "@/stores/trainings";

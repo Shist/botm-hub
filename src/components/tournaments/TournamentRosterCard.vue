@@ -78,42 +78,51 @@
       </div>
     </template>
     <template #text>
-      <div class="tournament-roster-card__players-grid mb-4">
+      <div class="tournament-roster-card__players-grid">
         <template
-          v-for="player in roster.players"
-          :key="'uid' in player ? player.uid : player.osuId"
+          v-for="(player, index) in roster.players"
+          :key="`player-${index}`"
         >
-          <UserCard v-if="isRegisteredPlayer(player)" :user="player" />
-          <a
-            v-else
-            :href="`https://osu.ppy.sh/users/${player.osuId}`"
-            target="_blank"
-            class="tournament-roster-card__unregistered-card"
-          >
-            <div class="tournament-roster-card__unregistered-constant-info">
-              <div class="tournament-roster-card__unregistered-avatar-nick">
-                <AppImage
-                  :imgPath="`https://a.ppy.sh/${player.osuId}?.png`"
-                  :imgAlt="`Аватар ${player.nick}`"
-                  isAvatar
-                  class="tournament-roster-card__unregistered-avatar"
-                />
-                <span class="tournament-roster-card__unregistered-nick">
-                  {{ player.nick }}
-                </span>
-                <v-icon
-                  icon="mdi-open-in-new"
-                  size="x-small"
-                  color="grey"
-                  class="ml-1"
-                />
+          <template v-if="player">
+            <UserCard v-if="isRegisteredPlayer(player)" :user="player" />
+            <a
+              v-else
+              :href="`https://osu.ppy.sh/users/${player.osuId}`"
+              target="_blank"
+              class="tournament-roster-card__unregistered-card"
+            >
+              <div class="tournament-roster-card__unregistered-constant-info">
+                <div class="tournament-roster-card__unregistered-avatar-nick">
+                  <AppImage
+                    :imgPath="`https://a.ppy.sh/${player.osuId}?.png`"
+                    :imgAlt="`Аватар ${player.nick}`"
+                    isAvatar
+                    class="tournament-roster-card__unregistered-avatar"
+                  />
+                  <span class="tournament-roster-card__unregistered-nick">
+                    {{ player.nick }}
+                  </span>
+                  <v-icon
+                    icon="mdi-open-in-new"
+                    size="x-small"
+                    color="grey"
+                    class="tournament-roster-card__unregistered-player-link-icon"
+                  />
+                </div>
               </div>
-            </div>
-          </a>
+            </a>
+          </template>
         </template>
+        <div
+          v-for="n in emptySlotsCount"
+          :key="`empty-${n}`"
+          class="tournament-roster-card__hashed-slot"
+        ></div>
       </div>
       <template v-if="roster.collabImgLink">
-        <v-divider class="mb-3 border-opacity-100" />
+        <v-divider
+          class="tournament-roster-card__horizontal-divider border-opacity-100"
+        />
         <div class="tournament-roster-card__media-section">
           <h6 class="tournament-roster-card__media-title">Коллаб</h6>
           <AppImage
@@ -154,6 +163,7 @@ const props = defineProps<{
   isEditable: boolean;
   isRecordOwner: boolean;
   recordOwnerNick: string;
+  teamSize: number;
 }>();
 
 const emit = defineEmits<{
@@ -166,6 +176,10 @@ const authStore = useAuthStore();
 const isUserRedactor = computed(
   () => authStore.userAdditionalInfo?.isRedactor ?? false
 );
+
+const emptySlotsCount = computed(() => {
+  return Math.max(0, props.teamSize - props.roster.players.length);
+});
 
 const placeBadgeClass = computed(() => {
   if (!props.roster.achievedPlace) return "";
@@ -412,6 +426,7 @@ const embedRosterRevealUrl = computed(() => {
     }
   }
   &__players-grid {
+    margin-bottom: 16px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
@@ -426,6 +441,29 @@ const embedRosterRevealUrl = computed(() => {
     @media (max-width: $phone-l) {
       font-size: 14px;
       line-height: 14px;
+    }
+  }
+  &__hashed-slot {
+    min-height: 44px;
+    border-radius: 4px;
+    border: 1px dashed rgba(var(--v-theme-on-surface), 0.2);
+    background: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 10px,
+      rgba(var(--v-theme-on-surface), 0.05) 10px,
+      rgba(var(--v-theme-on-surface), 0.05) 20px
+    );
+    opacity: 0.7;
+    .light-theme & {
+      border-color: rgba(var(--v-theme-on-surface), 0.3);
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 10px,
+        rgba(var(--v-theme-on-surface), 0.08) 10px,
+        rgba(var(--v-theme-on-surface), 0.08) 20px
+      );
     }
   }
   &__unregistered-card {
@@ -463,6 +501,12 @@ const embedRosterRevealUrl = computed(() => {
       font-size: 16px;
       line-height: 16px;
     }
+  }
+  &__unregistered-player-link-icon {
+    margin-left: 4px;
+  }
+  &__horizontal-divider {
+    margin-bottom: 12px;
   }
   &__media-section {
     display: flex;

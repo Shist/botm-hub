@@ -48,7 +48,14 @@ export interface IUnregisteredUser {
 }
 
 export function isRegisteredPlayer(
-  player: IAllUsersListItem | IUnregisteredUser
+  player: IAllUsersListItem | IUnregisteredUser | null
 ): player is IAllUsersListItem {
-  return "uid" in player;
+  return player !== null && "uid" in player;
+}
+
+export interface IPlayerSlot {
+  localId: string;
+  isRegistered: boolean;
+  registeredPlayer: IAllUsersListItem | null;
+  unregisteredPlayer: IUnregisteredUser | null;
 }

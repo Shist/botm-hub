@@ -43,7 +43,10 @@ export const useTournamentsStore = defineStore("tournaments", () => {
               return {
                 ...rosterInfo,
                 players: rosterInfo.players.reduce(
-                  (acc: (IAllUsersListItem | IUnregisteredUser)[], player) => {
+                  (
+                    acc: (IAllUsersListItem | IUnregisteredUser | null)[],
+                    player
+                  ) => {
                     if (typeof player === "string") {
                       const userInfo = allUsers.find((u) => u.uid === player);
                       if (userInfo) acc.push(userInfo);
