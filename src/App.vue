@@ -26,6 +26,7 @@
     <TheHeader :style="{ paddingRight: scrollbarWidth }" />
     <main class="main-wrapper" :style="{ paddingRight: scrollbarWidth }">
       <div class="main-wrapper__container">
+        <TheBreadcrumbs class="main-wrapper__breadcrumbs" />
         <router-view />
       </div>
     </main>
@@ -39,6 +40,7 @@ import { useThemeStore } from "@/stores/theme";
 import { useScrollbarPaddingStore } from "@/stores/scrollbar-padding";
 import TheHeader from "@/components/layout/TheHeader.vue";
 import TheFooter from "@/components/layout/TheFooter.vue";
+import TheBreadcrumbs from "@/components/layout/TheBreadcrumbs.vue";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
 const APP_VERSION = "3.0.0";
@@ -100,7 +102,7 @@ onMounted(() => {
 
 .global-container {
   position: relative;
-  min-height: 100vh;
+  min-height: 100dvh;
   max-width: 1920px;
   width: 100%;
   margin: 0 auto;
@@ -119,11 +121,9 @@ onMounted(() => {
   flex-grow: 1;
   &__container {
     @extend %default-wrapper;
-    &:has(.players-page),
-    &:has(.skillset-maps-page),
-    &:has(.workout-constructor-page) {
-      padding: 10px;
-    }
+  }
+  &__breadcrumbs {
+    margin-bottom: 10px;
   }
 }
 
@@ -152,6 +152,8 @@ onMounted(() => {
   row-gap: 10px;
   &__headline {
     @include default-headline(28px, 28px, var(--color-text));
+    width: 100%;
+    text-align: center;
     @media (max-width: $phone-l) {
       font-size: 20px;
       line-height: 20px;

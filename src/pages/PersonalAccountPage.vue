@@ -1,6 +1,6 @@
 <template>
   <div class="personal-account-page">
-    <h2 class="personal-account-page__headline">Личный кабинет</h2>
+    <h2 class="personal-account-page__headline">Личный Кабинет</h2>
     <div class="personal-account-page__avatar-inputs-wrapper">
       <v-tooltip
         :disabled="currentOsuId !== null"
@@ -176,6 +176,7 @@ const onUpdate = async () => {
   row-gap: 20px;
   &__headline {
     @include default-headline(36px, 36px, var(--color-text));
+    text-align: center;
     @media (max-width: $tablet-l) {
       font-size: 28px;
       line-height: 28px;

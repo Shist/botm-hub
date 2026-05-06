@@ -164,12 +164,12 @@ const copyToClipboard = async (mapId: number) => {
     vertical-align: middle;
   }
   &__content {
-    height: calc(100vh - 308px);
+    height: calc(100dvh - 344px);
     @media (max-width: $tablet-l) {
-      height: calc(100vh - 298px);
+      height: calc(100dvh - 334px);
     }
     @media (max-width: $phone-l) {
-      height: calc(100vh - 285px);
+      height: calc(100dvh - 321px);
     }
   }
   &__id-label {

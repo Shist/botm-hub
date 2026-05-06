@@ -768,7 +768,7 @@ const onConfirmTournament = async () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    max-height: 75vh;
+    max-height: 75dvh;
     padding-right: 5px;
   }
   &__grid-2-cols {

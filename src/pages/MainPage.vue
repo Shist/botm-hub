@@ -60,8 +60,11 @@
 
 <style lang="scss" scoped>
 .main-page {
+  padding: 10px;
   &__welcome-msg {
     @include default-headline(36px, 36px, var(--color-text));
+    margin-bottom: 10px;
+    text-align: center;
     @media (max-width: $tablet-l) {
       font-size: 28px;
       line-height: 28px;
@@ -72,10 +75,10 @@
     }
   }
   &__links-list {
-    padding: 30px;
+    padding: 10px 20px;
     display: flex;
     flex-direction: column;
-    row-gap: 20px;
+    row-gap: 15px;
     li {
       display: flex;
     }
@@ -83,7 +86,7 @@
   &__btn {
     position: relative;
     text-decoration: none;
-    height: 100px;
+    height: 90px;
     display: flex;
     justify-content: center;
     align-items: center;

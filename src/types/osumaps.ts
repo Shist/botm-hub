@@ -44,3 +44,9 @@ export interface IOsuMapsCategoryState {
   mapsList: IOsuMap[];
   loadingState: LoadingState;
 }
+
+export function isMapCategoryKey(
+  key: string
+): key is keyof typeof OsuMapCategory {
+  return key in OsuMapCategory;
+}

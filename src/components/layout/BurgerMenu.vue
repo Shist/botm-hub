@@ -1,7 +1,7 @@
 <template>
   <AppModal
     :isOpened="isPatchNotesModalOpened"
-    title="🛠️ Последние обновления 🛠️"
+    title="🛠️ Последние Обновления 🛠️"
     closeBtnText="Понятно"
     :isClosableByClickOutside="true"
     @closeModal="closePatchNotesModal"
@@ -10,7 +10,7 @@
       <div class="patch-notes-modal-wrapper">
         <AppImage
           :imgPath="newPatchImagePath"
-          imgAlt="Последние обновления"
+          imgAlt="Последние Обновления"
           class="patch-notes-modal-img"
         />
         <PatchNotes />
@@ -57,7 +57,7 @@
           <ul class="burger-menu__nav-list">
             <li v-if="authStore.user" class="burger-menu__nav-list-item">
               <a class="burger-menu__link" @click.stop="onProfileBtnClicked">
-                Личный кабинет
+                Личный Кабинет
               </a>
             </li>
             <li class="burger-menu__nav-list-item">
@@ -65,7 +65,7 @@
                 class="burger-menu__btn"
                 @click.stop="openPatchNotesModal"
               >
-                Последние обновления
+                Последние Обновления
               </button>
             </li>
             <li v-if="userEmail" class="burger-menu__nav-list-item">

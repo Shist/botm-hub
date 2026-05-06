@@ -1,6 +1,6 @@
 <template>
   <div class="skillsets-maps-page">
-    <h2 class="skillsets-maps-page__headline">Мапы Скиллсетов</h2>
+    <h2 class="skillsets-maps-page__headline">Карты Скиллсетов</h2>
     <nav>
       <ul class="skillsets-maps-page__links-list">
         <li
@@ -28,6 +28,7 @@ import { MAPS_CATEGORIES } from "@/constants";
 .skillsets-maps-page {
   &__headline {
     @include default-headline(36px, 36px, var(--color-text));
+    text-align: center;
     @media (max-width: $tablet-l) {
       font-size: 28px;
       line-height: 28px;

@@ -317,6 +317,7 @@ const onCloseDeleteRosterModalAfterDeleting = () => {
   row-gap: 20px;
   &__headline {
     @include default-headline(36px, 36px, var(--color-text));
+    text-align: center;
     @media (max-width: $tablet-l) {
       font-size: 28px;
       line-height: 28px;

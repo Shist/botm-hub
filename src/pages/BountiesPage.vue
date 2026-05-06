@@ -15,6 +15,7 @@
   row-gap: 20px;
   &__headline {
     @include default-headline(48px, 48px, var(--color-text));
+    text-align: center;
   }
   &__link-to-main {
     @include default-text(36px, 36px, var(--color-text));
