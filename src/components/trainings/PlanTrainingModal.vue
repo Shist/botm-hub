@@ -206,7 +206,6 @@ import { useDate } from "vuetify";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useTrainingsStore } from "@/stores/trainings";
-import { MAPS_CATEGORIES } from "@/constants";
 import { OsuMapCategory } from "@/types/osumaps";
 import {
   type IAllTrainingsListItem,
@@ -255,11 +254,6 @@ const confirmBtnLabel = computed(() =>
   props.training ? "Изменить" : "Запланировать"
 );
 const userInfo = computed(() => authStore.userAdditionalInfo);
-const skillsetsDescription = computed(() => {
-  return trainingCategories.value
-    .map((category) => MAPS_CATEGORIES[category])
-    .join(", ");
-});
 const trainingDateObject = computed(() => {
   if (!trainingDate.value || !trainingTime.value) return null;
   let dateObject = vuetifyDate.date(trainingDate.value);
@@ -329,8 +323,11 @@ watch(
 watch(userInfo, (valueFromStore) => {
   if (props.training) return;
   const nick = valueFromStore?.nick;
-  if (nick) trainingTitle.value = `Качалочка от ${nick}`;
-  trainingCategories.value = valueFromStore?.skillsets ?? [];
+  if (nick) {
+    const defaultStr = `Качалочка от ${nick}`;
+    if (!trainingTitle.value) trainingTitle.value = defaultStr;
+    if (!trainingDescription.value) trainingDescription.value = defaultStr;
+  }
 });
 watch(trainingDate, (value) => {
   if (
@@ -346,10 +343,6 @@ watch(trainingDate, (value) => {
   ) {
     trainingTime.value = minPossibleTimeIso.value;
   }
-});
-watch(skillsetsDescription, (value) => {
-  if (props.training) return;
-  trainingDescription.value = value ? `Тренировка скиллсетов: ${value}` : "";
 });
 
 onMounted(() => {
@@ -384,15 +377,21 @@ const initValues = () => {
     trainingDescription.value = props.training.description;
   } else {
     const nick = userInfo.value?.nick;
-    if (nick) trainingTitle.value = `Качалочка от ${nick}`;
-    trainingCategories.value = userInfo.value?.skillsets ?? [];
+    if (nick) {
+      const defaultStr = `Качалочка от ${nick}`;
+      trainingTitle.value = defaultStr;
+      trainingDescription.value = defaultStr;
+    } else {
+      trainingTitle.value = "";
+      trainingDescription.value = "";
+    }
+    trainingCategories.value = [];
     trainingDate.value =
       minPossibleDateTime.value.getHours() < 21
         ? currDate.value
         : (vuetifyDate.addDays(currDate.value, 1) as Date);
     trainingTime.value = "21:00";
     trainingDuration.value = 120;
-    trainingDescription.value = `Тренировка скиллсетов: ${skillsetsDescription.value}`;
   }
 };
 
