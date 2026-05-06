@@ -202,6 +202,7 @@ onMounted(async () => {
     transition: 0.3s;
     &:hover {
       scale: 1.05;
+      translate: 10px;
       color: var(--color-link-active);
     }
     @media (max-width: $tablet-l) {
