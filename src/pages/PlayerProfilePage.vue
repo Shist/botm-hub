@@ -1,7 +1,7 @@
 <template>
-  <div class="player-by-uid-page">
+  <div class="player-profile-page">
     <v-skeleton-loader type="image, paragraph" :loading="isLoading">
-      <div v-if="playerInfo" class="player-by-uid-page__user-info-wrapper">
+      <div v-if="playerInfo" class="player-profile-page__user-info-wrapper">
         <v-tooltip
           :disabled="playerInfo?.osuId !== null"
           text="Этот игрок пока не указал свой osu! ID"
@@ -12,11 +12,11 @@
               v-bind="props"
               :imgPath="avatarSrc"
               imgAlt="Аватар"
-              class="player-by-uid-page__avatar"
+              class="player-profile-page__avatar"
             />
           </template>
         </v-tooltip>
-        <div class="player-by-uid-page__info-wrapper">
+        <div class="player-profile-page__info-wrapper">
           <span>Ник:</span>
           <span>
             {{ playerInfo?.nick ?? "(не указан)" }}
@@ -31,7 +31,7 @@
           </a>
           <span v-else>(не указан)</span>
           <span>Скиллсеты:</span>
-          <div class="player-by-uid-page__categories-wrapper">
+          <div class="player-profile-page__categories-wrapper">
             <template v-if="playerSkillsets.length">
               <CategoryBadge
                 v-for="skillset in playerSkillsets"
@@ -42,25 +42,28 @@
             <span v-else>(не указаны)</span>
           </div>
           <span>Особые тэги:</span>
-          <div class="player-by-uid-page__tags-wrapper">
+          <div class="player-profile-page__tags-wrapper">
             <IconAdmin v-if="isShist" />
             <IconRedactor v-if="isRedactor" />
             <IconTrainer v-if="isTrainer" />
             <component :is="digitIconComponent" />
-            <span v-if="!hasSomeTags" class="player-by-uid-page__no-tags-label">
+            <span
+              v-if="!hasSomeTags"
+              class="player-profile-page__no-tags-label"
+            >
               (пока нет)
             </span>
           </div>
         </div>
       </div>
-      <div v-else class="player-by-uid-page__user-not-found-wrapper">
-        <h2 class="player-by-uid-page__user-not-found-headline">
-          Игрок с указанным UID не найден
+      <div v-else class="player-profile-page__user-not-found-wrapper">
+        <h2 class="player-profile-page__user-not-found-headline">
+          Игрок с указанным ником не найден
         </h2>
-        <span class="player-by-uid-page__user-not-found-uid">
-          UID: {{ playerUid }}
+        <span class="player-profile-page__user-not-found-nick">
+          Ник: {{ playerNick }}
         </span>
-        <router-link to="/" class="player-by-uid-page__link-to-main">
+        <router-link to="/" class="player-profile-page__link-to-main">
           Назад на главную страницу
         </router-link>
       </div>
@@ -89,10 +92,13 @@ const { setErrorToast } = useToast();
 
 const isLoading = ref(false);
 
-const playerUid = computed<string>(() => `${route.params.uid}`);
-const playerInfo = computed<IAllUsersListItem | null>(() => {
-  return usersStore.users.find((u) => u.uid === playerUid.value) ?? null;
-});
+const playerNick = computed<string>(() => `${route.params.nick}`);
+const playerInfo = computed<IAllUsersListItem | null>(
+  () =>
+    usersStore.users.find(
+      (u) => u.nick.toLowerCase() === playerNick.value.toLowerCase()
+    ) ?? null
+);
 const avatarSrc = computed(
   () => `https://a.ppy.sh/${playerInfo.value?.osuId}?.png`
 );
@@ -120,7 +126,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
-.player-by-uid-page {
+.player-profile-page {
   &__user-info-wrapper {
     display: flex;
     flex-direction: column;
@@ -155,7 +161,7 @@ onMounted(async () => {
     flex-wrap: wrap;
     align-items: center;
     gap: 2px;
-    *:not(.player-by-uid-page__no-tags-label) {
+    *:not(.player-profile-page__no-tags-label) {
       width: 50px;
       height: 50px;
       color: var(--color-text);
@@ -182,7 +188,7 @@ onMounted(async () => {
       line-height: 28px;
     }
   }
-  &__user-not-found-uid {
+  &__user-not-found-nick {
     @include default-text(36px, 36px, var(--color-text));
     width: 100%;
     text-overflow: ellipsis;

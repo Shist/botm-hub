@@ -41,7 +41,9 @@ async function updateUserAdditionalInfoToFirebase(
       }
     }
     const isNickTakenByAnotherUser = allUsers.some(
-      (u) => u.nick === additionalInfo.nick && u.uid !== userUid
+      (u) =>
+        u.nick.toLowerCase() === additionalInfo.nick.toLowerCase() &&
+        u.uid !== userUid
     );
     if (isNickTakenByAnotherUser) {
       throw new Error("Этот ник уже занят другим игроком!");

@@ -14,10 +14,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useRoute } from "vue-router";
+import { useUsersStore } from "@/stores/users";
 import { MAPS_CATEGORIES } from "@/constants";
 import { isMapCategoryKey } from "@/types/osumaps";
 
 const route = useRoute();
+const usersStore = useUsersStore();
 
 const HIDDEN_ON_ROUTES = ["sign-in", "sign-up", "not-found", "main"];
 
@@ -68,14 +70,23 @@ const breadcrumbs = computed(() => {
     return items;
   }
 
-  if (routeName === "player-by-uid") {
+  if (routeName === "player-profile") {
     items.push({
       title: ROUTE_LABELS["players"] ?? "Наши Игроки",
       disabled: false,
       to: "/players",
     });
+
+    const rawNick = route.params.nick
+      ? decodeURIComponent(String(route.params.nick))
+      : "";
+    const userFromStore = usersStore.users.find(
+      (u) => u.nick.toLowerCase() === rawNick.toLowerCase()
+    );
+    const displayNick = userFromStore ? userFromStore.nick : rawNick;
+
     items.push({
-      title: ROUTE_LABELS["player-by-uid"] ?? "Профиль игрока",
+      title: displayNick || "Профиль игрока",
       disabled: true,
       to: route.path,
     });
@@ -108,6 +119,8 @@ const breadcrumbs = computed(() => {
   }
   &__icon {
     font-size: 20px;
+    color: var(--color-text);
+    opacity: 0.7;
     @media (max-width: $tablet-l) {
       font-size: 18px;
     }

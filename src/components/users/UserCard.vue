@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`/players/${user.uid}`" class="user-card">
+  <router-link :to="`/players/${user.nick}`" class="user-card">
     <slot />
     <div class="user-card__constant-info-wrapper">
       <div class="user-card__tags-wrapper">
