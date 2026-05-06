@@ -41,10 +41,13 @@
       </v-btn>
     </v-form>
     <h3 class="sign-in-page__sign-up-suggestion-headline">Eщё нет аккаунта?</h3>
-    <v-btn :disabled="isLoading" height="50" class="sign-in-page__sign-up-btn">
-      <router-link to="/sign-up" class="sign-in-page__sign-up-btn-label">
-        Зарегистрироваться
-      </router-link>
+    <v-btn
+      :disabled="isLoading"
+      height="50"
+      class="sign-in-page__sign-up-btn"
+      to="/sign-up"
+    >
+      Зарегистрироваться
     </v-btn>
   </div>
 </template>
@@ -132,10 +135,6 @@ const onConfirmBtnClicked = async () => {
   }
   &__sign-up-btn {
     @include default-btn(250px, var(--color-btn-text), var(--color-btn-bg));
-  }
-  &__sign-up-btn-label {
-    color: var(--color-btn-text);
-    text-decoration: none;
   }
 }
 </style>
