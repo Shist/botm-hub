@@ -3,6 +3,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail,
   type UserCredential,
 } from "firebase/auth";
 import {
@@ -118,6 +119,11 @@ async function signOutUserFromFirebase() {
   await signOut(auth);
 }
 
+async function resetUserPasswordInFirebase(email: string) {
+  const auth = getAuth();
+  await sendPasswordResetEmail(auth, email);
+}
+
 async function loadUserInfoFromFirebase(): Promise<IUserFirebaseAdditionalInfo> {
   const db = getFirestore();
 
@@ -146,6 +152,7 @@ export {
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
+  resetUserPasswordInFirebase,
   loadUserInfoFromFirebase,
   loadAllUsersFromFirebase,
 };

@@ -24,8 +24,8 @@ export default function useFormValidation() {
       /^[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,}$/i.test(emailValue ?? "") ||
       "Требуется указать валидную почту!",
     isStrongPassword: (passwordValue: string | null) =>
-      /^(?=.*[a-z])(?=.*\d).+$/i.test(passwordValue ?? "") ||
-      "Требуется указать как минимум одну букву и одну цифру!",
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(passwordValue ?? "") ||
+      "Требуется минимум одна строчная и одна заглавная латинские буквы, а также цифра!",
     isPasswordSame: (firstPass: string | null) => (secondPass: string | null) =>
       (firstPass ?? "") === (secondPass ?? "") ||
       "Требуется повторить точно такой же пароль!",

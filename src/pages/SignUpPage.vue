@@ -138,7 +138,7 @@ const onConfirmBtnClicked = async () => {
   flex-direction: column;
   align-items: center;
   &__form {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     padding: 40px 20px;
     max-width: 700px;
     width: 100%;

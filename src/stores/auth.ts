@@ -5,6 +5,7 @@ import {
   signUpUserToFirebase,
   signInUserToFirebase,
   signOutUserFromFirebase,
+  resetUserPasswordInFirebase,
   loadUserInfoFromFirebase,
 } from "@/services/firebase/users";
 import {
@@ -98,6 +99,10 @@ export const useAuthStore = defineStore("auth", () => {
     await signOutUserFromFirebase();
   };
 
+  const resetUserPassword = async (email: string) => {
+    await resetUserPasswordInFirebase(email);
+  };
+
   const updateUserAdditionalInfo = async (
     additionalInfo: Omit<
       IUserFirebaseAdditionalInfo,
@@ -128,6 +133,7 @@ export const useAuthStore = defineStore("auth", () => {
     signUpUser,
     signInUser,
     signOutUser,
+    resetUserPassword,
     updateUserAdditionalInfo,
   };
 });
