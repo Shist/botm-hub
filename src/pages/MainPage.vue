@@ -46,11 +46,8 @@
           </router-link>
         </li>
         <li>
-          <router-link
-            to="/bounties"
-            class="main-page__btn main-page__btn_bounties"
-          >
-            Баунти Карты Месяца
+          <router-link to="/clubs" class="main-page__btn main-page__btn_clubs">
+            Клубы и Лидерборды
           </router-link>
         </li>
       </ul>
@@ -144,8 +141,8 @@
     &_tournaments {
       background-color: var(--color-btn-bg-tournaments);
     }
-    &_bounties {
-      background-color: var(--color-btn-bg-bounties);
+    &_clubs {
+      background-color: var(--color-btn-bg-clubs);
     }
   }
 }

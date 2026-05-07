@@ -30,7 +30,7 @@ import TBMapsPage from "@/pages/skillsets-maps-pages/TBMapsPage.vue";
 import WorkoutConstructorPage from "@/pages/WorkoutConstructorPage.vue";
 import TrainingsPage from "@/pages/TrainingsPage.vue";
 import TournamentsPage from "@/pages/TournamentsPage.vue";
-import BountiesPage from "@/pages/BountiesPage.vue";
+import ClubsPage from "@/pages/ClubsPage.vue";
 import NotFoundPage from "@/pages/NotFoundPage.vue";
 import { useAuthStore } from "@/stores/auth";
 
@@ -198,9 +198,9 @@ const router = createRouter({
       component: TournamentsPage,
     },
     {
-      path: "/bounties",
-      name: "bounties",
-      component: BountiesPage,
+      path: "/clubs",
+      name: "clubs",
+      component: ClubsPage,
     },
     {
       path: "/:catchAll(.*)",

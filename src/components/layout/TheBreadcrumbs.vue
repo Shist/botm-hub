@@ -31,7 +31,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "workout-constructor": "Конструктор Тренировочной Сессии",
   trainings: "Расписания Качалочек",
   tournaments: "Турниры и Наши Ростеры",
-  bounties: "Баунти",
+  clubs: "Клубы и Лидерборды",
 };
 
 const breadcrumbs = computed(() => {
