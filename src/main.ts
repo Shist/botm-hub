@@ -23,7 +23,6 @@ Object.keys(appComponents).forEach((name) => {
 });
 
 app.use(pinia);
-app.use(router);
 app.use(vuetifyConfig);
 app.use(Vue3Toasity, {
   clearOnUrlChange: false,
@@ -50,6 +49,7 @@ onFirebaseAuthStateChanged((user) => {
 
   if (!isMounted) {
     isMounted = true;
+    app.use(router);
     app.mount("#app");
   }
 });
