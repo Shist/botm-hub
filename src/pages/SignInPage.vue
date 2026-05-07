@@ -19,7 +19,7 @@
       <v-text-field
         v-model="password"
         :counter="28"
-        :rules="[rules.min(8), rules.max(28), rules.isStrongPassword]"
+        :rules="[rules.min(8), rules.max(28)]"
         type="password"
         autocomplete="current-password"
         variant="solo"
