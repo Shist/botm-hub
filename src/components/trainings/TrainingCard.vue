@@ -341,6 +341,7 @@ const onUnsubscribe = async () => {
 <style lang="scss" scoped>
 .training-card {
   border-radius: 10px;
+  scroll-margin-top: 100px;
   &__panel-header-wrapper {
     width: 100%;
     display: flex;

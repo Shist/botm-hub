@@ -27,6 +27,7 @@ import {
   VTooltip,
   VAlert,
   VDivider,
+  VPagination,
 } from "vuetify/components";
 
 export default {
@@ -58,4 +59,5 @@ export default {
   VTooltip,
   VAlert,
   VDivider,
+  VPagination,
 };
