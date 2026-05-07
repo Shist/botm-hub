@@ -392,6 +392,7 @@ const sortedRosters = computed(() => {
 <style lang="scss" scoped>
 .tournament-card {
   border-radius: 10px;
+  scroll-margin-top: 100px;
   &__panel-header-wrapper {
     width: 100%;
     display: flex;

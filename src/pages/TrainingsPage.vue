@@ -6,7 +6,7 @@
         v-model="searchQuery"
         variant="solo"
         prepend-inner-icon="mdi-magnify"
-        placeholder="Поиск по названию, описанию или никам..."
+        placeholder="Поиск по названию, описанию или нику..."
         clearable
         hide-details
       />
@@ -235,7 +235,6 @@ const paginatedActiveTrainings = computed(() => {
   const start = (activePage.value - 1) * ITEMS_PER_PAGE;
   return filteredActiveTrainings.value.slice(start, start + ITEMS_PER_PAGE);
 });
-
 const paginatedArchivedTrainings = computed(() => {
   const start = (archivePage.value - 1) * ITEMS_PER_PAGE;
   return filteredArchivedTrainings.value.slice(start, start + ITEMS_PER_PAGE);
