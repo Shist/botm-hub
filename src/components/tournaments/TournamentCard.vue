@@ -262,10 +262,11 @@ import TournamentStatusBadge from "@/components/tournaments/TournamentStatusBadg
 import TournamentRosterCard from "@/components/tournaments/TournamentRosterCard.vue";
 import {
   TournamentStatus,
+  ACHIEVED_PLACES,
+  ACHIEVED_STAGES,
   type IAllTournamentsListItem,
 } from "@/types/tournaments";
 import { fromSecondsToDurationLabel } from "@/utils";
-import { STAGES_SORT_PRIORITIES } from "@/constants";
 
 const props = defineProps<{
   tournament: IAllTournamentsListItem;
@@ -379,10 +380,23 @@ const isArchiveTournamentBtnVisible = computed(() => {
 });
 const sortedRosters = computed(() => {
   return [...props.tournament.rostersInfo].sort((a, b) => {
-    const weightA = STAGES_SORT_PRIORITIES[a.achievedStage ?? "Not Specified"];
-    const weightB = STAGES_SORT_PRIORITIES[b.achievedStage ?? "Not Specified"];
-    if (weightA !== weightB) {
-      return weightA - weightB;
+    const stageIndexA = a.achievedStage
+      ? ACHIEVED_STAGES.indexOf(a.achievedStage)
+      : Infinity;
+    const stageIndexB = b.achievedStage
+      ? ACHIEVED_STAGES.indexOf(b.achievedStage)
+      : Infinity;
+    if (stageIndexA !== stageIndexB) {
+      return stageIndexA - stageIndexB;
+    }
+    const placeIndexA = a.achievedPlace
+      ? ACHIEVED_PLACES.indexOf(a.achievedPlace)
+      : Infinity;
+    const placeIndexB = b.achievedPlace
+      ? ACHIEVED_PLACES.indexOf(b.achievedPlace)
+      : Infinity;
+    if (placeIndexA !== placeIndexB) {
+      return placeIndexA - placeIndexB;
     }
     return a.teamName.localeCompare(b.teamName);
   });
