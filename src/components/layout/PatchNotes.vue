@@ -1,6 +1,17 @@
 <template>
   <ul class="patch-notes">
     <li class="patch-notes__patch-wrapper">
+      <h3 class="patch-notes__patch-version">Версия 3.1.1</h3>
+      <ol class="patch_notes__patch-features-wrapper">
+        <li class="patch_notes__patch-feature">
+          Во время добавления турика KFC было замечено, что сортировка ростеров
+          не идеальная - она сортировала только по стадии и алфавиту. Логика
+          была переписана так, чтобы сортировка шла по стадии, затем по месту, а
+          только потом по алфавиту (например, 7-8 выше, чем 9-12)
+        </li>
+      </ol>
+    </li>
+    <li class="patch-notes__patch-wrapper">
       <h3 class="patch-notes__patch-version">Версия 3.1.0</h3>
       <ol class="patch_notes__patch-features-wrapper">
         <li class="patch_notes__patch-feature">
