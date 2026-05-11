@@ -17,13 +17,15 @@
         :search="searchQuery"
         :mobile-breakpoint="769"
         :fixed-header="true"
+        hover
         hide-details
         class="skillset-maps-table__content"
+        @click:row="onRowClick"
       >
         <template #[`item.id`]="{ item }">
           <span
             class="skillset-maps-table__id-label"
-            @click="copyToClipboard(item.id)"
+            @click.stop="copyToClipboard(item.id)"
           >
             {{ item.id }}
           </span>
@@ -39,6 +41,7 @@
                 size="small"
                 variant="text"
                 color="var(--color-text)"
+                @click.stop
               />
             </template>
           </v-tooltip>
@@ -75,6 +78,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
+import { useRouter } from "vue-router";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
@@ -90,6 +94,8 @@ type DataTableHeader = {
     | ((a: OsuMapCategory, b: OsuMapCategory) => number)
     | ((a: string, b: string) => number);
 };
+
+const router = useRouter();
 
 const props = defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();
 
@@ -203,6 +209,22 @@ const copyToClipboard = async (mapId: number) => {
     setErrorToast(`Не удалось скопировать ID карты: ${msg}`);
   }
 };
+
+const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
+  const routeLocation = router.resolve({
+    name: "map-profile",
+    params: {
+      category: item.category.toLowerCase(),
+      mapId: item.id,
+    },
+  });
+
+  if (event.ctrlKey || event.metaKey) {
+    window.open(routeLocation.href, "_blank");
+  } else {
+    router.push(routeLocation);
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -218,6 +240,7 @@ const copyToClipboard = async (mapId: number) => {
   }
   &__content {
     height: calc(100dvh - 344px);
+    cursor: pointer;
     @media (max-width: $tablet-l) {
       height: calc(100dvh - 334px);
     }

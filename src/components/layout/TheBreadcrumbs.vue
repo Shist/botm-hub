@@ -15,11 +15,14 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
+import { useMapsStore } from "@/stores/maps";
 import { MAPS_CATEGORIES } from "@/constants";
-import { isMapCategoryKey } from "@/types/osumaps";
+import { isMapCategoryKey, type OsuMapCategory } from "@/types/osumaps";
 
 const route = useRoute();
+
 const usersStore = useUsersStore();
+const mapsStore = useMapsStore();
 
 const HIDDEN_ON_ROUTES = ["sign-in", "sign-up", "not-found", "main"];
 
@@ -49,6 +52,46 @@ const breadcrumbs = computed(() => {
     to: "/",
   });
 
+  if (routeName === "map-profile") {
+    items.push({
+      title: ROUTE_LABELS["skillsets-maps"] ?? "Карты Скиллсетов",
+      disabled: false,
+      to: "/skillsets-maps",
+    });
+
+    const categoryRaw = String(route.params.category).toLowerCase();
+    const mapIdRaw = Number(route.params.mapId);
+
+    if (isMapCategoryKey(categoryRaw)) {
+      const readableCategory = MAPS_CATEGORIES[categoryRaw as OsuMapCategory];
+      items.push({
+        title: readableCategory,
+        disabled: false,
+        to: `/skillsets-maps/${categoryRaw}`,
+      });
+
+      const categoryMaps = mapsStore.getMapsOfGivenCategories([
+        categoryRaw as OsuMapCategory,
+      ]);
+      const foundMap = categoryMaps.find((m) => m.id === mapIdRaw);
+      const displayTitle = foundMap ? foundMap.name : `Карта ${mapIdRaw}`;
+
+      items.push({
+        title: displayTitle,
+        disabled: true,
+        to: route.path,
+      });
+    } else {
+      items.push({
+        title: `Категория '${route.params.category}' не найдена`,
+        disabled: true,
+        to: route.path,
+      });
+    }
+
+    return items;
+  }
+
   if (routeName.startsWith("skillsets-maps-")) {
     const categoryKey = routeName.replace("skillsets-maps-", "");
     const readableTitle = isMapCategoryKey(categoryKey)
@@ -56,7 +99,7 @@ const breadcrumbs = computed(() => {
       : categoryKey.toUpperCase();
 
     items.push({
-      title: ROUTE_LABELS["skillsets-maps"] ?? "Карты скиллсетов",
+      title: ROUTE_LABELS["skillsets-maps"] ?? "Карты Скиллсетов",
       disabled: false,
       to: "/skillsets-maps",
     });
@@ -86,7 +129,7 @@ const breadcrumbs = computed(() => {
     const displayNick = userFromStore ? userFromStore.nick : rawNick;
 
     items.push({
-      title: displayNick || "Профиль игрока",
+      title: displayNick || "Профиль Игрока",
       disabled: true,
       to: route.path,
     });

@@ -27,6 +27,7 @@ import FM1MapsPage from "@/pages/skillsets-maps-pages/fm/FM1MapsPage.vue";
 import FM2MapsPage from "@/pages/skillsets-maps-pages/fm/FM2MapsPage.vue";
 import FM3MapsPage from "@/pages/skillsets-maps-pages/fm/FM3MapsPage.vue";
 import TBMapsPage from "@/pages/skillsets-maps-pages/TBMapsPage.vue";
+import MapProfilePage from "@/pages/skillsets-maps-pages/MapProfilePage.vue";
 import WorkoutConstructorPage from "@/pages/WorkoutConstructorPage.vue";
 import TrainingsPage from "@/pages/TrainingsPage.vue";
 import TournamentsPage from "@/pages/TournamentsPage.vue";
@@ -179,6 +180,11 @@ const router = createRouter({
           path: "tb",
           component: TBMapsPage,
           name: "skillsets-maps-tb",
+        },
+        {
+          path: ":category/:mapId?",
+          component: MapProfilePage,
+          name: "map-profile",
         },
       ],
     },
