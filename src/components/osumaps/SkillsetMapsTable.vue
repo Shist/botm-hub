@@ -29,7 +29,38 @@
           </span>
         </template>
         <template #[`item.link`]="{ item }">
-          <a :href="item.link" target="_blank">{{ item.link }}</a>
+          <v-tooltip text="Перейти на страницу osu!-сайта" location="top">
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                :href="item.link"
+                target="_blank"
+                icon="mdi-open-in-new"
+                size="small"
+                variant="text"
+                color="var(--color-text)"
+              />
+            </template>
+          </v-tooltip>
+        </template>
+        <template #[`item.cover`]="{ item }">
+          <div class="skillset-maps-table__cover-wrapper">
+            <v-img
+              :src="`https://assets.ppy.sh/beatmaps/${item.mapsetId}/covers/cover.jpg`"
+              cover
+            >
+              <template #placeholder>
+                <div class="skillset-maps-table__cover-loader">
+                  <v-progress-circular
+                    indeterminate
+                    size="16"
+                    width="2"
+                    color="var(--color-vuetify-progress)"
+                  />
+                </div>
+              </template>
+            </v-img>
+          </div>
         </template>
         <template #[`item.category`]="{ item }">
           <CategoryBadge
@@ -49,27 +80,49 @@ import useToast from "@/composables/useToast";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 
+type DataTableHeader = {
+  key: string;
+  title: string;
+  minWidth?: string;
+  align?: "start" | "center" | "end";
+  sortable?: boolean;
+  sort?:
+    | ((a: OsuMapCategory, b: OsuMapCategory) => number)
+    | ((a: string, b: string) => number);
+};
+
 const props = defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();
 
 const { setSuccessToast, setErrorToast } = useToast();
 
 const searchQuery = ref("");
 
-const headers = reactive([
+const headers = reactive<DataTableHeader[]>([
   {
     key: "id",
     title: "ID",
     minWidth: "104px",
+    align: "center",
   },
   {
     key: "link",
     title: "Ссылка",
-    minWidth: "255px",
+    minWidth: "83px",
+    sortable: false,
+    align: "center",
+  },
+  {
+    key: "cover",
+    title: "Фон",
+    minWidth: "176px",
+    sortable: false,
+    align: "center",
   },
   {
     key: "category",
     title: "Мод",
     minWidth: "89px",
+    align: "center",
     sort: (a: OsuMapCategory, b: OsuMapCategory) =>
       CATEGORIES_SORT_PRIORITIES[a] - CATEGORIES_SORT_PRIORITIES[b],
   },
@@ -81,7 +134,7 @@ const headers = reactive([
   {
     key: "mapper",
     title: "Мапер",
-    minWidth: "182px",
+    minWidth: "181px",
   },
   {
     key: "starRate",
@@ -177,6 +230,23 @@ const copyToClipboard = async (mapId: number) => {
     &:hover {
       text-decoration: underline;
     }
+  }
+  &__cover-wrapper {
+    width: 144px;
+    height: 40px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 0 auto;
+    @media (max-width: $tablet-l) {
+      margin: 0 0 0 auto;
+    }
+  }
+  &__cover-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
   }
   &__badge {
     @media (max-width: $tablet-l) {

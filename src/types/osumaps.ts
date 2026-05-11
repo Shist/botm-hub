@@ -26,6 +26,7 @@ export enum OsuMapCategory {
 
 export interface IOsuMap {
   id: number;
+  mapsetId: number;
   link: string;
   category: OsuMapCategory;
   name: string;
