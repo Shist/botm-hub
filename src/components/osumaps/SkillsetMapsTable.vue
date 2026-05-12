@@ -51,6 +51,7 @@
             <v-img
               :src="`https://assets.ppy.sh/beatmaps/${item.mapsetId}/covers/cover.jpg`"
               cover
+              height="100%"
             >
               <template #placeholder>
                 <div class="skillset-maps-table__cover-loader">
@@ -60,6 +61,11 @@
                     width="2"
                     color="var(--color-vuetify-progress)"
                   />
+                </div>
+              </template>
+              <template #error>
+                <div class="skillset-maps-table__cover-error">
+                  <span>NO BG</span>
                 </div>
               </template>
             </v-img>
@@ -270,6 +276,19 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
     justify-content: center;
     width: 100%;
     height: 100%;
+  }
+  &__cover-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.1);
+    span {
+      @include default-text(14px, 14px, var(--color-vuetify-progress));
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
   }
   &__badge {
     @media (max-width: $tablet-l) {

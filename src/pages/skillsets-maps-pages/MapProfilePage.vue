@@ -19,6 +19,11 @@
                 />
               </div>
             </template>
+            <template #error>
+              <div class="map-profile-page__banner-error">
+                <span>NO BG</span>
+              </div>
+            </template>
           </v-img>
         </div>
         <h2 class="map-profile-page__headline">{{ mapInfo.name }}</h2>
@@ -178,6 +183,23 @@ onMounted(async () => {
     width: 100%;
     height: 100%;
     background-color: rgba(128, 128, 128, 0.1);
+  }
+  &__banner-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(128, 128, 128, 0.1);
+    span {
+      @include default-headline(48px, 48px, var(--color-vuetify-progress));
+      letter-spacing: 4px;
+      @media (max-width: $phone-l) {
+        font-size: 28px;
+        line-height: 28px;
+        letter-spacing: 2px;
+      }
+    }
   }
   &__headline {
     @include default-headline(32px, 32px, var(--color-text));
