@@ -57,6 +57,8 @@ async function updateUserAdditionalInfoToFirebase(
         nick: additionalInfo.nick,
         digitCategory: additionalInfo.digitCategory,
         skillsets: additionalInfo.skillsets,
+        ledClubs: additionalInfo.ledClubs,
+        joinedClubs: additionalInfo.joinedClubs,
         isTrainer: additionalInfo.isTrainer,
         isRedactor: additionalInfo.isRedactor,
       });

@@ -4,6 +4,7 @@ import IconDigitFive from "@/components/users/user-icons/IconDigitFive.vue";
 import IconDigitSix from "@/components/users/user-icons/IconDigitSix.vue";
 import { SHIST_UID } from "@/constants";
 import { DigitCategory, type IAllUsersListItem } from "@/types/users";
+import { BotmClub } from "@/types/clubs";
 
 export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
   const isShist = computed(() => {
@@ -35,5 +36,31 @@ export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
     }
   });
 
-  return { isShist, isRedactor, isTrainer, digitIconComponent };
+  const ledClubs = computed<BotmClub[]>(() => {
+    return JSON.parse(userRef.value?.ledClubs ?? "[]");
+  });
+
+  const isAimLead = computed(() => ledClubs.value.includes(BotmClub.AIM));
+  const isSpeedLead = computed(() => ledClubs.value.includes(BotmClub.SPEED));
+  const isTechLead = computed(() => ledClubs.value.includes(BotmClub.TECH));
+  const isReadingLead = computed(() =>
+    ledClubs.value.includes(BotmClub.READING)
+  );
+  const isHiddenLead = computed(() => ledClubs.value.includes(BotmClub.HIDDEN));
+  const isHardrockLead = computed(() =>
+    ledClubs.value.includes(BotmClub.HARDROCK)
+  );
+
+  return {
+    isShist,
+    isRedactor,
+    isTrainer,
+    digitIconComponent,
+    isAimLead,
+    isSpeedLead,
+    isTechLead,
+    isReadingLead,
+    isHiddenLead,
+    isHardrockLead,
+  };
 }

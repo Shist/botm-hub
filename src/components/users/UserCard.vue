@@ -6,6 +6,12 @@
         <IconAdmin v-if="isShist" />
         <IconRedactor v-if="isRedactor" />
         <IconTrainer v-if="isTrainer" />
+        <IconAimLead v-if="isAimLead" />
+        <IconSpeedLead v-if="isSpeedLead" />
+        <IconTechLead v-if="isTechLead" />
+        <IconReadingLead v-if="isReadingLead" />
+        <IconHiddenLead v-if="isHiddenLead" />
+        <IconHardrockLead v-if="isHardrockLead" />
         <component :is="digitIconComponent" />
       </div>
       <div class="user-card__avatar-nick-wrapper">
@@ -29,13 +35,29 @@ import useUserTags from "@/composables/useUserTags";
 import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
 import IconRedactor from "@/components/users/user-icons/IconRedactor.vue";
 import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
+import IconAimLead from "@/components/users/user-icons/IconAimLead.vue";
+import IconSpeedLead from "@/components/users/user-icons/IconSpeedLead.vue";
+import IconTechLead from "@/components/users/user-icons/IconTechLead.vue";
+import IconReadingLead from "@/components/users/user-icons/IconReadingLead.vue";
+import IconHiddenLead from "@/components/users/user-icons/IconHiddenLead.vue";
+import IconHardrockLead from "@/components/users/user-icons/IconHardrockLead.vue";
+
 import { type IAllUsersListItem } from "@/types/users";
 
 const props = defineProps<{ user: IAllUsersListItem }>();
 
-const { isShist, isRedactor, isTrainer, digitIconComponent } = useUserTags(
-  toRef(props.user)
-);
+const {
+  isShist,
+  isRedactor,
+  isTrainer,
+  digitIconComponent,
+  isAimLead,
+  isSpeedLead,
+  isTechLead,
+  isReadingLead,
+  isHiddenLead,
+  isHardrockLead,
+} = useUserTags(toRef(props.user));
 </script>
 
 <style lang="scss" scoped>

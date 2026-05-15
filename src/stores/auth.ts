@@ -52,6 +52,8 @@ export const useAuthStore = defineStore("auth", () => {
       user.value.additionalInfo = {
         ...additionalInfoFields,
         skillsets: JSON.parse(additionalInfoFields.skillsets),
+        ledClubs: JSON.parse(additionalInfoFields.ledClubs),
+        joinedClubs: JSON.parse(additionalInfoFields.joinedClubs),
       };
     }
   };
@@ -66,6 +68,8 @@ export const useAuthStore = defineStore("auth", () => {
       osuId: null,
       digitCategory: null,
       skillsets: "[]",
+      ledClubs: "[]",
+      joinedClubs: "[]",
       isTrainer: false,
       isRedactor: false,
     };
@@ -104,9 +108,9 @@ export const useAuthStore = defineStore("auth", () => {
   };
 
   const updateUserAdditionalInfo = async (
-    additionalInfo: Omit<
+    additionalInfo: Pick<
       IUserFirebaseAdditionalInfo,
-      "email" | "isTrainer" | "isRedactor"
+      "osuId" | "nick" | "digitCategory" | "skillsets"
     >
   ) => {
     if (
@@ -117,6 +121,8 @@ export const useAuthStore = defineStore("auth", () => {
       return;
     const newUserInfo = {
       email: user.value.email,
+      ledClubs: JSON.stringify(user.value.additionalInfo.ledClubs),
+      joinedClubs: JSON.stringify(user.value.additionalInfo.joinedClubs),
       isTrainer: user.value.additionalInfo.isTrainer,
       isRedactor: user.value.additionalInfo.isRedactor,
       ...additionalInfo,
