@@ -3,10 +3,10 @@ import type { IAllUsersListItem } from "@/types/users";
 import type { OsuMapCategory } from "@/types/osumaps";
 
 export enum TrainingStatus {
-  waiting = "waiting",
-  inProgress = "in-progress",
-  completed = "completed",
-  archived = "archived",
+  WAITING = "waiting",
+  IN_PROGRESS = "in-progress",
+  COMPLETED = "completed",
+  ARCHIVED = "archived",
 }
 
 export interface IAllTrainingsItemBase {

@@ -233,15 +233,15 @@ const timeDiffSeconds = computed(() => {
 });
 const currentStatus = computed(() => {
   if (props.training.isArchived) {
-    return TrainingStatus.archived;
+    return TrainingStatus.ARCHIVED;
   } else {
     const totalDurationSec = props.training.durationMins * 60;
     if (timeDiffSeconds.value > 0) {
-      return TrainingStatus.waiting;
+      return TrainingStatus.WAITING;
     } else if (timeDiffSeconds.value > -totalDurationSec) {
-      return TrainingStatus.inProgress;
+      return TrainingStatus.IN_PROGRESS;
     } else {
-      return TrainingStatus.completed;
+      return TrainingStatus.COMPLETED;
     }
   }
 });
@@ -264,9 +264,9 @@ const totalDurationSecs = computed(() => {
 });
 const remainingTimeLabel = computed(() => {
   switch (currentStatus.value) {
-    case TrainingStatus.waiting:
+    case TrainingStatus.WAITING:
       return fromSecondsToDurationLabel(timeDiffSeconds.value);
-    case TrainingStatus.inProgress:
+    case TrainingStatus.IN_PROGRESS:
       return fromSecondsToDurationLabel(
         totalDurationSecs.value + timeDiffSeconds.value
       );
@@ -284,16 +284,16 @@ const freeSlotsCount = computed(() => {
   return 16 - props.training.participants.length;
 });
 const isTrainingEditable = computed(() => {
-  return currentStatus.value !== TrainingStatus.archived;
+  return currentStatus.value !== TrainingStatus.ARCHIVED;
 });
 const isArchiveTrainingBtnVisible = computed(() => {
-  return currentStatus.value === TrainingStatus.completed;
+  return currentStatus.value === TrainingStatus.COMPLETED;
 });
 const isSubscribeBtnVisible = computed(() => {
   return (
     authStore.user &&
-    (currentStatus.value === TrainingStatus.waiting ||
-      currentStatus.value === TrainingStatus.inProgress)
+    (currentStatus.value === TrainingStatus.WAITING ||
+      currentStatus.value === TrainingStatus.IN_PROGRESS)
   );
 });
 const isFullLobby = computed(() => {
