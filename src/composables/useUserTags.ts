@@ -25,11 +25,11 @@ export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
   const digitIconComponent = computed(() => {
     if (!userRef.value) return null;
     switch (userRef.value.digitCategory) {
-      case DigitCategory.fourDigit:
+      case DigitCategory.FOUR_DIGIT:
         return IconDigitFour;
-      case DigitCategory.fiveDigit:
+      case DigitCategory.FIVE_DIGIT:
         return IconDigitFive;
-      case DigitCategory.sixDigit:
+      case DigitCategory.SIX_DIGIT:
         return IconDigitSix;
       default:
         return null;

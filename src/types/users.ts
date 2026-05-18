@@ -3,9 +3,9 @@ import { OsuMapCategory } from "@/types/osumaps";
 import { BotmClub } from "@/types/clubs";
 
 export enum DigitCategory {
-  fourDigit = "4-digit",
-  fiveDigit = "5-digit",
-  sixDigit = "6-digit",
+  FOUR_DIGIT = "4-digit",
+  FIVE_DIGIT = "5-digit",
+  SIX_DIGIT = "6-digit",
 }
 
 export interface IUserAdditionalInfoBase {
