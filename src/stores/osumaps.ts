@@ -3,34 +3,97 @@ import { defineStore } from "pinia";
 import { loadMapsByCategoryFromFirebase } from "@/services/firebase/osumaps";
 import { LoadingState } from "@/types/global";
 import {
-  type OsuMapCategory,
+  OsuMapCategory,
   type IOsuMap,
   type IOsuMapsCategoryState,
 } from "@/types/osumaps";
 
 export const useOsumapsStore = defineStore("osumaps", () => {
   const osumaps = reactive<Record<OsuMapCategory, IOsuMapsCategoryState>>({
-    nm1: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    nm2: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    nm3: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    nm4: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    nm5: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    nm6: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    nm7: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    hd1: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    hd2: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    hd3: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    hr1: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    hr2: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    hr3: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    dt1: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    dt2: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    dt3: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    dt4: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    fm1: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    fm2: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    fm3: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
-    tb: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
+    [OsuMapCategory.NM1]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.NM2]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.NM3]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.NM4]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.NM5]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.NM6]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.NM7]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.HD1]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.HD2]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.HD3]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.HR1]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.HR2]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.HR3]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.DT1]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.DT2]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.DT3]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.DT4]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.FM1]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.FM2]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.FM3]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
+    [OsuMapCategory.TB]: {
+      mapsList: [],
+      loadingState: LoadingState.NOT_LOADED,
+    },
   });
 
   const loadMapsByCategory = async (

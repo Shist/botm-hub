@@ -26,7 +26,7 @@
               <CategoryBadge
                 v-for="skillset in training.skillsets"
                 :key="skillset"
-                :category="OsuMapCategory[skillset]"
+                :category="skillset"
               />
             </div>
             <span>Дата начала:</span>
@@ -194,7 +194,6 @@ import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useTrainingsStore } from "@/stores/trainings";
 import useToast from "@/composables/useToast";
-import { OsuMapCategory } from "@/types/osumaps";
 import { TrainingStatus, type IAllTrainingsListItem } from "@/types/trainings";
 import { fromMinsToDurationLabel, fromSecondsToDurationLabel } from "@/utils";
 

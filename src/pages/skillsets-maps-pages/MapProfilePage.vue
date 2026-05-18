@@ -108,7 +108,7 @@ import { useOsumapsStore } from "@/stores/osumaps";
 import {
   type IOsuMap,
   OsuMapCategory,
-  isMapCategoryKey,
+  isOsuMapCategory,
 } from "@/types/osumaps";
 
 const route = useRoute();
@@ -123,7 +123,7 @@ const routeMapId = computed(() => Number(route.params.mapId));
 
 const routeCategory = computed<OsuMapCategory | null>(() => {
   const category = String(route.params.category).toLowerCase();
-  return isMapCategoryKey(category) ? (category as OsuMapCategory) : null;
+  return isOsuMapCategory(category) ? category : null;
 });
 
 const mapInfo = computed<IOsuMap | null>(() => {

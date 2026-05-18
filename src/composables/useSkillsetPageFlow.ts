@@ -6,16 +6,15 @@ import { OsuMapCategory } from "@/types/osumaps";
 
 export default function useSkillsetPageFlow(category: OsuMapCategory) {
   const mapsStore = useOsumapsStore();
-
   const { setErrorToast } = useToast();
 
   onMounted(async () => {
     try {
-      await mapsStore.loadMapsByCategory(OsuMapCategory[category]);
+      await mapsStore.loadMapsByCategory(category);
     } catch (error) {
       const msg = error instanceof Error ? error?.message : error;
       setErrorToast(
-        `Не удалось загрузить карты для категории "${OsuMapCategory[category]}": ${msg}`
+        `Не удалось загрузить карты для категории "${category.toUpperCase()}": ${msg}`
       );
     }
   });

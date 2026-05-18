@@ -17,7 +17,7 @@ import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { MAPS_CATEGORIES } from "@/constants";
-import { isMapCategoryKey, type OsuMapCategory } from "@/types/osumaps";
+import { isOsuMapCategory } from "@/types/osumaps";
 import { isBotmClub } from "@/types/clubs";
 
 const route = useRoute();
@@ -63,17 +63,15 @@ const breadcrumbs = computed(() => {
     const categoryRaw = String(route.params.category).toLowerCase();
     const mapIdRaw = Number(route.params.mapId);
 
-    if (isMapCategoryKey(categoryRaw)) {
-      const readableCategory = MAPS_CATEGORIES[categoryRaw as OsuMapCategory];
+    if (isOsuMapCategory(categoryRaw)) {
+      const readableCategory = MAPS_CATEGORIES[categoryRaw];
       items.push({
         title: readableCategory,
         disabled: false,
         to: `/skillsets-maps/${categoryRaw}`,
       });
 
-      const categoryMaps = mapsStore.getMapsOfGivenCategories([
-        categoryRaw as OsuMapCategory,
-      ]);
+      const categoryMaps = mapsStore.getMapsOfGivenCategories([categoryRaw]);
       const foundMap = categoryMaps.find((m) => m.id === mapIdRaw);
       const displayTitle = foundMap ? foundMap.name : `Карта ${mapIdRaw}`;
 
@@ -95,8 +93,8 @@ const breadcrumbs = computed(() => {
 
   if (routeName.startsWith("skillsets-maps-")) {
     const categoryKey = routeName.replace("skillsets-maps-", "");
-    const readableTitle = isMapCategoryKey(categoryKey)
-      ? MAPS_CATEGORIES[categoryKey as keyof typeof MAPS_CATEGORIES]
+    const readableTitle = isOsuMapCategory(categoryKey)
+      ? MAPS_CATEGORIES[categoryKey]
       : categoryKey.toUpperCase();
 
     items.push({

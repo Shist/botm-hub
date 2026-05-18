@@ -148,7 +148,7 @@ const allUsersCategoriesMap = computed(
   () =>
     Object.fromEntries(
       Object.keys(MAPS_CATEGORIES).map((mapCategoryKey) => [
-        mapCategoryKey as OsuMapCategory,
+        mapCategoryKey,
         usersStore.users.filter((user) =>
           user.skillsets.includes(mapCategoryKey)
         ),

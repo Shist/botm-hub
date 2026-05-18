@@ -5,7 +5,7 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore/lite";
-import { type OsuMapCategory, type IOsuMap } from "@/types/osumaps";
+import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 
 async function loadMapsByCategoryFromFirebase(
   category: OsuMapCategory

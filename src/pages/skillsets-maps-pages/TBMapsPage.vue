@@ -1,7 +1,7 @@
 <template>
   <div class="skillset-maps-page">
     <h2 class="skillset-maps-page__headline">
-      Мапы {{ MAPS_CATEGORIES[OsuMapCategory.tb] }}
+      Мапы {{ MAPS_CATEGORIES[OsuMapCategory.TB] }}
     </h2>
     <SkillsetMapsTable :mapsList="categoryMapsList" :isLoading="isLoading" />
   </div>
@@ -13,5 +13,5 @@ import { OsuMapCategory } from "@/types/osumaps";
 import useSkillsetPageFlow from "@/composables/useSkillsetPageFlow";
 import { MAPS_CATEGORIES } from "@/constants";
 
-const { categoryMapsList, isLoading } = useSkillsetPageFlow(OsuMapCategory.tb);
+const { categoryMapsList, isLoading } = useSkillsetPageFlow(OsuMapCategory.TB);
 </script>
