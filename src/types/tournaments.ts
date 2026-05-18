@@ -43,10 +43,10 @@ export const TOURNAMENT_FORMATS = ["4v4", "3v3", "2v2", "1v1"] as const;
 export const TOURNAMENT_TEAM_SIZES = [8, 4, 3, 2, 1] as const;
 
 export enum TournamentStatus {
-  announced = "announced",
-  active = "active",
-  completed = "completed",
-  archived = "archived",
+  ANNOUNCED = "announced",
+  ACTIVE = "active",
+  COMPLETED = "completed",
+  ARCHIVED = "archived",
 }
 
 export type AchievedPlaceType = (typeof ACHIEVED_PLACES)[number];

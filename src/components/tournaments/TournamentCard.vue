@@ -306,7 +306,7 @@ const recordOwnerNick = computed(() => {
   const creator = usersStore.users.find(
     (u) => u.uid === props.tournament.redactorUid
   );
-  return creator ? creator.nick : "(ник не найден)";
+  return creator ? creator.nick : "(ник не найден)";
 });
 const timeDiffSeconds = computed(() => {
   return (
@@ -316,13 +316,13 @@ const timeDiffSeconds = computed(() => {
 });
 const currentStatus = computed(() => {
   if (props.tournament.isArchived) {
-    return TournamentStatus.archived;
+    return TournamentStatus.ARCHIVED;
   } else if (props.currDate < props.tournament.datesInfo.startDate) {
-    return TournamentStatus.announced;
+    return TournamentStatus.ANNOUNCED;
   } else if (timeDiffSeconds.value > 0) {
-    return TournamentStatus.active;
+    return TournamentStatus.ACTIVE;
   } else {
-    return TournamentStatus.completed;
+    return TournamentStatus.COMPLETED;
   }
 });
 const startDateLabel = computed(() => {
@@ -357,14 +357,14 @@ const hasAnyLink = computed(() => {
   );
 });
 const remainingTimeLabel = computed(() => {
-  if (currentStatus.value === TournamentStatus.announced) {
+  if (currentStatus.value === TournamentStatus.ANNOUNCED) {
     const diff =
       vuetifyDate.getDiff(
         props.tournament.datesInfo.startDate,
         props.currDate
       ) / 1000;
     return fromSecondsToDurationLabel(diff);
-  } else if (currentStatus.value === TournamentStatus.active) {
+  } else if (currentStatus.value === TournamentStatus.ACTIVE) {
     const diff =
       vuetifyDate.getDiff(props.tournament.datesInfo.endDate, props.currDate) /
       1000;
@@ -373,10 +373,10 @@ const remainingTimeLabel = computed(() => {
   return null;
 });
 const isTournamentEditable = computed(() => {
-  return currentStatus.value !== TournamentStatus.archived;
+  return currentStatus.value !== TournamentStatus.ARCHIVED;
 });
 const isArchiveTournamentBtnVisible = computed(() => {
-  return currentStatus.value === TournamentStatus.completed;
+  return currentStatus.value === TournamentStatus.COMPLETED;
 });
 const sortedRosters = computed(() => {
   return [...props.tournament.rostersInfo].sort((a, b) => {
