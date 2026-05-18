@@ -1,4 +1,5 @@
 import type { OsuMapCategory } from "@/types/osumaps";
+import { BotmClub } from "@/types/clubs";
 
 export const SHIST_UID = "mjFMxVxnVrdAuYf0wYHY7Zb3KRl2";
 
@@ -73,3 +74,12 @@ export const CATEGORIES_COLORS = {
   fm3: "#277d2b",
   tb: "#d4ac7c",
 };
+
+export const CLUBS_INFO = [
+  { id: BotmClub.AIM, title: "Aim Club" },
+  { id: BotmClub.SPEED, title: "Speed Club" },
+  { id: BotmClub.TECH, title: "Tech Club" },
+  { id: BotmClub.READING, title: "Reading Club" },
+  { id: BotmClub.HIDDEN, title: "Hidden Club" },
+  { id: BotmClub.HARDROCK, title: "Hardrock Club" },
+];
