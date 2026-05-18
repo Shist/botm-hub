@@ -8,8 +8,8 @@ import {
   type IOsuMapsCategoryState,
 } from "@/types/osumaps";
 
-export const useMapsStore = defineStore("maps", () => {
-  const maps = reactive<Record<OsuMapCategory, IOsuMapsCategoryState>>({
+export const useOsumapsStore = defineStore("osumaps", () => {
+  const osumaps = reactive<Record<OsuMapCategory, IOsuMapsCategoryState>>({
     nm1: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
     nm2: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
     nm3: { mapsList: [], loadingState: LoadingState.NOT_LOADED },
@@ -36,17 +36,17 @@ export const useMapsStore = defineStore("maps", () => {
   const loadMapsByCategory = async (
     category: OsuMapCategory
   ): Promise<IOsuMap[]> => {
-    if (maps[category].loadingState === LoadingState.LOADED)
-      return maps[category].mapsList;
+    if (osumaps[category].loadingState === LoadingState.LOADED)
+      return osumaps[category].mapsList;
 
     try {
-      maps[category].loadingState = LoadingState.LOADING;
+      osumaps[category].loadingState = LoadingState.LOADING;
       const mapsList = await loadMapsByCategoryFromFirebase(category);
-      maps[category].mapsList = mapsList;
-      maps[category].loadingState = LoadingState.LOADED;
+      osumaps[category].mapsList = mapsList;
+      osumaps[category].loadingState = LoadingState.LOADED;
       return mapsList;
     } catch (error) {
-      maps[category].loadingState = LoadingState.ERROR;
+      osumaps[category].loadingState = LoadingState.ERROR;
       throw error;
     }
   };
@@ -55,7 +55,9 @@ export const useMapsStore = defineStore("maps", () => {
     categories: OsuMapCategory[],
     sortBy: keyof IOsuMap = "starRate"
   ): IOsuMap[] => {
-    const mapsList = categories.flatMap((category) => maps[category].mapsList);
+    const mapsList = categories.flatMap(
+      (category) => osumaps[category].mapsList
+    );
 
     if (["id", "starRate", "bpm", "cs", "ar", "od", "hp"].includes(sortBy)) {
       mapsList.sort((a, b) => (a[sortBy] as number) - (b[sortBy] as number));
@@ -79,7 +81,7 @@ export const useMapsStore = defineStore("maps", () => {
   };
 
   return {
-    maps,
+    osumaps,
     loadMapsByCategory,
     getMapsOfGivenCategories,
   };

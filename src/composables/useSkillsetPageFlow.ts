@@ -1,11 +1,11 @@
 import { computed, onMounted } from "vue";
-import { useMapsStore } from "@/stores/maps";
+import { useOsumapsStore } from "@/stores/osumaps";
 import useToast from "@/composables/useToast";
 import { LoadingState } from "@/types/global";
 import { OsuMapCategory } from "@/types/osumaps";
 
 export default function useSkillsetPageFlow(category: OsuMapCategory) {
-  const mapsStore = useMapsStore();
+  const mapsStore = useOsumapsStore();
 
   const { setErrorToast } = useToast();
 
@@ -20,9 +20,9 @@ export default function useSkillsetPageFlow(category: OsuMapCategory) {
     }
   });
 
-  const categoryMapsList = computed(() => mapsStore.maps[category].mapsList);
+  const categoryMapsList = computed(() => mapsStore.osumaps[category].mapsList);
   const isLoading = computed(
-    () => mapsStore.maps[category].loadingState === LoadingState.LOADING
+    () => mapsStore.osumaps[category].loadingState === LoadingState.LOADING
   );
 
   return { categoryMapsList, isLoading };

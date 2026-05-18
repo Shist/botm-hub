@@ -95,7 +95,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from "vue";
-import { useMapsStore } from "@/stores/maps";
+import { useOsumapsStore } from "@/stores/osumaps";
 import { useAuthStore } from "@/stores/auth";
 import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
 import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
@@ -104,7 +104,7 @@ import { LoadingState } from "@/types/global";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import { fromDurationToSeconds, fromTotalSecondsToLabel } from "@/utils";
 
-const mapsStore = useMapsStore();
+const mapsStore = useOsumapsStore();
 const authStore = useAuthStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
@@ -158,7 +158,7 @@ const onConfirm = async () => {
   const neededRequests: (() => Promise<IOsuMap[]>)[] = [];
 
   chosenCategories.value.forEach((category) => {
-    if (mapsStore.maps[category].loadingState !== LoadingState.LOADED) {
+    if (mapsStore.osumaps[category].loadingState !== LoadingState.LOADED) {
       neededRequests.push(() => mapsStore.loadMapsByCategory(category));
     }
   });

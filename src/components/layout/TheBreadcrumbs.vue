@@ -15,7 +15,7 @@
 import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
-import { useMapsStore } from "@/stores/maps";
+import { useOsumapsStore } from "@/stores/osumaps";
 import { MAPS_CATEGORIES } from "@/constants";
 import { isMapCategoryKey, type OsuMapCategory } from "@/types/osumaps";
 import { isBotmClub } from "@/types/clubs";
@@ -23,7 +23,7 @@ import { isBotmClub } from "@/types/clubs";
 const route = useRoute();
 
 const usersStore = useUsersStore();
-const mapsStore = useMapsStore();
+const mapsStore = useOsumapsStore();
 
 const HIDDEN_ON_ROUTES = ["sign-in", "sign-up", "not-found", "main"];
 

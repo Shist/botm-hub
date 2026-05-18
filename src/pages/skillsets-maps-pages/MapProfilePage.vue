@@ -104,7 +104,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
-import { useMapsStore } from "@/stores/maps";
+import { useOsumapsStore } from "@/stores/osumaps";
 import {
   type IOsuMap,
   OsuMapCategory,
@@ -113,7 +113,7 @@ import {
 
 const route = useRoute();
 
-const mapsStore = useMapsStore();
+const mapsStore = useOsumapsStore();
 
 const { setErrorToast } = useToast();
 
