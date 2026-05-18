@@ -26,6 +26,10 @@ export interface IClubState {
   loadingState: LoadingState;
 }
 
+export function isBotmClub(value: string): value is BotmClub {
+  return Object.values(BotmClub).includes(value as BotmClub);
+}
+
 export interface IClubFirebase {
   leaderMessage: string;
   members: { uid: string; joinedAt: Timestamp }[];

@@ -18,6 +18,7 @@ import { useUsersStore } from "@/stores/users";
 import { useMapsStore } from "@/stores/maps";
 import { MAPS_CATEGORIES } from "@/constants";
 import { isMapCategoryKey, type OsuMapCategory } from "@/types/osumaps";
+import { isBotmClub } from "@/types/clubs";
 
 const route = useRoute();
 
@@ -133,6 +134,36 @@ const breadcrumbs = computed(() => {
       disabled: true,
       to: route.path,
     });
+
+    return items;
+  }
+
+  if (routeName === "club-profile") {
+    items.push({
+      title: ROUTE_LABELS["clubs"] ?? "Клубы и Лидерборды",
+      disabled: false,
+      to: "/clubs",
+    });
+
+    const displayClubId = route.params.clubId
+      ? String(route.params.clubId)
+      : "";
+    const normalizedClubId = displayClubId.toLowerCase();
+
+    if (isBotmClub(normalizedClubId)) {
+      const readableClubTitle = `${normalizedClubId[0]?.toUpperCase()}${normalizedClubId.slice(1)} Club`;
+      items.push({
+        title: readableClubTitle,
+        disabled: true,
+        to: route.path,
+      });
+    } else {
+      items.push({
+        title: displayClubId,
+        disabled: true,
+        to: route.path,
+      });
+    }
 
     return items;
   }

@@ -32,6 +32,7 @@ import WorkoutConstructorPage from "@/pages/WorkoutConstructorPage.vue";
 import TrainingsPage from "@/pages/TrainingsPage.vue";
 import TournamentsPage from "@/pages/TournamentsPage.vue";
 import ClubsPage from "@/pages/ClubsPage.vue";
+import ClubProfilePage from "@/pages/ClubProfilePage.vue";
 import NotFoundPage from "@/pages/NotFoundPage.vue";
 import { useAuthStore } from "@/stores/auth";
 
@@ -207,6 +208,11 @@ const router = createRouter({
       path: "/clubs",
       name: "clubs",
       component: ClubsPage,
+    },
+    {
+      path: "/clubs/:clubId",
+      name: "club-profile",
+      component: ClubProfilePage,
     },
     {
       path: "/:catchAll(.*)",
