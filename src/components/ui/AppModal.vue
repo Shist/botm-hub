@@ -122,6 +122,8 @@ watch(
     row-gap: 15px;
     max-width: 650px;
     max-height: 90dvh;
+    overflow-y: auto;
+    overflow-x: hidden;
     background-color: var(--color-modal-bg);
     border-radius: 10px;
     border: none;

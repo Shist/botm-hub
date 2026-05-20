@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase/firestore/lite";
 import { LoadingState } from "@/types/global";
+import { OsuMapCategory } from "@/types/osumaps";
 
 export enum BotmClub {
   AIM = "aim",
@@ -12,7 +13,9 @@ export enum BotmClub {
 
 export interface IClubMember {
   uid: string;
-  joinedAt: Date;
+  joinedAt: Date | null;
+  leftAt: Date | null;
+  isActive: boolean;
 }
 
 export interface IClub {
@@ -32,5 +35,36 @@ export function isBotmClub(value: string): value is BotmClub {
 
 export interface IClubFirebase {
   leaderMessage: string;
-  members: { uid: string; joinedAt: Timestamp }[];
+  members: {
+    uid: string;
+    joinedAt: Timestamp | null;
+    leftAt: Timestamp | null;
+    isActive: boolean;
+  }[];
+}
+
+export type AllowedModType =
+  | ""
+  | "hd"
+  | "hr"
+  | "dt"
+  | "ez"
+  | "fl"
+  | "hdhr"
+  | "flhd"
+  | "flhr"
+  | "flhdhr"
+  | "ezhd"
+  | "ezfl"
+  | "ezflhd";
+
+export interface IClubSkillsetRule {
+  category: OsuMapCategory;
+  allowedMods: AllowedModType[];
+}
+
+export interface IClubConfig {
+  id: BotmClub;
+  title: string;
+  skillsets: IClubSkillsetRule[];
 }

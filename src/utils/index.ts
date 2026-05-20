@@ -130,3 +130,61 @@ export function fromSecondsToDurationLabel(totalSeconds: number): string {
 
   return timeString;
 }
+
+export function pluralizeRu(
+  count: number,
+  words: [string, string, string]
+): string {
+  const cases = [2, 0, 1, 1, 1, 2];
+  const caseIndex = count % 10 < 5 ? Math.abs(count % 10) : 5;
+  const wordIndex =
+    count % 100 > 4 && count % 100 < 20 ? 2 : (cases[caseIndex] ?? 2);
+  return words[wordIndex] ?? "";
+}
+
+export function getMembershipDurationLabel(startDate: Date | null): string {
+  if (!startDate) return "Дата неизвестна";
+
+  const now = new Date();
+  if (startDate > now) return "Меньше дня";
+
+  let years = now.getFullYear() - startDate.getFullYear();
+  let months = now.getMonth() - startDate.getMonth();
+  let days = now.getDate() - startDate.getDate();
+
+  if (days < 0) {
+    months--;
+    const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    days += prevMonth.getDate();
+  }
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  const weeks = Math.floor(days / 7);
+  days = days % 7;
+
+  const parts = [];
+  if (years > 0)
+    parts.push(`${years} ${pluralizeRu(years, ["год", "года", "лет"])}`);
+  if (months > 0)
+    parts.push(
+      `${months} ${pluralizeRu(months, ["месяц", "месяца", "месяцев"])}`
+    );
+  if (weeks > 0)
+    parts.push(
+      `${weeks} ${pluralizeRu(weeks, ["неделю", "недели", "недель"])}`
+    );
+  if (days > 0)
+    parts.push(`${days} ${pluralizeRu(days, ["день", "дня", "дней"])}`);
+
+  if (parts.length === 0) return "Меньше дня";
+  return parts.join(", ");
+}
+
+export function formatModsList(mods: string[]): string {
+  return mods
+    .map((modStr) => (modStr === "" ? "NM" : modStr.toUpperCase()))
+    .join(", ");
+}

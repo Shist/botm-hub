@@ -1,5 +1,5 @@
 import { OsuMapCategory } from "@/types/osumaps";
-import { BotmClub } from "@/types/clubs";
+import { BotmClub, type IClubConfig, type AllowedModType } from "@/types/clubs";
 
 export const SHIST_UID = "mjFMxVxnVrdAuYf0wYHY7Zb3KRl2";
 
@@ -75,11 +75,142 @@ export const CATEGORIES_COLORS = {
   [OsuMapCategory.TB]: "#d4ac7c",
 };
 
-export const CLUBS_INFO = [
-  { id: BotmClub.AIM, title: "Aim Club" },
-  { id: BotmClub.SPEED, title: "Speed Club" },
-  { id: BotmClub.TECH, title: "Tech Club" },
-  { id: BotmClub.READING, title: "Reading Club" },
-  { id: BotmClub.HIDDEN, title: "Hidden Club" },
-  { id: BotmClub.HARDROCK, title: "Hardrock Club" },
+const MODS_ONLY_NM: AllowedModType[] = [""];
+const MODS_ONLY_HD: AllowedModType[] = ["hd"];
+const MODS_ONLY_HR: AllowedModType[] = ["hr"];
+const MODS_ONLY_DT: AllowedModType[] = ["dt"];
+const MODS_WITHOUT_EZ: AllowedModType[] = [
+  "",
+  "hd",
+  "hr",
+  "fl",
+  "hdhr",
+  "flhd",
+  "flhr",
+  "flhdhr",
 ];
+const MODS_WITH_EZ_OR_FL: AllowedModType[] = [
+  "ez",
+  "fl",
+  "flhd",
+  "flhr",
+  "flhdhr",
+  "ezhd",
+  "ezfl",
+  "ezflhd",
+];
+const MODS_WITH_HD: AllowedModType[] = ["hd", "ezhd", "flhd", "ezflhd"];
+const MODS_WITH_HR: AllowedModType[] = ["hr", "hdhr", "flhr", "flhdhr"];
+
+export const CLUB_SETTINGS: Record<BotmClub, IClubConfig> = {
+  [BotmClub.AIM]: {
+    id: BotmClub.AIM,
+    title: "Aim Клуб",
+    skillsets: [
+      { category: OsuMapCategory.NM1, allowedMods: MODS_ONLY_NM },
+      { category: OsuMapCategory.HD1, allowedMods: MODS_ONLY_HD },
+      { category: OsuMapCategory.HR1, allowedMods: MODS_ONLY_HR },
+      { category: OsuMapCategory.DT1, allowedMods: MODS_ONLY_DT },
+      { category: OsuMapCategory.FM1, allowedMods: MODS_WITHOUT_EZ },
+      { category: OsuMapCategory.TB, allowedMods: MODS_WITHOUT_EZ },
+    ],
+  },
+  [BotmClub.SPEED]: {
+    id: BotmClub.SPEED,
+    title: "Speed Клуб",
+    skillsets: [
+      { category: OsuMapCategory.NM2, allowedMods: MODS_ONLY_NM },
+      { category: OsuMapCategory.NM5, allowedMods: MODS_ONLY_NM },
+      { category: OsuMapCategory.DT1, allowedMods: MODS_ONLY_DT },
+      { category: OsuMapCategory.DT2, allowedMods: MODS_ONLY_DT },
+      { category: OsuMapCategory.DT3, allowedMods: MODS_ONLY_DT },
+      { category: OsuMapCategory.DT4, allowedMods: MODS_ONLY_DT },
+    ],
+  },
+  [BotmClub.TECH]: {
+    id: BotmClub.TECH,
+    title: "Tech Клуб",
+    skillsets: [
+      { category: OsuMapCategory.NM3, allowedMods: MODS_ONLY_NM },
+      { category: OsuMapCategory.NM4, allowedMods: MODS_ONLY_NM },
+      { category: OsuMapCategory.HD3, allowedMods: MODS_ONLY_HD },
+      { category: OsuMapCategory.HR3, allowedMods: MODS_ONLY_HR },
+      { category: OsuMapCategory.FM3, allowedMods: MODS_WITHOUT_EZ },
+      { category: OsuMapCategory.TB, allowedMods: MODS_WITHOUT_EZ },
+    ],
+  },
+  [BotmClub.READING]: {
+    id: BotmClub.READING,
+    title: "Reading Клуб",
+    skillsets: [
+      { category: OsuMapCategory.NM6, allowedMods: MODS_ONLY_NM },
+      { category: OsuMapCategory.NM7, allowedMods: MODS_ONLY_NM },
+      { category: OsuMapCategory.HD2, allowedMods: MODS_ONLY_HD },
+      {
+        category: OsuMapCategory.FM1,
+        allowedMods: MODS_WITH_EZ_OR_FL,
+      },
+      {
+        category: OsuMapCategory.FM2,
+        allowedMods: [
+          "",
+          "hd",
+          "ez",
+          "fl",
+          "flhd",
+          "flhr",
+          "flhdhr",
+          "ezhd",
+          "ezfl",
+          "ezflhd",
+        ],
+      },
+      {
+        category: OsuMapCategory.FM3,
+        allowedMods: MODS_WITH_EZ_OR_FL,
+      },
+    ],
+  },
+  [BotmClub.HIDDEN]: {
+    id: BotmClub.HIDDEN,
+    title: "Hidden Клуб",
+    skillsets: [
+      { category: OsuMapCategory.HD1, allowedMods: MODS_ONLY_HD },
+      { category: OsuMapCategory.HD2, allowedMods: MODS_ONLY_HD },
+      { category: OsuMapCategory.HD3, allowedMods: MODS_ONLY_HD },
+      {
+        category: OsuMapCategory.FM1,
+        allowedMods: MODS_WITH_HD,
+      },
+      {
+        category: OsuMapCategory.FM2,
+        allowedMods: MODS_WITH_HD,
+      },
+      {
+        category: OsuMapCategory.FM3,
+        allowedMods: MODS_WITH_HD,
+      },
+    ],
+  },
+  [BotmClub.HARDROCK]: {
+    id: BotmClub.HARDROCK,
+    title: "Hardrock Клуб",
+    skillsets: [
+      { category: OsuMapCategory.HR1, allowedMods: MODS_ONLY_HR },
+      { category: OsuMapCategory.HR2, allowedMods: MODS_ONLY_HR },
+      { category: OsuMapCategory.HR3, allowedMods: MODS_ONLY_HR },
+      {
+        category: OsuMapCategory.FM1,
+        allowedMods: MODS_WITH_HR,
+      },
+      {
+        category: OsuMapCategory.FM2,
+        allowedMods: MODS_WITH_HR,
+      },
+      {
+        category: OsuMapCategory.FM3,
+        allowedMods: MODS_WITH_HR,
+      },
+    ],
+  },
+};

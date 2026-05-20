@@ -170,6 +170,7 @@
           clearable
           auto-grow
           rows="3"
+          max-rows="10"
         />
       </v-form>
     </template>

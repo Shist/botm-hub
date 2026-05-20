@@ -27,7 +27,7 @@
           </div>
           <v-divider class="clubs-grid__divider border-opacity-50" />
           <div class="clubs-grid__section">
-            <span class="clubs-grid__section-label">Участники:</span>
+            <span class="clubs-grid__section-label">Активные участники:</span>
             <div class="clubs-grid__members-list">
               <span v-if="!club.members.length" class="clubs-grid__empty-label">
                 В поисках талантов...
@@ -52,7 +52,7 @@ import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import UserCard from "@/components/users/UserCard.vue";
 import useToast from "@/composables/useToast";
-import { CLUBS_INFO } from "@/constants";
+import { CLUB_SETTINGS } from "@/constants";
 
 const usersStore = useUsersStore();
 
@@ -61,7 +61,7 @@ const { setErrorToast } = useToast();
 const isLoading = ref(false);
 
 const clubsData = computed(() => {
-  return CLUBS_INFO.map((club) => {
+  return Object.values(CLUB_SETTINGS).map((club) => {
     const leader =
       usersStore.users.find((u) => {
         const ledClubs = JSON.parse(u.ledClubs ?? "[]");

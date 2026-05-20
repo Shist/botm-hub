@@ -289,6 +289,7 @@
           clearable
           auto-grow
           rows="3"
+          max-rows="10"
         />
         <v-expansion-panels class="plan-tournament-modal__links-panels-wrapper">
           <v-expansion-panel title="Ссылки (Опционально)">

@@ -16,7 +16,7 @@ import { computed } from "vue";
 import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
-import { MAPS_CATEGORIES } from "@/constants";
+import { MAPS_CATEGORIES, CLUB_SETTINGS } from "@/constants";
 import { isOsuMapCategory } from "@/types/osumaps";
 import { isBotmClub } from "@/types/clubs";
 
@@ -149,7 +149,8 @@ const breadcrumbs = computed(() => {
     const normalizedClubId = displayClubId.toLowerCase();
 
     if (isBotmClub(normalizedClubId)) {
-      const readableClubTitle = `${normalizedClubId[0]?.toUpperCase()}${normalizedClubId.slice(1)} Club`;
+      const readableClubTitle = CLUB_SETTINGS[normalizedClubId].title;
+
       items.push({
         title: readableClubTitle,
         disabled: true,

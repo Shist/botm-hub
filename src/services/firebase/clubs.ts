@@ -28,7 +28,9 @@ export async function loadClubByIdFromFirebase(
       leaderMessage: data.leaderMessage ?? "",
       members: (data.members ?? []).map((m) => ({
         uid: m.uid,
-        joinedAt: m.joinedAt.toDate(),
+        joinedAt: m.joinedAt ? m.joinedAt.toDate() : null,
+        leftAt: m.leftAt ? m.leftAt.toDate() : null,
+        isActive: m.isActive,
       })),
     };
   } catch (error) {
@@ -75,12 +77,23 @@ export async function toggleClubMembershipInFirebase(
     const members = clubData.members ?? [];
     const memberIndex = members.findIndex((m) => m.uid === userUid);
 
-    if (isJoining) {
-      if (memberIndex === -1) {
-        members.push({ uid: userUid, joinedAt: Timestamp.now() });
+    if (memberIndex !== -1 && members[memberIndex]) {
+      if (isJoining) {
+        members[memberIndex].isActive = true;
+        members[memberIndex].joinedAt = Timestamp.now();
+        members[memberIndex].leftAt = null;
+      } else {
+        members[memberIndex].isActive = false;
+        members[memberIndex].joinedAt = null;
+        members[memberIndex].leftAt = Timestamp.now();
       }
     } else {
-      members.splice(memberIndex, 1);
+      members.push({
+        uid: userUid,
+        joinedAt: Timestamp.now(),
+        leftAt: null,
+        isActive: true,
+      });
     }
     transaction.update(clubRef, { members });
 
