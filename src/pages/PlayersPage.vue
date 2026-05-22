@@ -130,6 +130,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
+import { useClubsStore } from "@/stores/clubs";
 import UserCard from "@/components/users/UserCard.vue";
 import useToast from "@/composables/useToast";
 import { DigitCategory, type IAllUsersListItem } from "@/types/users";
@@ -138,6 +139,7 @@ import { MAPS_CATEGORIES, CATEGORIES_COLORS } from "@/constants";
 import { getLeftAmountLabel } from "@/utils";
 
 const usersStore = useUsersStore();
+const clubsStore = useClubsStore();
 
 const { setErrorToast } = useToast();
 
@@ -175,7 +177,7 @@ const digitsCategoriesMap = computed(
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await usersStore.getAllUsers();
+    await Promise.all([usersStore.getAllUsers(), clubsStore.loadAllClubs()]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось загрузить список игроков: ${msg}`);

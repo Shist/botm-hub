@@ -2,39 +2,25 @@ import {
   getFirestore,
   doc,
   getDoc,
-  runTransaction,
-  Timestamp,
   updateDoc,
+  deleteField,
+  serverTimestamp,
 } from "firebase/firestore/lite";
-import { type IClub, type IClubFirebase, BotmClub } from "@/types/clubs";
-import { type IAllUsersListItem } from "@/types/users";
+import { type IClubFirebase, BotmClub } from "@/types/clubs";
 
-export async function loadClubByIdFromFirebase(
-  clubId: BotmClub
-): Promise<IClub | null> {
+export async function loadAllClubsFromFirebase(): Promise<Record<
+  string,
+  IClubFirebase
+> | null> {
   const db = getFirestore();
-  const clubRef = doc(db, "clubs", clubId);
+  const clubsRef = doc(db, "clubs", "allClubs");
 
   try {
-    const clubSnap = await getDoc(clubRef);
-
-    if (!clubSnap.exists()) {
-      throw new Error(`Клуб ${clubId} не найден в базе данных`);
-    }
-
-    const data = clubSnap.data() as IClubFirebase;
-    return {
-      id: clubId,
-      leaderMessage: data.leaderMessage ?? "",
-      members: (data.members ?? []).map((m) => ({
-        uid: m.uid,
-        joinedAt: m.joinedAt ? m.joinedAt.toDate() : null,
-        leftAt: m.leftAt ? m.leftAt.toDate() : null,
-        isActive: m.isActive,
-      })),
-    };
+    const snap = await getDoc(clubsRef);
+    if (!snap.exists()) return null;
+    return snap.data() as Record<string, IClubFirebase>;
   } catch (error) {
-    console.error(`Ошибка при загрузке данных для клуба ${clubId}:`, error);
+    console.error(`Ошибка при загрузке клубов:`, error);
     return null;
   }
 }
@@ -44,8 +30,8 @@ export async function updateLeaderMessageInFirebase(
   newMessage: string
 ) {
   const db = getFirestore();
-  const clubRef = doc(db, "clubs", clubId);
-  await updateDoc(clubRef, { leaderMessage: newMessage });
+  const clubRef = doc(db, "clubs", "allClubs");
+  await updateDoc(clubRef, { [`${clubId}.leaderMessage`]: newMessage });
 }
 
 export async function toggleClubMembershipInFirebase(
@@ -54,66 +40,17 @@ export async function toggleClubMembershipInFirebase(
   isJoining: boolean
 ) {
   const db = getFirestore();
+  const clubRef = doc(db, "clubs", "allClubs");
 
-  await runTransaction(db, async (transaction) => {
-    const clubRef = doc(db, "clubs", clubId);
-    const userRef = doc(db, "users", userUid);
-    const allUsersRef = doc(db, "users", "allUsers");
+  const fieldPath = `${clubId}.members.${userUid}`;
 
-    const [clubDoc, userDoc, allUsersDoc] = await Promise.all([
-      transaction.get(clubRef),
-      transaction.get(userRef),
-      transaction.get(allUsersRef),
-    ]);
-
-    if (!clubDoc.exists())
-      throw new Error("Документ клубов почему-то не найден в базе...");
-    if (!userDoc.exists())
-      throw new Error("Документ юзера почему-то не найден в базе...");
-    if (!allUsersDoc.exists())
-      throw new Error("Документ всех юзеров почему-то не найден в базе...");
-
-    const clubData = clubDoc.data() as IClubFirebase;
-    const members = clubData.members ?? [];
-    const memberIndex = members.findIndex((m) => m.uid === userUid);
-
-    if (memberIndex !== -1 && members[memberIndex]) {
-      if (isJoining) {
-        members[memberIndex].isActive = true;
-        members[memberIndex].joinedAt = Timestamp.now();
-        members[memberIndex].leftAt = null;
-      } else {
-        members[memberIndex].isActive = false;
-        members[memberIndex].joinedAt = null;
-        members[memberIndex].leftAt = Timestamp.now();
-      }
-    } else {
-      members.push({
-        uid: userUid,
-        joinedAt: Timestamp.now(),
-        leftAt: null,
-        isActive: true,
-      });
-    }
-    transaction.update(clubRef, { members });
-
-    const userData = userDoc.data();
-    const joinedClubs = JSON.parse(userData.joinedClubs ?? "[]") as BotmClub[];
-    const clubIndex = joinedClubs.findIndex((jClubId) => jClubId === clubId);
-
-    if (isJoining) {
-      if (clubIndex === -1) joinedClubs.push(clubId);
-    } else {
-      joinedClubs.splice(clubIndex, 1);
-    }
-    transaction.update(userRef, { joinedClubs: JSON.stringify(joinedClubs) });
-
-    const allUsersData = allUsersDoc.data().allUsers as IAllUsersListItem[];
-    const userIndex = allUsersData.findIndex((u) => u.uid === userUid);
-
-    if (userIndex !== -1 && allUsersData[userIndex]) {
-      allUsersData[userIndex].joinedClubs = JSON.stringify(joinedClubs);
-      transaction.update(allUsersRef, { allUsers: allUsersData });
-    }
-  });
+  if (isJoining) {
+    await updateDoc(clubRef, {
+      [fieldPath]: { joinedAt: serverTimestamp() },
+    });
+  } else {
+    await updateDoc(clubRef, {
+      [fieldPath]: deleteField(),
+    });
+  }
 }

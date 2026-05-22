@@ -7,9 +7,9 @@
   >
     <template #default>
       <p class="leave-club-modal__message">
-        Ты уверен, что хочешь выйти из клуба? Ты сможешь вернуться, а твои
-        зарегистрированные скоры сохранятся в записях клуба, но
-        <b>счетчик дней нахождения в клубе обнулится</b>.
+        Ты уверен(а), что хочешь выйти из клуба? Ты всегда сможешь вернуться, но
+        счетчик дней нахождения в клубе обнулится, а клуб временно потеряет твои
+        очки и станет слабее без тебя!
       </p>
     </template>
     <template #actions>
@@ -48,8 +48,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  closeModal: [];
-  closeModalAfterLeaving: [];
+  (e: "closeModal"): void;
+  (e: "closeModalAfterLeaving"): void;
 }>();
 
 const clubsStore = useClubsStore();
@@ -65,7 +65,7 @@ const onConfirmLeaving = async () => {
   try {
     isLeaving.value = true;
     await clubsStore.leaveClub(props.clubId, userUid);
-    setSuccessToast("🚪🚪🚪 Ты успешно покинул клуб!!! 🚪🚪🚪");
+    setSuccessToast("🚪🚪🚪 Ты успешно покинул(а) клуб!!! 🚪🚪🚪");
     emit("closeModalAfterLeaving");
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
@@ -81,9 +81,6 @@ const onConfirmLeaving = async () => {
   &__message {
     text-align: center;
     @include default-text(20px, 24px, var(--color-text));
-    b {
-      color: var(--color-error);
-    }
     @media (max-width: $phone-l) {
       font-size: 16px;
       line-height: 20px;

@@ -26,13 +26,6 @@
                 </v-tooltip>
               </template>
               <span
-                v-else-if="isFormerMember"
-                class="club-profile-page__status-text club-profile-page__status-text_out"
-              >
-                Ты покинул(а) клуб<br />
-                <b>{{ formattedLeftDate }}</b>
-              </span>
-              <span
                 v-else
                 class="club-profile-page__status-text club-profile-page__status-text_out"
               >
@@ -59,13 +52,7 @@
                     }"
                     @click="onMembershipBtnClick"
                   >
-                    {{
-                      isActiveMember
-                        ? "Покинуть клуб"
-                        : isFormerMember
-                          ? "Вернуться в клуб"
-                          : "Вступить в клуб"
-                    }}
+                    {{ isActiveMember ? "Покинуть клуб" : "Вступить в клуб" }}
                   </v-btn>
                 </div>
               </template>
@@ -163,29 +150,15 @@
             item-value="rawMember.uid"
             class="club-profile-page__table"
             hover
+            :sort-by="[{ key: 'points', order: 'desc' }]"
           >
-            <template #[`item.player`]="{ item }">
+            <template #[`item.nick`]="{ item }">
               <div class="club-profile-page__table-user-wrapper">
                 <UserCard :user="item.fullUser" />
               </div>
             </template>
-            <template #[`item.status`]="{ item }">
-              <v-chip
-                :color="item.rawMember.isActive ? 'success' : 'grey'"
-                size="small"
-                variant="flat"
-                class="club-profile-page__status-chip"
-              >
-                {{ item.rawMember.isActive ? "Активен" : "Неактивен" }}
-              </v-chip>
-            </template>
-            <template #[`item.joinedAt`]="{ item }">
-              <span>{{ formatDateForTable(item.rawMember.joinedAt) }}</span>
-            </template>
-            <template #[`item.leftAt`]="{ item }">
-              <span :class="{ 'opacity-50': !item.rawMember.leftAt }">
-                {{ formatDateForTable(item.rawMember.leftAt) }}
-              </span>
+            <template #[`item.joinedTimestamp`]="{ item }">
+              <span>{{ formatDateTimeForTable(item.rawMember.joinedAt) }}</span>
             </template>
             <template #[`item.points`]>
               <span class="club-profile-page__points">0</span>
@@ -236,7 +209,6 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { useDate } from "vuetify";
 import { useClubsStore } from "@/stores/clubs";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
@@ -252,8 +224,6 @@ import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { CLUB_SETTINGS } from "@/constants";
 
 const route = useRoute();
-
-const vuetifyDate = useDate();
 
 const clubsStore = useClubsStore();
 const authStore = useAuthStore();
@@ -284,16 +254,13 @@ const clubTitle = computed(() => {
 
 const clubData = computed(() => {
   if (!isValidClub.value) return null;
-  return clubsStore.clubs[normalizedClubId.value]?.data;
+  return clubsStore.clubs[normalizedClubId.value] ?? null;
 });
 
 const clubLeader = computed(() => {
-  if (!isValidClub.value) return null;
+  if (!clubData.value?.leaderUid) return null;
   return (
-    usersStore.users.find((u) => {
-      const ledClubs = JSON.parse(u.ledClubs ?? "[]");
-      return ledClubs.includes(normalizedClubId.value);
-    }) ?? null
+    usersStore.users.find((u) => u.uid === clubData.value!.leaderUid) ?? null
   );
 });
 
@@ -301,19 +268,10 @@ const currentUserUid = computed(() => authStore.user?.uid);
 
 const currentUserMembershipRecord = computed(() => {
   if (!clubData.value || !currentUserUid.value) return null;
-  return (
-    clubData.value.members.find((m) => m.uid === currentUserUid.value) ?? null
-  );
+  return clubData.value.members[currentUserUid.value] ?? null;
 });
 
-const isActiveMember = computed(
-  () => !!currentUserMembershipRecord.value?.isActive
-);
-const isFormerMember = computed(
-  () =>
-    currentUserMembershipRecord.value &&
-    !currentUserMembershipRecord.value.isActive
-);
+const isActiveMember = computed(() => !!currentUserMembershipRecord.value);
 const isLeaderOfThisClub = computed(
   () => clubLeader.value?.uid === currentUserUid.value
 );
@@ -326,26 +284,11 @@ const membershipDuration = computed(() => {
 const formattedJoinedDate = computed(() => {
   const date = currentUserMembershipRecord.value?.joinedAt;
   if (!date) return "";
-
   const dateStr = date.toLocaleDateString("ru-RU");
   const timeStr = date.toLocaleTimeString("ru-RU", {
     hour: "2-digit",
     minute: "2-digit",
   });
-
-  return `${dateStr}, ${timeStr}`;
-});
-
-const formattedLeftDate = computed(() => {
-  const date = currentUserMembershipRecord.value?.leftAt;
-  if (!date) return "";
-
-  const dateStr = date.toLocaleDateString("ru-RU");
-  const timeStr = date.toLocaleTimeString("ru-RU", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
   return `${dateStr}, ${timeStr}`;
 });
 
@@ -363,62 +306,56 @@ const clubMaps = computed(() => {
 const searchQuery = ref("");
 
 const tableHeaders = [
-  { title: "Игрок", key: "player", sortable: false, minWidth: "300px" },
-  {
-    title: "Статус",
-    key: "status",
-    align: "center" as const,
-    minWidth: "100px",
-  },
+  { title: "Игрок", key: "nick", sortable: true, minWidth: "300px" },
   {
     title: "Дата вступления",
-    key: "joinedAt",
-    minWidth: "165px",
-  },
-  {
-    title: "Дата выхода",
-    key: "leftAt",
+    key: "joinedTimestamp",
+    sortable: true,
     minWidth: "165px",
   },
   {
     title: "Очки",
     key: "points",
+    sortable: true,
     align: "center" as const,
     minWidth: "100px",
   },
 ];
 
 const tableItems = computed(() => {
-  if (!clubData.value) return [];
+  if (!clubData.value?.members) return [];
 
   const items = [];
 
-  for (const member of clubData.value.members) {
+  for (const member of Object.values(clubData.value.members)) {
     const fullUser = usersStore.users.find((u) => u.uid === member.uid);
-
     if (!fullUser) continue;
 
     items.push({
       rawMember: member,
       fullUser: fullUser,
+      nick: fullUser.nick,
       searchString: fullUser.nick.toLowerCase(),
       joinedTimestamp: member.joinedAt ? member.joinedAt.getTime() : 0,
-      leftTimestamp: member.leftAt ? member.leftAt.getTime() : 0,
       points: 0,
     });
   }
 
-  return items.sort((a, b) => {
-    if (b.points !== a.points) {
-      return b.points - a.points;
-    }
-    return a.fullUser.nick.localeCompare(b.fullUser.nick);
-  });
+  return items;
 });
 
-const formatDateForTable = (date: Date | null) => {
+const formatDateTimeForTable = (date: Date | null) => {
   if (!date) return "—";
-  return vuetifyDate.format(date, "keyboardDate");
+  const dateStr = date.toLocaleDateString("ru-RU", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+  const timeStr = date.toLocaleTimeString("ru-RU", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return `${dateStr} в ${timeStr}`;
 };
 
 const onMembershipBtnClick = async () => {
@@ -430,11 +367,7 @@ const onMembershipBtnClick = async () => {
     try {
       isUpdatingMembership.value = true;
       await clubsStore.joinClub(normalizedClubId.value, currentUserUid.value);
-      setSuccessToast(
-        isFormerMember.value
-          ? "🔙🔙🔙 С возвращением в клуб!!! 🔙🔙🔙"
-          : "👋👋👋 Добро пожаловать в клуб!!! 👋👋👋"
-      );
+      setSuccessToast("👋👋👋 Добро пожаловать в клуб!!! 👋👋👋");
     } catch (error) {
       const msg = error instanceof Error ? error?.message : error;
       setErrorToast(`Ошибка: ${msg}`);
@@ -460,7 +393,7 @@ onMounted(async () => {
 
     await Promise.all([
       usersStore.getAllUsers(),
-      clubsStore.loadClubById(normalizedClubId.value),
+      clubsStore.loadAllClubs(),
       ...mapLoadingPromises,
     ]);
   } catch (error) {

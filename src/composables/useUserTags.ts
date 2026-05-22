@@ -1,4 +1,5 @@
 import { computed, type Ref } from "vue";
+import { useClubsStore } from "@/stores/clubs";
 import IconDigitFour from "@/components/users/user-icons/IconDigitFour.vue";
 import IconDigitFive from "@/components/users/user-icons/IconDigitFive.vue";
 import IconDigitSix from "@/components/users/user-icons/IconDigitSix.vue";
@@ -7,6 +8,8 @@ import { DigitCategory, type IAllUsersListItem } from "@/types/users";
 import { BotmClub } from "@/types/clubs";
 
 export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
+  const clubsStore = useClubsStore();
+
   const isShist = computed(() => {
     if (!userRef.value) return false;
     return userRef.value.uid === SHIST_UID;
@@ -36,19 +39,23 @@ export default function useUserTags(userRef: Ref<IAllUsersListItem | null>) {
     }
   });
 
-  const ledClubs = computed<BotmClub[]>(() => {
-    return JSON.parse(userRef.value?.ledClubs ?? "[]");
-  });
-
-  const isAimLead = computed(() => ledClubs.value.includes(BotmClub.AIM));
-  const isSpeedLead = computed(() => ledClubs.value.includes(BotmClub.SPEED));
-  const isTechLead = computed(() => ledClubs.value.includes(BotmClub.TECH));
-  const isReadingLead = computed(() =>
-    ledClubs.value.includes(BotmClub.READING)
+  const isAimLead = computed(
+    () => clubsStore.clubs[BotmClub.AIM].leaderUid === userRef.value?.uid
   );
-  const isHiddenLead = computed(() => ledClubs.value.includes(BotmClub.HIDDEN));
-  const isHardrockLead = computed(() =>
-    ledClubs.value.includes(BotmClub.HARDROCK)
+  const isSpeedLead = computed(
+    () => clubsStore.clubs[BotmClub.SPEED].leaderUid === userRef.value?.uid
+  );
+  const isTechLead = computed(
+    () => clubsStore.clubs[BotmClub.TECH].leaderUid === userRef.value?.uid
+  );
+  const isReadingLead = computed(
+    () => clubsStore.clubs[BotmClub.READING].leaderUid === userRef.value?.uid
+  );
+  const isHiddenLead = computed(
+    () => clubsStore.clubs[BotmClub.HIDDEN].leaderUid === userRef.value?.uid
+  );
+  const isHardrockLead = computed(
+    () => clubsStore.clubs[BotmClub.HARDROCK].leaderUid === userRef.value?.uid
   );
 
   return {

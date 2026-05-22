@@ -1,64 +1,109 @@
-import { reactive } from "vue";
+import { ref } from "vue";
 import { defineStore } from "pinia";
-import { LoadingState } from "@/types/global";
-import { BotmClub, type IClub, type IClubState } from "@/types/clubs";
+import { BotmClub, type IClub, type IClubMember } from "@/types/clubs";
 import {
-  loadClubByIdFromFirebase,
+  loadAllClubsFromFirebase,
   toggleClubMembershipInFirebase,
   updateLeaderMessageInFirebase,
 } from "@/services/firebase/clubs";
-import { useUsersStore } from "@/stores/users";
 
 export const useClubsStore = defineStore("clubs", () => {
-  const usersStore = useUsersStore();
-
-  const clubs = reactive<Record<BotmClub, IClubState>>({
-    [BotmClub.AIM]: { data: null, loadingState: LoadingState.NOT_LOADED },
-    [BotmClub.SPEED]: { data: null, loadingState: LoadingState.NOT_LOADED },
-    [BotmClub.TECH]: { data: null, loadingState: LoadingState.NOT_LOADED },
-    [BotmClub.READING]: { data: null, loadingState: LoadingState.NOT_LOADED },
-    [BotmClub.HIDDEN]: { data: null, loadingState: LoadingState.NOT_LOADED },
-    [BotmClub.HARDROCK]: { data: null, loadingState: LoadingState.NOT_LOADED },
+  const clubs = ref<Record<BotmClub, IClub>>({
+    [BotmClub.AIM]: {
+      id: BotmClub.AIM,
+      leaderMessage: "",
+      leaderUid: null,
+      members: {},
+    },
+    [BotmClub.SPEED]: {
+      id: BotmClub.SPEED,
+      leaderMessage: "",
+      leaderUid: null,
+      members: {},
+    },
+    [BotmClub.TECH]: {
+      id: BotmClub.TECH,
+      leaderMessage: "",
+      leaderUid: null,
+      members: {},
+    },
+    [BotmClub.READING]: {
+      id: BotmClub.READING,
+      leaderMessage: "",
+      leaderUid: null,
+      members: {},
+    },
+    [BotmClub.HIDDEN]: {
+      id: BotmClub.HIDDEN,
+      leaderMessage: "",
+      leaderUid: null,
+      members: {},
+    },
+    [BotmClub.HARDROCK]: {
+      id: BotmClub.HARDROCK,
+      leaderMessage: "",
+      leaderUid: null,
+      members: {},
+    },
   });
+  const isLoaded = ref(false);
 
-  const loadClubById = async (clubId: BotmClub): Promise<IClub | null> => {
-    if (clubs[clubId].loadingState === LoadingState.LOADED)
-      return clubs[clubId].data;
+  const loadAllClubs = async () => {
+    if (isLoaded.value) return;
 
-    try {
-      clubs[clubId].loadingState = LoadingState.LOADING;
-      const clubData = await loadClubByIdFromFirebase(clubId);
-      clubs[clubId].data = clubData;
-      clubs[clubId].loadingState = LoadingState.LOADED;
-      return clubData;
-    } catch (error) {
-      clubs[clubId].loadingState = LoadingState.ERROR;
-      throw error;
+    const data = await loadAllClubsFromFirebase();
+    if (data) {
+      const parsed: Record<string, IClub> = {};
+      for (const [id, clubData] of Object.entries(data)) {
+        const membersMap: Record<string, IClubMember> = {};
+
+        if (clubData.members) {
+          for (const [uid, memberData] of Object.entries(clubData.members)) {
+            membersMap[uid] = {
+              uid,
+              joinedAt: memberData.joinedAt?.toDate() ?? new Date(),
+            };
+          }
+        }
+
+        parsed[id] = {
+          id: id as BotmClub,
+          leaderUid: clubData.leaderUid ?? null,
+          leaderMessage: clubData.leaderMessage ?? "",
+          members: membersMap,
+        };
+      }
+      clubs.value = parsed;
+      isLoaded.value = true;
     }
   };
 
   const updateLeaderMessage = async (clubId: BotmClub, message: string) => {
     await updateLeaderMessageInFirebase(clubId, message);
-    if (clubs[clubId].data) {
-      clubs[clubId].data!.leaderMessage = message;
+    if (clubs.value[clubId]) {
+      clubs.value[clubId].leaderMessage = message;
     }
   };
 
   const joinClub = async (clubId: BotmClub, userUid: string) => {
     await toggleClubMembershipInFirebase(clubId, userUid, true);
-    clubs[clubId].loadingState = LoadingState.NOT_LOADED;
-    await Promise.all([loadClubById(clubId), usersStore.loadAllUsers()]);
+    if (!clubs.value[clubId].members) clubs.value[clubId].members = {};
+    clubs.value[clubId].members[userUid] = {
+      uid: userUid,
+      joinedAt: new Date(),
+    };
   };
 
   const leaveClub = async (clubId: BotmClub, userUid: string) => {
     await toggleClubMembershipInFirebase(clubId, userUid, false);
-    clubs[clubId].loadingState = LoadingState.NOT_LOADED;
-    await Promise.all([loadClubById(clubId), usersStore.loadAllUsers()]);
+    if (clubs.value[clubId].members[userUid]) {
+      delete clubs.value[clubId].members[userUid];
+    }
   };
 
   return {
     clubs,
-    loadClubById,
+    loadAllClubs,
     updateLeaderMessage,
     joinClub,
     leaveClub,

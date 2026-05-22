@@ -14,14 +14,13 @@ export enum BotmClub {
 export interface IClubMember {
   uid: string;
   joinedAt: Date | null;
-  leftAt: Date | null;
-  isActive: boolean;
 }
 
 export interface IClub {
   id: BotmClub;
+  leaderUid: string | null;
   leaderMessage: string;
-  members: IClubMember[];
+  members: Record<string, IClubMember>;
 }
 
 export interface IClubState {
@@ -34,13 +33,9 @@ export function isBotmClub(value: string): value is BotmClub {
 }
 
 export interface IClubFirebase {
+  leaderUid: string | null;
   leaderMessage: string;
-  members: {
-    uid: string;
-    joinedAt: Timestamp | null;
-    leftAt: Timestamp | null;
-    isActive: boolean;
-  }[];
+  members: Record<string, { joinedAt: Timestamp }>;
 }
 
 export type AllowedModType =

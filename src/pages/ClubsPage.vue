@@ -50,43 +50,45 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
+import { useClubsStore } from "@/stores/clubs";
 import UserCard from "@/components/users/UserCard.vue";
 import useToast from "@/composables/useToast";
 import { CLUB_SETTINGS } from "@/constants";
 
 const usersStore = useUsersStore();
+const clubsStore = useClubsStore();
 
 const { setErrorToast } = useToast();
 
 const isLoading = ref(false);
 
 const clubsData = computed(() => {
-  return Object.values(CLUB_SETTINGS).map((club) => {
-    const leader =
-      usersStore.users.find((u) => {
-        const ledClubs = JSON.parse(u.ledClubs ?? "[]");
-        return ledClubs.includes(club.id);
-      }) ?? null;
+  return Object.values(CLUB_SETTINGS).map((clubSettings) => {
+    const clubDbData = clubsStore.clubs[clubSettings.id];
+
+    const leader = clubDbData?.leaderUid
+      ? (usersStore.users.find((u) => u.uid === clubDbData.leaderUid) ?? null)
+      : null;
 
     const members = usersStore.users
       .filter((u) => {
-        const joinedClubs = JSON.parse(u.joinedClubs ?? "[]");
+        const isMember = clubDbData?.members?.[u.uid];
         const isLeader = u.uid === leader?.uid;
-        return joinedClubs.includes(club.id) && !isLeader;
+        return isMember && !isLeader;
       })
       .sort((a, b) => a.nick.localeCompare(b.nick));
 
-    return { ...club, leader, members };
+    return { ...clubSettings, leader, members };
   });
 });
 
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await usersStore.getAllUsers();
+    await Promise.all([usersStore.getAllUsers(), clubsStore.loadAllClubs()]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить список игроков для клубов: ${msg}`);
+    setErrorToast(`Не удалось загрузить клубы: ${msg}`);
   } finally {
     isLoading.value = false;
   }

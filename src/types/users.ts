@@ -1,6 +1,5 @@
 import { type Ref } from "vue";
 import { OsuMapCategory } from "@/types/osumaps";
-import { BotmClub } from "@/types/clubs";
 
 export enum DigitCategory {
   FOUR_DIGIT = "4-digit",
@@ -19,14 +18,10 @@ export interface IUserAdditionalInfoBase {
 
 export interface IUserLocalAdditionalInfo extends IUserAdditionalInfoBase {
   skillsets: OsuMapCategory[];
-  ledClubs: BotmClub[];
-  joinedClubs: BotmClub[];
 }
 
 export interface IUserFirebaseAdditionalInfo extends IUserAdditionalInfoBase {
   skillsets: string;
-  ledClubs: string;
-  joinedClubs: string;
 }
 
 export interface IUser {

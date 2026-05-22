@@ -81,6 +81,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
+import { useClubsStore } from "@/stores/clubs";
 import useUserTags from "@/composables/useUserTags";
 import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
@@ -99,6 +100,7 @@ import { OsuMapCategory } from "@/types/osumaps";
 const route = useRoute();
 
 const usersStore = useUsersStore();
+const clubsStore = useClubsStore();
 
 const { setErrorToast } = useToast();
 
@@ -147,7 +149,7 @@ const hasSomeTags = computed(
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await usersStore.getAllUsers();
+    await Promise.all([usersStore.getAllUsers(), clubsStore.loadAllClubs()]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось загрузить список игроков: ${msg}`);

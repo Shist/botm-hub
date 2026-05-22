@@ -57,8 +57,6 @@ async function updateUserAdditionalInfoToFirebase(
         nick: additionalInfo.nick,
         digitCategory: additionalInfo.digitCategory,
         skillsets: additionalInfo.skillsets,
-        ledClubs: additionalInfo.ledClubs,
-        joinedClubs: additionalInfo.joinedClubs,
         isTrainer: additionalInfo.isTrainer,
         isRedactor: additionalInfo.isRedactor,
       });
@@ -83,7 +81,7 @@ async function updateUserAdditionalInfoToFirebase(
 async function signUpUserToFirebase(
   email: string,
   password: string,
-  additionalInfo: IUserFirebaseAdditionalInfo
+  partialInfo: Pick<IUserFirebaseAdditionalInfo, "nick" | "email">
 ) {
   const auth = getAuth();
   let newUserInfo: UserCredential | null = null;
@@ -97,9 +95,18 @@ async function signUpUserToFirebase(
       );
     }
 
+    const fullAdditionalInfo: IUserFirebaseAdditionalInfo = {
+      ...partialInfo,
+      osuId: null,
+      digitCategory: null,
+      skillsets: "[]",
+      isTrainer: false,
+      isRedactor: false,
+    };
+
     await updateUserAdditionalInfoToFirebase(
       newUserInfo.user.uid,
-      additionalInfo
+      fullAdditionalInfo
     );
 
     return newUserInfo;

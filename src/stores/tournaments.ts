@@ -19,9 +19,11 @@ import {
   type IAllTournamentsFirebaseOutgoingItem,
 } from "@/types/tournaments";
 import { useUsersStore } from "@/stores/users";
+import { useClubsStore } from "@/stores/clubs";
 
 export const useTournamentsStore = defineStore("tournaments", () => {
   const usersStore = useUsersStore();
+  const clubsStore = useClubsStore();
 
   const tournaments = reactive<IAllTournamentsListItem[]>([]);
 
@@ -32,7 +34,10 @@ export const useTournamentsStore = defineStore("tournaments", () => {
 
   const loadAllTournaments = async (): Promise<IAllTournamentsListItem[]> => {
     try {
-      const allUsers = await usersStore.getAllUsers();
+      const [allUsers] = await Promise.all([
+        usersStore.getAllUsers(),
+        clubsStore.loadAllClubs(),
+      ]);
 
       const allTournaments = (await loadAllTournamentsFromFirebase()).map(
         (tournament) => {
