@@ -1,7 +1,9 @@
 <template>
   <footer class="app-footer" ref="footerRef">
     <div class="app-footer__container">
-      <span class="app-footer__version">Версия 3.2.1</span>
+      <span class="app-footer__version">
+        Версия {{ metaStore.metaConfig?.appVersion ?? "..." }}
+      </span>
       <div class="app-footer__git-link-wrapper">
         <a
           href="https://github.com/Shist/botm-hub"
@@ -19,6 +21,11 @@
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+import { useMetaStore } from "@/stores/meta";
+const metaStore = useMetaStore();
+</script>
 
 <style lang="scss" scoped>
 .app-footer {

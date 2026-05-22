@@ -14,10 +14,11 @@
           class="new-patch-modal-img"
         />
         <p class="new-patch-label">
-          Вышла новая версия веб-приложения BOTM Hub - 3.2.1! Вы можете
-          взглянуть на полный список изменений по кнопке `Последние обновления`,
-          находящейся в бургер-меню. Это окно больше не будет показываться, пока
-          не выйдет новый патч или пока вы не почистите кэш браузера.
+          Вышла новая версия веб-приложения BOTM Hub -
+          {{ metaStore.metaConfig?.appVersion }}! Вы можете взглянуть на полный
+          список изменений по кнопке `Последние обновления`, находящейся в
+          бургер-меню. Это окно больше не будет показываться, пока не выйдет
+          новый патч или пока вы не почистите кэш браузера.
         </p>
       </div>
     </template>
@@ -37,14 +38,14 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useThemeStore } from "@/stores/theme";
+import { useMetaStore } from "@/stores/meta";
 import { useScrollbarPaddingStore } from "@/stores/scrollbar-padding";
 import TheHeader from "@/components/layout/TheHeader.vue";
 import TheFooter from "@/components/layout/TheFooter.vue";
 import TheBreadcrumbs from "@/components/layout/TheBreadcrumbs.vue";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
-const APP_VERSION = "3.2.1";
-
+const metaStore = useMetaStore();
 const scrollbarPaddingStore = useScrollbarPaddingStore();
 
 const scrollbarWidth = computed(() =>
@@ -62,20 +63,24 @@ const newPatchImagePath = ref(newPatchImage);
 
 const closeNewPatchModal = () => {
   isNewPatchModalOpened.value = false;
-
   localStorage.setItem("wasPatchNotesShown", "true");
-
-  localStorage.setItem("appVersion", APP_VERSION);
+  if (metaStore.metaConfig?.appVersion) {
+    localStorage.setItem("appVersion", metaStore.metaConfig.appVersion);
+  }
 };
 
-onMounted(() => {
+onMounted(async () => {
+  await metaStore.loadMeta();
+
+  const currentVersion = metaStore.metaConfig?.appVersion;
+  if (!currentVersion) return;
+
   if (
     !localStorage.getItem("wasPatchNotesShown") ||
-    localStorage.getItem("appVersion") !== APP_VERSION
+    localStorage.getItem("appVersion") !== currentVersion
   ) {
-    nextTick(() => {
-      isNewPatchModalOpened.value = true;
-    });
+    await nextTick();
+    isNewPatchModalOpened.value = true;
   }
 });
 </script>
