@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { ref, reactive } from "vue";
 import { defineStore } from "pinia";
 import {
   loadAllTournamentsFromFirebase,
@@ -25,72 +25,84 @@ export const useTournamentsStore = defineStore("tournaments", () => {
 
   const tournaments = reactive<IAllTournamentsListItem[]>([]);
 
+  const isLoaded = ref(false);
+  let loadPromise: Promise<IAllTournamentsListItem[]> | null = null;
+
   const getAllTournaments = async (): Promise<IAllTournamentsListItem[]> => {
-    if (tournaments.length) return tournaments;
+    if (isLoaded.value) return tournaments;
     return await loadAllTournaments();
   };
 
   const loadAllTournaments = async (): Promise<IAllTournamentsListItem[]> => {
-    try {
-      const allUsers = await usersStore.getAllUsersAndLoadClubs();
+    if (loadPromise) return loadPromise;
 
-      const allTournaments = (await loadAllTournamentsFromFirebase()).map(
-        (tournament) => {
-          const rostersInfoFromFirebase = tournament.rostersInfo ?? [];
+    loadPromise = (async () => {
+      try {
+        const allUsers = await usersStore.getAllUsersAndLoadClubs();
 
-          const rostersInfo: IRosterInfo<IAllUsersListItem>[] =
-            rostersInfoFromFirebase.map((rosterInfo) => {
-              return {
-                ...rosterInfo,
-                players: rosterInfo.players.reduce(
-                  (
-                    acc: (IAllUsersListItem | IUnregisteredUser | null)[],
-                    player
-                  ) => {
-                    if (typeof player === "string") {
-                      const userInfo = allUsers.find((u) => u.uid === player);
-                      if (userInfo) acc.push(userInfo);
-                    } else {
-                      acc.push(player);
-                    }
-                    return acc;
-                  },
-                  []
-                ),
-              };
-            });
+        const allTournaments = (await loadAllTournamentsFromFirebase()).map(
+          (tournament) => {
+            const rostersInfoFromFirebase = tournament.rostersInfo ?? [];
 
-          const datesInfo = {
-            startDate: tournament.datesInfo.startDate.toDate(),
-            endDate: tournament.datesInfo.endDate.toDate(),
-          } as ITournamentDatesInfo;
+            const rostersInfo: IRosterInfo<IAllUsersListItem>[] =
+              rostersInfoFromFirebase.map((rosterInfo) => {
+                return {
+                  ...rosterInfo,
+                  players: rosterInfo.players.reduce(
+                    (
+                      acc: (IAllUsersListItem | IUnregisteredUser | null)[],
+                      player
+                    ) => {
+                      if (typeof player === "string") {
+                        const userInfo = allUsers.find((u) => u.uid === player);
+                        if (userInfo) acc.push(userInfo);
+                      } else {
+                        acc.push(player);
+                      }
+                      return acc;
+                    },
+                    []
+                  ),
+                };
+              });
 
-          return {
-            id: tournament.id,
-            redactorUid: tournament.redactorUid,
-            title: tournament.title,
-            rankRange: tournament.rankRange,
-            description: tournament.description,
-            format: tournament.format,
-            teamSize: tournament.teamSize,
-            isDoubleElimination: tournament.isDoubleElimination,
-            forumPostLink: tournament.forumPostLink,
-            mainSheetLink: tournament.mainSheetLink,
-            challongeLink: tournament.challongeLink,
-            twitchFirstLink: tournament.twitchFirstLink,
-            twitchSecondLink: tournament.twitchSecondLink,
-            isArchived: tournament.isArchived,
-            rostersInfo,
-            datesInfo,
-          };
-        }
-      );
+            const datesInfo = {
+              startDate: tournament.datesInfo.startDate.toDate(),
+              endDate: tournament.datesInfo.endDate.toDate(),
+            } as ITournamentDatesInfo;
 
-      tournaments.splice(0, tournaments.length, ...allTournaments);
-      return allTournaments;
-    } catch (error) {
-      throw error;
-    }
+            return {
+              id: tournament.id,
+              redactorUid: tournament.redactorUid,
+              title: tournament.title,
+              rankRange: tournament.rankRange,
+              description: tournament.description,
+              format: tournament.format,
+              teamSize: tournament.teamSize,
+              isDoubleElimination: tournament.isDoubleElimination,
+              forumPostLink: tournament.forumPostLink,
+              mainSheetLink: tournament.mainSheetLink,
+              challongeLink: tournament.challongeLink,
+              twitchFirstLink: tournament.twitchFirstLink,
+              twitchSecondLink: tournament.twitchSecondLink,
+              isArchived: tournament.isArchived,
+              rostersInfo,
+              datesInfo,
+            };
+          }
+        );
+
+        tournaments.splice(0, tournaments.length, ...allTournaments);
+        return allTournaments;
+      } catch (error) {
+        throw error;
+      }
+    })();
+
+    const result = await loadPromise;
+    loadPromise = null;
+    isLoaded.value = true;
+    return result;
   };
 
   const uploadTournament = async (
@@ -197,6 +209,7 @@ export const useTournamentsStore = defineStore("tournaments", () => {
 
   return {
     tournaments,
+    isLoaded,
     getAllTournaments,
     loadAllTournaments,
     uploadTournament,

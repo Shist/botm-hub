@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { ref, reactive } from "vue";
 import { defineStore } from "pinia";
 import {
   loadAllTrainingsFromFirebase,
@@ -21,43 +21,55 @@ export const useTrainingsStore = defineStore("trainings", () => {
 
   const trainings = reactive<IAllTrainingsListItem[]>([]);
 
+  const isLoaded = ref(false);
+  let loadPromise: Promise<IAllTrainingsListItem[]> | null = null;
+
   const getAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
-    if (trainings.length) return trainings;
+    if (isLoaded.value) return trainings;
     return await loadAllTrainings();
   };
 
   const loadAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
-    try {
-      const allUsers = await usersStore.getAllUsersAndLoadClubs();
+    if (loadPromise) return loadPromise;
 
-      const allTrainings = (await loadAllTrainingsFromFirebase()).map(
-        (training) => {
-          const participantsUids = JSON.parse(
-            training.participantsUids
-          ) as string[];
+    loadPromise = (async () => {
+      try {
+        const allUsers = await usersStore.getAllUsersAndLoadClubs();
 
-          return {
-            id: training.id,
-            title: training.title,
-            trainerUid: training.trainerUid,
-            skillsets: JSON.parse(training.skillsets) as OsuMapCategory[],
-            dateTime: training.dateTime.toDate(),
-            durationMins: training.durationMins,
-            description: training.description,
-            participants: allUsers.filter((u) =>
-              participantsUids.includes(u.uid)
-            ),
-            mpLinkId: training.mpLinkId,
-            isArchived: training.isArchived,
-          };
-        }
-      );
+        const allTrainings = (await loadAllTrainingsFromFirebase()).map(
+          (training) => {
+            const participantsUids = JSON.parse(
+              training.participantsUids
+            ) as string[];
 
-      trainings.splice(0, trainings.length, ...allTrainings);
-      return allTrainings;
-    } catch (error) {
-      throw error;
-    }
+            return {
+              id: training.id,
+              title: training.title,
+              trainerUid: training.trainerUid,
+              skillsets: JSON.parse(training.skillsets) as OsuMapCategory[],
+              dateTime: training.dateTime.toDate(),
+              durationMins: training.durationMins,
+              description: training.description,
+              participants: allUsers.filter((u) =>
+                participantsUids.includes(u.uid)
+              ),
+              mpLinkId: training.mpLinkId,
+              isArchived: training.isArchived,
+            };
+          }
+        );
+
+        trainings.splice(0, trainings.length, ...allTrainings);
+        return allTrainings;
+      } catch (error) {
+        throw error;
+      }
+    })();
+
+    const result = await loadPromise;
+    loadPromise = null;
+    isLoaded.value = true;
+    return result;
   };
 
   const uploadTraining = async (
@@ -126,6 +138,7 @@ export const useTrainingsStore = defineStore("trainings", () => {
 
   return {
     trainings,
+    isLoaded,
     getAllTrainings,
     loadAllTrainings,
     uploadTraining,

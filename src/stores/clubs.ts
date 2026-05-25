@@ -46,36 +46,44 @@ export const useClubsStore = defineStore("clubs", () => {
       members: {},
     },
   });
+
   const isLoaded = ref(false);
+  let loadPromise: Promise<void> | null = null;
 
   const loadAllClubs = async () => {
     if (isLoaded.value) return;
+    if (loadPromise) return loadPromise;
 
-    const data = await loadAllClubsFromFirebase();
-    if (data) {
-      const parsed: Record<string, IClub> = {};
-      for (const [id, clubData] of Object.entries(data)) {
-        const membersMap: Record<string, IClubMember> = {};
+    loadPromise = (async () => {
+      const data = await loadAllClubsFromFirebase();
+      if (data) {
+        const parsed: Record<string, IClub> = {};
+        for (const [id, clubData] of Object.entries(data)) {
+          const membersMap: Record<string, IClubMember> = {};
 
-        if (clubData.members) {
-          for (const [uid, memberData] of Object.entries(clubData.members)) {
-            membersMap[uid] = {
-              uid,
-              joinedAt: memberData.joinedAt?.toDate() ?? new Date(),
-            };
+          if (clubData.members) {
+            for (const [uid, memberData] of Object.entries(clubData.members)) {
+              membersMap[uid] = {
+                uid,
+                joinedAt: memberData.joinedAt?.toDate() ?? new Date(),
+              };
+            }
           }
-        }
 
-        parsed[id] = {
-          id: id as BotmClub,
-          leaderUid: clubData.leaderUid ?? null,
-          leaderMessage: clubData.leaderMessage ?? "",
-          members: membersMap,
-        };
+          parsed[id] = {
+            id: id as BotmClub,
+            leaderUid: clubData.leaderUid ?? null,
+            leaderMessage: clubData.leaderMessage ?? "",
+            members: membersMap,
+          };
+        }
+        clubs.value = parsed;
+        isLoaded.value = true;
       }
-      clubs.value = parsed;
-      isLoaded.value = true;
-    }
+    })();
+
+    await loadPromise;
+    loadPromise = null;
   };
 
   const updateLeaderMessage = async (clubId: BotmClub, message: string) => {
