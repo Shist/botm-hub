@@ -384,17 +384,10 @@ onMounted(async () => {
     isLoading.value = true;
     isMapsLoading.value = true;
 
-    const clubCategories = CLUB_SETTINGS[normalizedClubId.value].skillsets.map(
-      (s) => s.category
-    );
-    const mapLoadingPromises = clubCategories.map((category) =>
-      osumapsStore.loadMapsByCategory(category)
-    );
-
     await Promise.all([
       usersStore.getAllUsers(),
       clubsStore.loadAllClubs(),
-      ...mapLoadingPromises,
+      osumapsStore.loadAllMaps(),
     ]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;

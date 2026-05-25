@@ -39,6 +39,7 @@
 import { ref, computed, onMounted, nextTick } from "vue";
 import { useThemeStore } from "@/stores/theme";
 import { useMetaStore } from "@/stores/meta";
+import { useOsumapsStore } from "@/stores/osumaps";
 import { useScrollbarPaddingStore } from "@/stores/scrollbar-padding";
 import TheHeader from "@/components/layout/TheHeader.vue";
 import TheFooter from "@/components/layout/TheFooter.vue";
@@ -46,6 +47,7 @@ import TheBreadcrumbs from "@/components/layout/TheBreadcrumbs.vue";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
 const metaStore = useMetaStore();
+const mapsStore = useOsumapsStore();
 const scrollbarPaddingStore = useScrollbarPaddingStore();
 
 const scrollbarWidth = computed(() =>
@@ -71,6 +73,8 @@ const closeNewPatchModal = () => {
 
 onMounted(async () => {
   await metaStore.loadMeta();
+
+  mapsStore.loadAllMaps();
 
   const currentVersion = metaStore.metaConfig?.appVersion;
   if (!currentVersion) return;

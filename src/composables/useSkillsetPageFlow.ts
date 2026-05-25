@@ -1,7 +1,6 @@
 import { computed, onMounted } from "vue";
 import { useOsumapsStore } from "@/stores/osumaps";
 import useToast from "@/composables/useToast";
-import { LoadingState } from "@/types/global";
 import { OsuMapCategory } from "@/types/osumaps";
 
 export default function useSkillsetPageFlow(category: OsuMapCategory) {
@@ -10,19 +9,16 @@ export default function useSkillsetPageFlow(category: OsuMapCategory) {
 
   onMounted(async () => {
     try {
-      await mapsStore.loadMapsByCategory(category);
+      await mapsStore.loadAllMaps();
     } catch (error) {
       const msg = error instanceof Error ? error?.message : error;
-      setErrorToast(
-        `Не удалось загрузить карты для категории "${category.toUpperCase()}": ${msg}`
-      );
+      setErrorToast(`Не удалось загрузить карты для пула: ${msg}`);
     }
   });
 
-  const categoryMapsList = computed(() => mapsStore.osumaps[category].mapsList);
-  const isLoading = computed(
-    () => mapsStore.osumaps[category].loadingState === LoadingState.LOADING
-  );
+  const categoryMapsList = computed(() => mapsStore.osumaps[category]);
+
+  const isLoading = computed(() => mapsStore.isLoading);
 
   return { categoryMapsList, isLoading };
 }

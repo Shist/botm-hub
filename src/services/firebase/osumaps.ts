@@ -1,5 +1,7 @@
 import {
   getFirestore,
+  collection,
+  getDocs,
   doc,
   getDoc,
   updateDoc,
@@ -7,28 +9,31 @@ import {
 } from "firebase/firestore/lite";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 
-async function loadMapsByCategoryFromFirebase(
-  category: OsuMapCategory
-): Promise<IOsuMap[]> {
+async function loadAllMapsFromFirebase(): Promise<IOsuMap[]> {
   const db = getFirestore();
-  const mapsCategoryRef = doc(db, "maps", category);
+  const mapsColRef = collection(db, "maps");
+  const allMaps: IOsuMap[] = [];
 
   try {
-    const categoryDocSnapshot = await getDoc(mapsCategoryRef);
-    const mapsArr: Omit<IOsuMap, "link" | "category">[] =
-      categoryDocSnapshot.data()?.maps ?? [];
+    const snapshot = await getDocs(mapsColRef);
 
-    const formattedMapsArr: IOsuMap[] = mapsArr.map((map) => {
-      return {
-        link: `https://osu.ppy.sh/b/${map.id}`,
-        category,
-        ...map,
-      };
+    snapshot.docs.forEach((docSnap) => {
+      const category = docSnap.id as OsuMapCategory;
+      const mapsArr: Omit<IOsuMap, "link" | "category">[] =
+        docSnap.data().maps ?? [];
+
+      mapsArr.forEach((map) => {
+        allMaps.push({
+          link: `https://osu.ppy.sh/b/${map.id}`,
+          category,
+          ...map,
+        });
+      });
     });
 
-    return formattedMapsArr;
+    return allMaps;
   } catch (error) {
-    console.error(`Ошибка при загрузке карт для категории ${category}:`, error);
+    console.error("Ошибка при загрузке всех карт:", error);
     return [];
   }
 }
@@ -79,4 +84,4 @@ async function uploadMapsToFirebase(maps: Omit<IOsuMap, "link">[]) {
   }
 }
 
-export { loadMapsByCategoryFromFirebase, uploadMapsToFirebase };
+export { loadAllMapsFromFirebase, uploadMapsToFirebase };

@@ -100,7 +100,6 @@ import { useAuthStore } from "@/stores/auth";
 import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
 import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
-import { LoadingState } from "@/types/global";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import { fromDurationToSeconds, fromTotalSecondsToLabel } from "@/utils";
 
@@ -155,26 +154,24 @@ watch(
 const onConfirm = async () => {
   isPreparingMaps.value = true;
   suggestedMapsList.splice(0, suggestedMapsList.length);
-  const neededRequests: (() => Promise<IOsuMap[]>)[] = [];
 
-  chosenCategories.value.forEach((category) => {
-    if (mapsStore.osumaps[category].loadingState !== LoadingState.LOADED) {
-      neededRequests.push(() => mapsStore.loadMapsByCategory(category));
-    }
-  });
-
-  if (neededRequests.length) {
-    try {
-      await Promise.all(neededRequests.map((request) => request()));
-    } catch (error) {
-      const msg = error instanceof Error ? error?.message : error;
-      setErrorToast(`Не удалось загрузить карты для тренировки: ${msg}`);
-      isPreparingMaps.value = false;
-      return;
-    }
+  try {
+    await mapsStore.loadAllMaps();
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось загрузить карты для тренировки: ${msg}`);
+    isPreparingMaps.value = false;
+    return;
   }
 
   const allMaps = mapsStore.getMapsOfGivenCategories(chosenCategories.value);
+
+  if (!allMaps.length) {
+    setErrorToast("В выбранных категориях пока нет карт.");
+    isPreparingMaps.value = false;
+    return;
+  }
+
   let bestMapForStarRateIndex = allMaps.length - 1;
   let lastMap: IOsuMap | null = null;
 

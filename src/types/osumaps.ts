@@ -1,5 +1,3 @@
-import type { LoadingState } from "@/types/global";
-
 export enum OsuMapCategory {
   NM1 = "nm1",
   NM2 = "nm2",
@@ -39,11 +37,6 @@ export interface IOsuMap {
   od: number;
   hp: number;
   comment: string;
-}
-
-export interface IOsuMapsCategoryState {
-  mapsList: IOsuMap[];
-  loadingState: LoadingState;
 }
 
 export function isOsuMapCategory(value: string): value is OsuMapCategory {

@@ -1,126 +1,85 @@
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { defineStore } from "pinia";
-import { loadMapsByCategoryFromFirebase } from "@/services/firebase/osumaps";
-import { LoadingState } from "@/types/global";
-import {
-  OsuMapCategory,
-  type IOsuMap,
-  type IOsuMapsCategoryState,
-} from "@/types/osumaps";
+import { loadAllMapsFromFirebase } from "@/services/firebase/osumaps";
+import { useMetaStore } from "@/stores/meta";
+import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 
 export const useOsumapsStore = defineStore("osumaps", () => {
-  const osumaps = reactive<Record<OsuMapCategory, IOsuMapsCategoryState>>({
-    [OsuMapCategory.NM1]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.NM2]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.NM3]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.NM4]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.NM5]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.NM6]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.NM7]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.HD1]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.HD2]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.HD3]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.HR1]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.HR2]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.HR3]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.DT1]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.DT2]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.DT3]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.DT4]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.FM1]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.FM2]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.FM3]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-    [OsuMapCategory.TB]: {
-      mapsList: [],
-      loadingState: LoadingState.NOT_LOADED,
-    },
-  });
+  const metaStore = useMetaStore();
 
-  const loadMapsByCategory = async (
-    category: OsuMapCategory
-  ): Promise<IOsuMap[]> => {
-    if (osumaps[category].loadingState === LoadingState.LOADED)
-      return osumaps[category].mapsList;
+  const isLoading = ref(false);
+  const isLoaded = ref(false);
+  let loadPromise: Promise<void> | null = null;
 
-    try {
-      osumaps[category].loadingState = LoadingState.LOADING;
-      const mapsList = await loadMapsByCategoryFromFirebase(category);
-      osumaps[category].mapsList = mapsList;
-      osumaps[category].loadingState = LoadingState.LOADED;
-      return mapsList;
-    } catch (error) {
-      osumaps[category].loadingState = LoadingState.ERROR;
-      throw error;
+  const osumaps = reactive<Record<OsuMapCategory, IOsuMap[]>>(
+    Object.values(OsuMapCategory).reduce(
+      (acc, category) => {
+        acc[category] = [];
+        return acc;
+      },
+      {} as Record<OsuMapCategory, IOsuMap[]>
+    )
+  );
+
+  const populateStore = (maps: IOsuMap[]) => {
+    for (const key in osumaps) {
+      osumaps[key as OsuMapCategory] = [];
     }
+    maps.forEach((map) => {
+      osumaps[map.category].push(map);
+    });
+  };
+
+  const loadAllMaps = async () => {
+    if (isLoaded.value) return;
+    if (loadPromise) return loadPromise;
+
+    isLoading.value = true;
+
+    loadPromise = (async () => {
+      if (!metaStore.isLoaded) await metaStore.loadMeta();
+
+      const serverTimestamp = metaStore.metaConfig?.mapsUpdatedAt?.toString();
+      const localTimestamp = localStorage.getItem("mapsUpdatedAt");
+      const localMaps = localStorage.getItem("botmMaps");
+
+      if (serverTimestamp && localTimestamp === serverTimestamp && localMaps) {
+        try {
+          const parsedMaps: IOsuMap[] = JSON.parse(localMaps);
+          populateStore(parsedMaps);
+          isLoading.value = false;
+          isLoaded.value = true;
+          return;
+        } catch (e) {
+          console.error("Ошибка парсинга карт из localStorage:", e);
+        }
+      }
+
+      try {
+        const fetchedMaps = await loadAllMapsFromFirebase();
+        populateStore(fetchedMaps);
+
+        localStorage.setItem("botmMaps", JSON.stringify(fetchedMaps));
+        if (serverTimestamp) {
+          localStorage.setItem("mapsUpdatedAt", serverTimestamp);
+        }
+        isLoaded.value = true;
+      } catch (error) {
+        throw error;
+      } finally {
+        isLoading.value = false;
+      }
+    })();
+
+    await loadPromise;
+    loadPromise = null;
   };
 
   const getMapsOfGivenCategories = (
     categories: OsuMapCategory[],
     sortBy: keyof IOsuMap = "starRate"
   ): IOsuMap[] => {
-    const mapsList = categories.flatMap(
-      (category) => osumaps[category].mapsList
-    );
+    const mapsList = categories.flatMap((category) => osumaps[category]);
 
     if (["id", "starRate", "bpm", "cs", "ar", "od", "hp"].includes(sortBy)) {
       mapsList.sort((a, b) => (a[sortBy] as number) - (b[sortBy] as number));
@@ -145,7 +104,9 @@ export const useOsumapsStore = defineStore("osumaps", () => {
 
   return {
     osumaps,
-    loadMapsByCategory,
+    isLoading,
+    isLoaded,
+    loadAllMaps,
     getMapsOfGivenCategories,
   };
 });

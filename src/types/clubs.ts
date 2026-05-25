@@ -1,5 +1,4 @@
 import { Timestamp } from "firebase/firestore/lite";
-import { LoadingState } from "@/types/global";
 import { OsuMapCategory } from "@/types/osumaps";
 
 export enum BotmClub {
@@ -21,11 +20,6 @@ export interface IClub {
   leaderUid: string | null;
   leaderMessage: string;
   members: Record<string, IClubMember>;
-}
-
-export interface IClubState {
-  data: IClub | null;
-  loadingState: LoadingState;
 }
 
 export function isBotmClub(value: string): value is BotmClub {

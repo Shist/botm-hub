@@ -1,9 +1,22 @@
 <template>
   <footer class="app-footer" ref="footerRef">
     <div class="app-footer__container">
-      <span class="app-footer__version">
-        Версия {{ metaStore.metaConfig?.appVersion ?? "..." }}
-      </span>
+      <div class="app-footer__version">
+        <span>Версия </span>
+        <span
+          v-if="metaStore.metaConfig?.appVersion"
+          class="app-footer__version-text"
+        >
+          {{ metaStore.metaConfig.appVersion }}
+        </span>
+        <v-progress-circular
+          v-else
+          indeterminate
+          size="14"
+          width="2"
+          color="currentColor"
+        />
+      </div>
       <div class="app-footer__git-link-wrapper">
         <a
           href="https://github.com/Shist/botm-hub"
@@ -41,6 +54,9 @@ const metaStore = useMetaStore();
     }
     .app-footer__version {
       @include default-text(16px, 16px, var(--color-text));
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .app-footer__git-link-wrapper {
       max-width: 280px;

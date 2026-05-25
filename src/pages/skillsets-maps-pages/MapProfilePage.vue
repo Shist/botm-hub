@@ -139,7 +139,7 @@ onMounted(async () => {
 
   try {
     isLoading.value = true;
-    await mapsStore.loadMapsByCategory(routeCategory.value);
+    await mapsStore.loadAllMaps();
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось загрузить данные карты: ${msg}`);
