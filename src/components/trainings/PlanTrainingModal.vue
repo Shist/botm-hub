@@ -418,7 +418,7 @@ const uploadTraining = async () => {
   try {
     isLoading.value = true;
 
-    const users = await usersStore.getAllUsers();
+    const users = await usersStore.getAllUsersAndLoadClubs();
     const trainer = users.find((user) => user.uid === authStore.user?.uid);
 
     const training: IAllTrainingsFirebaseOutgoingItem = {

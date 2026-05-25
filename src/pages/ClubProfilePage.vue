@@ -385,8 +385,7 @@ onMounted(async () => {
     isMapsLoading.value = true;
 
     await Promise.all([
-      usersStore.getAllUsers(),
-      clubsStore.loadAllClubs(),
+      usersStore.getAllUsersAndLoadClubs(),
       osumapsStore.loadAllMaps(),
     ]);
   } catch (error) {

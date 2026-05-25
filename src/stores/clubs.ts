@@ -103,6 +103,7 @@ export const useClubsStore = defineStore("clubs", () => {
 
   return {
     clubs,
+    isLoaded,
     loadAllClubs,
     updateLeaderMessage,
     joinClub,

@@ -85,7 +85,7 @@ const clubsData = computed(() => {
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await Promise.all([usersStore.getAllUsers(), clubsStore.loadAllClubs()]);
+    await usersStore.getAllUsersAndLoadClubs();
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
     setErrorToast(`Не удалось загрузить клубы: ${msg}`);

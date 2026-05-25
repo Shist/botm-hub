@@ -15,11 +15,9 @@ import {
   type IAllTrainingsFirebaseOutgoingItem,
 } from "@/types/trainings";
 import { useUsersStore } from "@/stores/users";
-import { useClubsStore } from "@/stores/clubs";
 
 export const useTrainingsStore = defineStore("trainings", () => {
   const usersStore = useUsersStore();
-  const clubsStore = useClubsStore();
 
   const trainings = reactive<IAllTrainingsListItem[]>([]);
 
@@ -30,10 +28,7 @@ export const useTrainingsStore = defineStore("trainings", () => {
 
   const loadAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
     try {
-      const [allUsers] = await Promise.all([
-        usersStore.getAllUsers(),
-        clubsStore.loadAllClubs(),
-      ]);
+      const allUsers = await usersStore.getAllUsersAndLoadClubs();
 
       const allTrainings = (await loadAllTrainingsFromFirebase()).map(
         (training) => {
