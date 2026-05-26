@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase/firestore/lite";
 import { OsuMapCategory } from "@/types/osumaps";
+import { type OsuScoreMod } from "@/types/scores";
 
 export enum BotmClub {
   AIM = "aim",
@@ -32,24 +33,9 @@ export interface IClubFirebase {
   members: Record<string, { joinedAt: Timestamp }>;
 }
 
-export type AllowedModType =
-  | ""
-  | "hd"
-  | "hr"
-  | "dt"
-  | "ez"
-  | "fl"
-  | "hdhr"
-  | "flhd"
-  | "flhr"
-  | "flhdhr"
-  | "ezhd"
-  | "ezfl"
-  | "ezflhd";
-
 export interface IClubSkillsetRule {
   category: OsuMapCategory;
-  allowedMods: AllowedModType[];
+  allowedMods: OsuScoreMod[];
 }
 
 export interface IClubConfig {

@@ -184,7 +184,5 @@ export function getMembershipDurationLabel(startDate: Date | null): string {
 }
 
 export function formatModsList(mods: string[]): string {
-  return mods
-    .map((modStr) => (modStr === "" ? "NM" : modStr.toUpperCase()))
-    .join(", ");
+  return mods.map((modStr) => modStr.toUpperCase()).join(", ");
 }

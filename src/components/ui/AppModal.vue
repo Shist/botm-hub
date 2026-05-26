@@ -2,7 +2,11 @@
   <Teleport defer to=".global-container">
     <Transition name="fade-fall">
       <div v-if="isOpened" class="modal" @click="close(false)">
-        <dialog class="modal__window-wrapper" @click.stop>
+        <dialog
+          class="modal__window-wrapper"
+          :style="{ maxWidth: modalMaxWidth }"
+          @click.stop
+        >
           <header>
             <h2 class="modal__title">{{ title }}</h2>
           </header>
@@ -19,12 +23,13 @@
 </template>
 
 <script setup lang="ts">
-import { watch } from "vue";
+import { computed, watch } from "vue";
 import { useScrollbarPaddingStore } from "@/stores/scrollbar-padding";
 
 const props = defineProps<{
   isOpened: boolean;
   title: string;
+  maxWidth?: string;
   closeBtnText?: string;
   isClosableByClickOutside: boolean;
 }>();
@@ -34,6 +39,8 @@ const emit = defineEmits<{
 }>();
 
 const scrollbarPaddingStore = useScrollbarPaddingStore();
+
+const modalMaxWidth = computed(() => props.maxWidth ?? "650px");
 
 const close = (isClosedByBtn: boolean) => {
   if (isClosedByBtn || props.isClosableByClickOutside) {
@@ -120,7 +127,7 @@ watch(
     display: flex;
     flex-direction: column;
     row-gap: 15px;
-    max-width: 650px;
+    width: calc(100% - 20px);
     max-height: 90dvh;
     overflow-y: auto;
     overflow-x: hidden;

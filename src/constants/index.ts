@@ -1,5 +1,6 @@
 import { OsuMapCategory } from "@/types/osumaps";
-import { BotmClub, type IClubConfig, type AllowedModType } from "@/types/clubs";
+import { BotmClub, type IClubConfig } from "@/types/clubs";
+import { type OsuScoreMod } from "@/types/scores";
 
 export const SHIST_UID = "mjFMxVxnVrdAuYf0wYHY7Zb3KRl2";
 
@@ -75,12 +76,12 @@ export const CATEGORIES_COLORS = {
   [OsuMapCategory.TB]: "#d4ac7c",
 };
 
-const MODS_ONLY_NM: AllowedModType[] = [""];
-const MODS_ONLY_HD: AllowedModType[] = ["hd"];
-const MODS_ONLY_HR: AllowedModType[] = ["hr"];
-const MODS_ONLY_DT: AllowedModType[] = ["dt"];
-const MODS_WITHOUT_EZ: AllowedModType[] = [
-  "",
+const MODS_ONLY_NM: OsuScoreMod[] = ["nm"];
+const MODS_ONLY_HD: OsuScoreMod[] = ["hd"];
+const MODS_ONLY_HR: OsuScoreMod[] = ["hr"];
+const MODS_ONLY_DT: OsuScoreMod[] = ["dt"];
+const MODS_WITHOUT_EZ: OsuScoreMod[] = [
+  "nm",
   "hd",
   "hr",
   "fl",
@@ -89,7 +90,7 @@ const MODS_WITHOUT_EZ: AllowedModType[] = [
   "flhr",
   "flhdhr",
 ];
-const MODS_WITH_EZ_OR_FL: AllowedModType[] = [
+const MODS_WITH_EZ_OR_FL: OsuScoreMod[] = [
   "ez",
   "fl",
   "flhd",
@@ -99,8 +100,8 @@ const MODS_WITH_EZ_OR_FL: AllowedModType[] = [
   "ezfl",
   "ezflhd",
 ];
-const MODS_WITH_HD: AllowedModType[] = ["hd", "ezhd", "flhd", "ezflhd"];
-const MODS_WITH_HR: AllowedModType[] = ["hr", "hdhr", "flhr", "flhdhr"];
+const MODS_WITH_HD: OsuScoreMod[] = ["hd", "ezhd", "flhd", "ezflhd"];
+const MODS_WITH_HR: OsuScoreMod[] = ["hr", "hdhr", "flhr", "flhdhr"];
 
 export const CLUB_SETTINGS: Record<BotmClub, IClubConfig> = {
   [BotmClub.AIM]: {
@@ -153,7 +154,7 @@ export const CLUB_SETTINGS: Record<BotmClub, IClubConfig> = {
       {
         category: OsuMapCategory.FM2,
         allowedMods: [
-          "",
+          "nm",
           "hd",
           "ez",
           "fl",

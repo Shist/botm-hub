@@ -1,75 +1,116 @@
 <template>
   <div class="personal-account-page">
-    <h2 class="personal-account-page__headline">Личный Кабинет</h2>
-    <div class="personal-account-page__avatar-inputs-wrapper">
-      <v-tooltip
-        :disabled="currentOsuId !== null"
-        text="Для подгрузки аватара требуется osu! ID"
-        location="top"
-      >
-        <template #activator="{ props }">
-          <AppImage
-            v-bind="props"
-            :imgPath="avatarSrc"
-            imgAlt="Аватар"
-            class="personal-account-page__avatar"
+    <v-skeleton-loader type="image, article" :loading="isPageLoading">
+      <h2 class="personal-account-page__headline">Личный Кабинет</h2>
+      <div class="personal-account-page__avatar-inputs-wrapper">
+        <v-tooltip
+          :disabled="currentOsuId !== null"
+          text="Для подгрузки аватара требуется osu! ID"
+          location="top"
+        >
+          <template #activator="{ props }">
+            <AppImage
+              v-bind="props"
+              :imgPath="avatarSrc"
+              imgAlt="Аватар"
+              class="personal-account-page__avatar"
+            />
+          </template>
+        </v-tooltip>
+        <v-form
+          v-model="isFormValid"
+          class="personal-account-page__inputs-wrapper"
+        >
+          <v-number-input
+            v-model="chosenOsuId"
+            :min="1"
+            :max="1000000000"
+            variant="solo"
+            control-variant="hidden"
+            prepend-inner-icon="mdi-identifier"
+            label="osu! ID"
+            placeholder="Введи свой osu! ID ('https://osu.ppy.sh/users/<ID>')"
+            clearable
+            hide-details
           />
-        </template>
-      </v-tooltip>
-      <v-form
-        v-model="isFormValid"
-        class="personal-account-page__inputs-wrapper"
+          <v-text-field
+            v-model="chosenNick"
+            :counter="15"
+            :rules="[rules.min(3), rules.max(15)]"
+            autocomplete="username"
+            variant="solo"
+            prepend-inner-icon="mdi-account"
+            label="osu! Ник"
+            placeholder="Введи свой osu! ник"
+            persistent-counter
+            clearable
+          />
+          <v-select
+            v-model="chosenDigit"
+            :items="digitOptions"
+            variant="solo"
+            prepend-inner-icon="mdi-star-half-full"
+            label="Digit-категория"
+            placeholder="Выбери Digit-категорию"
+            clearable
+            hide-details
+          />
+          <SkillsetsSelect v-model="chosenCategories" />
+        </v-form>
+      </div>
+      <v-btn
+        :disabled="!isFormValid || !isSomeInfoChanged"
+        :loading="isUpdating"
+        height="50"
+        class="personal-account-page__confirm-btn"
+        @click="onUpdate"
       >
-        <v-number-input
-          v-model="chosenOsuId"
-          :min="1"
-          :max="1000000000"
-          variant="solo"
-          control-variant="hidden"
-          prepend-inner-icon="mdi-identifier"
-          label="osu! ID"
-          placeholder="Введи свой osu! ID ('https://osu.ppy.sh/users/<ID>')"
-          clearable
-          hide-details
-        />
-        <v-text-field
-          v-model="chosenNick"
-          :counter="15"
-          :rules="[rules.min(3), rules.max(15)]"
-          autocomplete="username"
-          variant="solo"
-          prepend-inner-icon="mdi-account"
-          label="osu! Ник"
-          placeholder="Введи свой osu! ник"
-          persistent-counter
-          clearable
-        />
-        <v-select
-          v-model="chosenDigit"
-          :items="digitOptions"
-          variant="solo"
-          prepend-inner-icon="mdi-star-half-full"
-          label="Digit-категория"
-          placeholder="Выбери Digit-категорию"
-          clearable
-          hide-details
-        />
-        <SkillsetsSelect v-model="chosenCategories" />
-      </v-form>
-    </div>
-    <v-btn
-      :disabled="!isFormValid || !isSomeInfoChanged"
-      :loading="isUpdating"
-      height="50"
-      class="personal-account-page__confirm-btn"
-      @click="onUpdate"
-    >
-      Обновить информацию
-    </v-btn>
-    <h3 class="personal-account-page__small-headline">
-      Здесь пока мало что есть, поэтому я разместил здесь коллаб с eh-ами
-    </h3>
-    <AppImage :imgPath="ehCollabImagePath" imgAlt="Коллаб белых котов eh-ов" />
+        Обновить информацию
+      </v-btn>
+      <v-divider class="border-opacity-100" />
+      <h2 class="personal-account-page__headline">Мои Скоры</h2>
+      <div class="personal-account-page__scores-actions">
+        <v-tooltip
+          :disabled="currentOsuId !== null"
+          text="Для загрузки скоров через MP линк сперва необходимо указать osu! ID"
+          location="top"
+        >
+          <template #activator="{ props }">
+            <div v-bind="props" class="personal-account-page__tooltip-wrapper">
+              <v-btn
+                :disabled="currentOsuId === null"
+                height="50"
+                prepend-icon="mdi-link-variant"
+                class="personal-account-page__action-btn personal-account-page__action-btn_mp"
+                @click="isMpModalOpened = true"
+              >
+                Загрузить по MP линку
+              </v-btn>
+            </div>
+          </template>
+        </v-tooltip>
+        <v-btn
+          height="50"
+          prepend-icon="mdi-file-document"
+          class="personal-account-page__action-btn personal-account-page__action-btn_osr"
+          disabled
+        >
+          Загрузить .osr файл(ы)
+        </v-btn>
+      </div>
+      <v-divider class="border-opacity-100" />
+      <h3 class="personal-account-page__small-headline">
+        Здесь уже много, что есть, но я всё равно оставил здесь коллаб с eh-ами
+      </h3>
+      <AppImage
+        :imgPath="ehCollabImagePath"
+        imgAlt="Коллаб белых котов eh-ов"
+      />
+    </v-skeleton-loader>
+    <MpLinkModal
+      :isOpened="isMpModalOpened"
+      @closeModal="isMpModalOpened = false"
+    />
   </div>
 </template>
 
@@ -77,7 +118,9 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
+import { useScoresStore } from "@/stores/scores";
 import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
+import MpLinkModal from "@/components/scores/MpLinkModal.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
 import ehCollabImage from "@/assets/images/eh-collab.png";
@@ -86,6 +129,7 @@ import { OsuMapCategory } from "@/types/osumaps";
 
 const authStore = useAuthStore();
 const usersStore = useUsersStore();
+const scoresStore = useScoresStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
 const { isFormValid, rules } = useFormValidation();
@@ -96,6 +140,12 @@ const chosenDigit = ref<DigitCategory | null>(null);
 const chosenCategories = ref<OsuMapCategory[]>([]);
 const isUpdating = ref(false);
 const ehCollabImagePath = ref(ehCollabImage);
+
+const isMpModalOpened = ref(false);
+
+const isPageLoading = computed(
+  () => authStore.user?.additionalInfo === "loading"
+);
 
 const digitOptions = computed(() =>
   Object.values(DigitCategory).map((digitValue) => ({
@@ -141,11 +191,17 @@ watch(currentSkillsets, (valueFromStore) => {
   chosenCategories.value = valueFromStore;
 });
 
-onMounted(() => {
+onMounted(async () => {
   chosenOsuId.value = currentOsuId.value === null ? null : +currentOsuId.value;
   chosenNick.value = currentNick.value;
   chosenDigit.value = currentDigit.value;
   chosenCategories.value = currentSkillsets.value;
+
+  try {
+    await scoresStore.loadAllScores();
+  } catch (error) {
+    console.error("Не удалось подгрузить скоры:", error);
+  }
 });
 
 const onUpdate = async () => {
@@ -209,6 +265,7 @@ const onUpdate = async () => {
   }
   &__small-headline {
     @include default-headline(28px, 28px, var(--color-text));
+    text-align: center;
     @media (max-width: $tablet-l) {
       font-size: 22px;
       line-height: 22px;
@@ -216,6 +273,44 @@ const onUpdate = async () => {
     @media (max-width: $phone-l) {
       font-size: 16px;
       line-height: 16px;
+    }
+  }
+  &__scores-actions {
+    display: flex;
+    row-gap: 15px;
+    column-gap: 20px;
+    @media (max-width: $tablet-l) {
+      flex-direction: column;
+    }
+  }
+  &__tooltip-wrapper {
+    display: flex;
+    flex: 1;
+    @media (max-width: $tablet-l) {
+      flex: auto;
+    }
+  }
+  &__action-btn {
+    flex: 1;
+    width: 100%;
+    &_mp {
+      @include default-btn(
+        auto,
+        var(--color-text-white),
+        var(--color-btn-mp),
+        0
+      );
+    }
+    &_osr {
+      @include default-btn(
+        auto,
+        var(--color-text-white),
+        var(--color-btn-osr),
+        0
+      );
+    }
+    @media (max-width: $tablet-l) {
+      flex: auto;
     }
   }
 }
