@@ -14,6 +14,7 @@
         :headers="headers"
         :items="itemsForTable"
         :item-value="'idWithCategory'"
+        :sort-by="defaultSortBy"
         :search="searchQuery"
         :mobile-breakpoint="769"
         :fixed-header="true"
@@ -105,7 +106,16 @@ type DataTableHeader = {
 
 const router = useRouter();
 
-const props = defineProps<{ mapsList: IOsuMap[]; isLoading: boolean }>();
+const props = withDefaults(
+  defineProps<{
+    mapsList: IOsuMap[];
+    isLoading: boolean;
+    defaultSort?: { key: string; order?: "asc" | "desc" }[];
+  }>(),
+  {
+    defaultSort: () => [{ key: "starRate", order: "asc" }],
+  }
+);
 
 const { setSuccessToast, setErrorToast } = useToast();
 
@@ -200,6 +210,8 @@ const headers = reactive<DataTableHeader[]>([
     minWidth: "190px",
   },
 ]);
+
+const defaultSortBy = computed(() => props.defaultSort);
 
 const itemsForTable = computed(() =>
   props.mapsList.map((item) => ({

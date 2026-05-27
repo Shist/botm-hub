@@ -217,8 +217,6 @@ const onConfirm = async () => {
     leftSeconds -= breakSeconds + fromDurationToSeconds(currMap.duration);
   }
 
-  suggestedMapsList.sort((a, b) => a.starRate - b.starRate);
-
   isPreparingMaps.value = false;
 
   setSuccessToast("Карты для тренировки успешно подготовлены!");
