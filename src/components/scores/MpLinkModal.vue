@@ -769,7 +769,7 @@ const confirmAndUpload = async () => {
   }
   &__score-rank {
     @include default-text(18px, 18px, var(--color-text-white));
-    font-weight: 900;
+    font-weight: bold;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     &.rank-X,
     &.rank-SS,
