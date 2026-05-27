@@ -1,7 +1,7 @@
 <template>
   <div class="clubs-page">
     <h2 class="clubs-page__headline">Клубы и Лидерборды</h2>
-    <v-skeleton-loader type="table" :loading="isLoading">
+    <v-skeleton-loader type="image, article" :loading="isLoading">
       <div class="clubs-flasks">
         <div
           v-for="club in clubsData"

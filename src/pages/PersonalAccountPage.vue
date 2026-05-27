@@ -218,12 +218,15 @@ onMounted(async () => {
   try {
     isDependenciesLoading.value = true;
     await Promise.all([
+      usersStore.getAllUsersAndLoadClubs(),
       osumapsStore.loadAllMaps(),
       scoresStore.loadAllScores(),
     ]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить данные карт и скоров: ${msg}`);
+    setErrorToast(
+      `Не удалось загрузить данные юзеров, клубов, карт и скоров: ${msg}`
+    );
   } finally {
     isDependenciesLoading.value = false;
   }
