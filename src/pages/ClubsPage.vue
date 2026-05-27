@@ -44,14 +44,18 @@
         </div>
       </div>
       <v-divider class="border-opacity-100" />
-      <h2 class="clubs-page__headline">Все BOTM Скоры</h2>
+      <h2 class="clubs-page__headline">
+        Все BOTM Скоры ({{ allScoresList.length }})
+      </h2>
       <ScoresTable
         :scoresList="allScoresList"
         :isLoading="isLoading"
         :defaultSort="[{ key: 'date', order: 'asc' }]"
       />
       <v-divider class="border-opacity-100" />
-      <h2 class="clubs-page__headline">Все BOTM Мапы</h2>
+      <h2 class="clubs-page__headline">
+        Все BOTM Мапы ({{ allMapsList.length }})
+      </h2>
       <SkillsetMapsTable :mapsList="allMapsList" :isLoading="isLoading" />
     </v-skeleton-loader>
   </div>

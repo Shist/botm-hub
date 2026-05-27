@@ -193,7 +193,7 @@
         <v-divider class="club-profile-page__divider border-opacity-100" />
         <div class="club-profile-page__scores-section">
           <h3 class="club-profile-page__sub-headline">
-            Профильные Скоры Участников Клуба
+            Профильные Скоры Участников Клуба ({{ clubScoresList.length }})
           </h3>
           <ScoresTable
             :scoresList="clubScoresList"
@@ -202,7 +202,9 @@
         </div>
         <v-divider class="club-profile-page__divider border-opacity-100" />
         <div class="club-profile-page__maps-section">
-          <h3 class="club-profile-page__sub-headline">Профильные Мапы Клуба</h3>
+          <h3 class="club-profile-page__sub-headline">
+            Профильные Мапы Клуба ({{ clubMaps.length }})
+          </h3>
           <SkillsetMapsTable :mapsList="clubMaps" :isLoading="isMapsLoading" />
         </div>
       </div>

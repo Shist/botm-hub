@@ -62,7 +62,9 @@
           </div>
         </div>
         <v-divider class="player-profile-page__divider border-opacity-100" />
-        <h2 class="player-profile-page__scores-headline">Скоры Игрока</h2>
+        <h2 class="player-profile-page__scores-headline">
+          Скоры Игрока ({{ playerScoresList.length }})
+        </h2>
         <ScoresTable
           :scoresList="playerScoresList"
           :isLoading="isLoading"

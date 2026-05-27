@@ -68,7 +68,9 @@
         Обновить информацию
       </v-btn>
       <v-divider class="border-opacity-100" />
-      <h2 class="personal-account-page__headline">Мои Скоры</h2>
+      <h2 class="personal-account-page__headline">
+        Мои Скоры ({{ myScoresList.length }})
+      </h2>
       <div class="personal-account-page__scores-actions">
         <v-tooltip
           :disabled="currentOsuId !== null"

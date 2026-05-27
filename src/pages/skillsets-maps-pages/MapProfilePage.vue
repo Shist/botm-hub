@@ -69,7 +69,9 @@
           </div>
         </div>
         <v-divider class="map-profile-page__divider border-opacity-100" />
-        <h2 class="map-profile-page__headline">BOTM Скоры Карты</h2>
+        <h2 class="map-profile-page__headline">
+          BOTM Скоры Карты ({{ mapScoresList.length }})
+        </h2>
         <ScoresTable
           :scoresList="mapScoresList"
           :isLoading="isLoading"
