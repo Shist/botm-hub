@@ -160,8 +160,28 @@
             <template #[`item.joinedTimestamp`]="{ item }">
               <span>{{ formatDateTimeForTable(item.rawMember.joinedAt) }}</span>
             </template>
-            <template #[`item.points`]>
-              <span class="club-profile-page__points">0</span>
+            <template #[`item.points`]="{ item }">
+              <span class="club-profile-page__points">
+                {{ item.points.toFixed(2) }}
+              </span>
+            </template>
+            <template #[`item.totalScores`]="{ item }">
+              <span>{{ item.totalScores }}</span>
+            </template>
+            <template #[`item.avgScore`]="{ item }">
+              <span class="club-profile-page__score">
+                {{
+                  item.avgScore > 0
+                    ? item.avgScore.toLocaleString("ru-RU")
+                    : "0"
+                }}
+              </span>
+            </template>
+            <template #[`item.avgAcc`]="{ item }">
+              <span>{{ item.avgAcc.toFixed(2) }}%</span>
+            </template>
+            <template #[`item.avgCombo`]="{ item }">
+              <span>{{ item.avgCombo }}x</span>
             </template>
             <template #no-data>
               <div class="club-profile-page__no-data">
@@ -343,7 +363,31 @@ const tableHeaders = [
     title: "Очки",
     key: "points",
     align: "center" as const,
-    minWidth: "100px",
+    minWidth: "120px",
+  },
+  {
+    title: "Скоров",
+    key: "totalScores",
+    align: "center" as const,
+    minWidth: "102px",
+  },
+  {
+    title: "Средний Скор",
+    key: "avgScore",
+    align: "center" as const,
+    minWidth: "146px",
+  },
+  {
+    title: "Средняя Акка",
+    key: "avgAcc",
+    align: "center" as const,
+    minWidth: "145px",
+  },
+  {
+    title: "Среднее Комбо",
+    key: "avgCombo",
+    align: "center" as const,
+    minWidth: "156px",
   },
 ];
 
@@ -356,12 +400,38 @@ const tableItems = computed(() => {
     const fullUser = usersStore.users.find((u) => u.uid === member.uid);
     if (!fullUser) continue;
 
+    const userClubScores = clubScoresList.value.filter(
+      (s) => s.uid === member.uid
+    );
+
+    let points = 0;
+    const totalScores = userClubScores.length;
+    let avgScore = 0;
+    let avgAcc = 0;
+    let avgCombo = 0;
+
+    if (totalScores > 0) {
+      const sumPoints = userClubScores.reduce((acc, s) => acc + s.points, 0);
+      const sumScore = userClubScores.reduce((acc, s) => acc + s.score, 0);
+      const sumAcc = userClubScores.reduce((acc, s) => acc + s.accuracy, 0);
+      const sumCombo = userClubScores.reduce((acc, s) => acc + s.combo, 0);
+
+      points = sumPoints;
+      avgScore = Math.round(sumScore / totalScores);
+      avgAcc = Number((sumAcc / totalScores).toFixed(2));
+      avgCombo = Math.round(sumCombo / totalScores);
+    }
+
     items.push({
       rawMember: member,
       fullUser: fullUser,
       searchString: fullUser.nick.toLowerCase(),
       joinedTimestamp: member.joinedAt ? member.joinedAt.getTime() : 0,
-      points: 0,
+      totalScores,
+      points,
+      avgScore,
+      avgAcc,
+      avgCombo,
     });
   }
 
@@ -379,7 +449,7 @@ const formatDateTimeForTable = (date: Date | null) => {
     hour: "2-digit",
     minute: "2-digit",
   });
-  return `${dateStr} в ${timeStr}`;
+  return `${dateStr} ${timeStr}`;
 };
 
 const onMembershipBtnClick = async () => {
@@ -689,9 +759,11 @@ onMounted(async () => {
     letter-spacing: 0.5px;
   }
   &__points {
-    font-size: 18px;
-    font-weight: bold;
     color: var(--color-club-points);
+    font-weight: bold;
+  }
+  &__score {
+    font-weight: bold;
   }
   &__no-data {
     padding: 40px;
