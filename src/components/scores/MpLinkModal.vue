@@ -173,6 +173,7 @@
         </v-btn>
         <v-btn
           :disabled="selectedScoresCount === 0 || isLoadingDependencies"
+          :loading="isUploading"
           class="mp-modal__confirm-btn"
           height="50"
           @click="confirmAndUpload"
@@ -201,10 +202,7 @@ import {
 } from "@/types/scores";
 
 const props = defineProps<{ isOpened: boolean }>();
-const emit = defineEmits<{
-  (e: "closeModal"): void;
-  (e: "loaded", data: IMpModalScore[]): void;
-}>();
+const emit = defineEmits<{ (e: "closeModal"): void }>();
 
 const { setErrorToast, setSuccessToast } = useToast();
 
@@ -217,6 +215,7 @@ const currentUserUid = computed(() => authStore.user?.uid);
 
 const chosenMpLinkId = ref<number | null>(null);
 const isFetching = ref(false);
+const isUploading = ref(false);
 const hasSearched = ref(false);
 const isLoadingDependencies = ref(false);
 const groupedScores = ref<IMpModalGroup[]>([]);
@@ -340,6 +339,7 @@ const extractMyScores = (events: IOsuApiEvent[]): IOsuApiScore[] => {
         accuracy: myScore.accuracy,
         passed: myScore.passed,
         rank: myScore.rank,
+        date: new Date(myScore.created_at),
       });
     }
   }
@@ -415,6 +415,7 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
       isDbScore: false,
       mapId: score.mapId,
       mods: score.mods,
+      date: score.date,
     });
   });
 
@@ -448,6 +449,7 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
             points: dbScore.points,
             isSelected: false,
             isDbScore: true,
+            date: dbScore.date,
           });
         }
       }
@@ -492,15 +494,30 @@ const toggleScoreSelection = (
   }
 };
 
-const confirmAndUpload = () => {
+const confirmAndUpload = async () => {
+  if (!currentUserUid.value) return;
+
   const selectedToUpload: IMpModalScore[] = [];
   groupedScores.value.forEach((group) => {
     const selected = group.scores.filter((s) => s.isSelected);
     selectedToUpload.push(...selected);
   });
 
-  emit("loaded", selectedToUpload);
-  closeModal();
+  if (selectedToUpload.length === 0) return;
+
+  try {
+    isUploading.value = true;
+
+    await scoresStore.uploadScores(currentUserUid.value, selectedToUpload);
+
+    setSuccessToast(`Успешно загружено скоров: ${selectedToUpload.length} 🥳`);
+    closeModal();
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    setErrorToast(`Не удалось загрузить скоры: ${msg}`);
+  } finally {
+    isUploading.value = false;
+  }
 };
 </script>
 

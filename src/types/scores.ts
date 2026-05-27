@@ -54,6 +54,7 @@ export interface IOsuApiMatchScore {
   accuracy: number;
   passed: boolean;
   rank: string;
+  created_at: string;
 }
 
 export interface IOsuApiBeatmapset {
@@ -103,6 +104,7 @@ export interface IOsuApiScore {
   accuracy: number;
   passed: boolean;
   rank: string;
+  date: Date;
 }
 
 export interface IMpModalScore {
@@ -119,6 +121,7 @@ export interface IMpModalScore {
   isDbScore: boolean;
   mapId?: number;
   mods?: string[];
+  date: Date;
 }
 
 export interface IMpModalGroup {
