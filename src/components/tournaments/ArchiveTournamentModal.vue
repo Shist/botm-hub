@@ -108,7 +108,6 @@ const archivingError = computed(() => {
   return "";
 });
 
-// Если строка ошибки пустая, значит всё валидно
 const canBeArchived = computed(() => archivingError.value === "");
 
 const onConfirmArchiving = async () => {

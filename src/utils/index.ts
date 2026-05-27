@@ -186,3 +186,10 @@ export function getMembershipDurationLabel(startDate: Date | null): string {
 export function formatModsList(mods: string[]): string {
   return mods.map((modStr) => modStr.toUpperCase()).join(", ");
 }
+
+export function formatMapRank(rank: string): string {
+  if (rank === "SH") return "S";
+  if (rank === "X" || rank === "SS") return "SS";
+  if (rank === "XH" || rank === "SSH") return "SS";
+  return rank;
+}

@@ -152,7 +152,7 @@
             hover
             :sort-by="[{ key: 'points', order: 'desc' }]"
           >
-            <template #[`item.nick`]="{ item }">
+            <template #[`item.user`]="{ item }">
               <div class="club-profile-page__table-user-wrapper">
                 <UserCard :user="item.fullUser" />
               </div>
@@ -165,14 +165,24 @@
             </template>
             <template #no-data>
               <div class="club-profile-page__no-data">
-                В клубе пока нет участников. Будь первым!
+                Нет данных об участниках
               </div>
             </template>
           </v-data-table-virtual>
         </div>
         <v-divider class="club-profile-page__divider border-opacity-100" />
+        <div class="club-profile-page__scores-section">
+          <h3 class="club-profile-page__sub-headline">
+            Профильные Скоры Участников Клуба
+          </h3>
+          <ScoresTable
+            :scoresList="clubScoresList"
+            :isLoading="isLoading || isMapsLoading"
+          />
+        </div>
+        <v-divider class="club-profile-page__divider border-opacity-100" />
         <div class="club-profile-page__maps-section">
-          <h3 class="club-profile-page__sub-headline">Профильные мапы клуба</h3>
+          <h3 class="club-profile-page__sub-headline">Профильные Мапы Клуба</h3>
           <SkillsetMapsTable :mapsList="clubMaps" :isLoading="isMapsLoading" />
         </div>
       </div>
@@ -213,9 +223,11 @@ import { useClubsStore } from "@/stores/clubs";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
+import { useScoresStore } from "@/stores/scores";
 import { isBotmClub, BotmClub } from "@/types/clubs";
 import UserCard from "@/components/users/UserCard.vue";
 import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
+import ScoresTable from "@/components/scores/ScoresTable.vue";
 import LeaveClubModal from "@/components/clubs/LeaveClubModal.vue";
 import EditLeaderMsgModal from "@/components/clubs/EditLeaderMsgModal.vue";
 import useToast from "@/composables/useToast";
@@ -229,6 +241,7 @@ const clubsStore = useClubsStore();
 const authStore = useAuthStore();
 const usersStore = useUsersStore();
 const osumapsStore = useOsumapsStore();
+const scoresStore = useScoresStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
 
@@ -303,20 +316,32 @@ const clubMaps = computed(() => {
   return osumapsStore.getMapsOfGivenCategories(allowedSkillsets);
 });
 
+const clubScoresList = computed(() => {
+  if (!clubData.value) return [];
+  const memberUids = Object.keys(clubData.value.members);
+  if (!memberUids.length) return [];
+  const allMemberScores = scoresStore.getFlatScoresTableData(memberUids);
+  return allMemberScores.filter((score) => {
+    return clubSkillsets.value.some((clubRule) => {
+      const hasCategory = score.mapCategories.includes(clubRule.category);
+      const isModAllowed = clubRule.allowedMods.includes(score.mods);
+      return hasCategory && isModAllowed;
+    });
+  });
+});
+
 const searchQuery = ref("");
 
 const tableHeaders = [
-  { title: "Игрок", key: "nick", sortable: true, minWidth: "300px" },
+  { title: "Игрок", key: "user", minWidth: "300px" },
   {
     title: "Дата вступления",
     key: "joinedTimestamp",
-    sortable: true,
     minWidth: "165px",
   },
   {
     title: "Очки",
     key: "points",
-    sortable: true,
     align: "center" as const,
     minWidth: "100px",
   },
@@ -334,7 +359,6 @@ const tableItems = computed(() => {
     items.push({
       rawMember: member,
       fullUser: fullUser,
-      nick: fullUser.nick,
       searchString: fullUser.nick.toLowerCase(),
       joinedTimestamp: member.joinedAt ? member.joinedAt.getTime() : 0,
       points: 0,
@@ -387,10 +411,13 @@ onMounted(async () => {
     await Promise.all([
       usersStore.getAllUsersAndLoadClubs(),
       osumapsStore.loadAllMaps(),
+      scoresStore.loadAllScores(),
     ]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить данные страницы: ${msg}`);
+    setErrorToast(
+      `Не удалось загрузить данные юзеров, клубов, карт или скоров: ${msg}`
+    );
   } finally {
     isLoading.value = false;
     isMapsLoading.value = false;
@@ -671,6 +698,12 @@ onMounted(async () => {
     text-align: center;
     @include default-text(18px, 18px, var(--color-text));
     opacity: 0.7;
+  }
+  &__scores-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
   &__maps-section {
     width: 100%;

@@ -111,7 +111,7 @@
                             class="mp-modal__score-rank"
                             :class="`rank-${score.rank}`"
                           >
-                            {{ score.rank }}
+                            {{ formatMapRank(score.rank) }}
                           </span>
                           <span class="mp-modal__score-stats-text">
                             | {{ (score.accuracy * 100).toFixed(2) }}% |
@@ -141,7 +141,9 @@
                               v-if="score.isInsufficient"
                               class="mp-modal__score-subtext-error"
                             >
-                              (&lt;70% скора, 0 очков)
+                              ({{
+                                !score.passed ? "Скор зафейлен" : "<70% скора"
+                              }}, 0 очков)
                             </span>
                             <span
                               v-else
@@ -192,6 +194,7 @@ import useToast from "@/composables/useToast";
 import { useAuthStore } from "@/stores/auth";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
+import { formatMapRank } from "@/utils";
 import { OsuMapCategory } from "@/types/osumaps";
 import {
   type IOsuApiEvent,
@@ -768,9 +771,15 @@ const confirmAndUpload = async () => {
     @include default-text(18px, 18px, var(--color-text-white));
     font-weight: 900;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    &.rank-X,
     &.rank-SS,
     &.rank-S {
       color: var(--color-rank-s-or-ss);
+    }
+    &.rank-XH,
+    &.rank-SSH,
+    &.rank-SH {
+      color: var(--color-rank-silver-s-or-ss);
     }
     &.rank-A {
       color: var(--color-rank-a);
@@ -783,6 +792,9 @@ const confirmAndUpload = async () => {
     }
     &.rank-D {
       color: var(--color-rank-d);
+    }
+    &.rank-F {
+      color: var(--color-rank-f);
     }
     @media (max-width: $phone-l) {
       font-size: 16px;

@@ -75,7 +75,9 @@
           <CategoryBadge
             :category="item.category"
             class="skillset-maps-table__badge"
-          />
+          /> </template
+        ><template #no-data>
+          <div class="skillset-maps-table__no-data">Нет данных о картах</div>
         </template>
       </v-data-table-virtual>
     </v-skeleton-loader>
@@ -294,6 +296,12 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
     @media (max-width: $tablet-l) {
       float: right;
     }
+  }
+  &__no-data {
+    padding: 40px;
+    text-align: center;
+    @include default-text(18px, 18px, var(--color-text));
+    opacity: 0.7;
   }
 }
 </style>

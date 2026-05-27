@@ -43,6 +43,13 @@
           </div>
         </div>
       </div>
+      <v-divider class="border-opacity-100" />
+      <h2 class="clubs-page__headline">Все BOTM Скоры</h2>
+      <ScoresTable
+        :scoresList="allScoresList"
+        :isLoading="isLoading"
+        :defaultSort="[{ key: 'date', order: 'asc' }]"
+      />
     </v-skeleton-loader>
   </div>
 </template>
@@ -51,12 +58,17 @@
 import { ref, computed, onMounted } from "vue";
 import { useUsersStore } from "@/stores/users";
 import { useClubsStore } from "@/stores/clubs";
+import { useOsumapsStore } from "@/stores/osumaps";
+import { useScoresStore } from "@/stores/scores";
 import UserCard from "@/components/users/UserCard.vue";
+import ScoresTable from "@/components/scores/ScoresTable.vue";
 import useToast from "@/composables/useToast";
 import { CLUB_SETTINGS } from "@/constants";
 
 const usersStore = useUsersStore();
 const clubsStore = useClubsStore();
+const mapsStore = useOsumapsStore();
+const scoresStore = useScoresStore();
 
 const { setErrorToast } = useToast();
 
@@ -82,13 +94,24 @@ const clubsData = computed(() => {
   });
 });
 
+const allScoresList = computed(() => {
+  if (isLoading.value) return [];
+  return scoresStore.getFlatScoresTableData();
+});
+
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await usersStore.getAllUsersAndLoadClubs();
+    await Promise.all([
+      usersStore.getAllUsersAndLoadClubs(),
+      mapsStore.loadAllMaps(),
+      scoresStore.loadAllScores(),
+    ]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить клубы: ${msg}`);
+    setErrorToast(
+      `Не удалось загрузить данные юзеров, клубов, карт или скоров: ${msg}`
+    );
   } finally {
     isLoading.value = false;
   }

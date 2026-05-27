@@ -61,6 +61,13 @@
             </span>
           </div>
         </div>
+        <v-divider class="player-profile-page__divider border-opacity-100" />
+        <h2 class="player-profile-page__scores-headline">Скоры Игрока</h2>
+        <ScoresTable
+          :scoresList="playerScoresList"
+          :isLoading="isLoading"
+          :hiddenColumns="['user']"
+        />
       </div>
       <div v-else class="player-profile-page__user-not-found-wrapper">
         <h2 class="player-profile-page__user-not-found-headline">
@@ -81,9 +88,12 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
+import { useOsumapsStore } from "@/stores/osumaps";
+import { useScoresStore } from "@/stores/scores";
 import useUserTags from "@/composables/useUserTags";
 import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
+import ScoresTable from "@/components/scores/ScoresTable.vue";
 import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
 import IconRedactor from "@/components/users/user-icons/IconRedactor.vue";
 import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
@@ -99,6 +109,8 @@ import { OsuMapCategory } from "@/types/osumaps";
 const route = useRoute();
 
 const usersStore = useUsersStore();
+const osumapsStore = useOsumapsStore();
+const scoresStore = useScoresStore();
 
 const { setErrorToast } = useToast();
 
@@ -116,6 +128,11 @@ const avatarSrc = computed(
 );
 const playerSkillsets = computed<OsuMapCategory[]>(() => {
   return JSON.parse(playerInfo.value?.skillsets ?? "[]");
+});
+
+const playerScoresList = computed(() => {
+  if (!playerInfo.value) return [];
+  return scoresStore.getFlatScoresTableData([playerInfo.value.uid]);
 });
 
 const {
@@ -147,10 +164,16 @@ const hasSomeTags = computed(
 onMounted(async () => {
   try {
     isLoading.value = true;
-    await usersStore.getAllUsersAndLoadClubs();
+    await Promise.all([
+      usersStore.getAllUsersAndLoadClubs(),
+      osumapsStore.loadAllMaps(),
+      scoresStore.loadAllScores(),
+    ]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить список игроков: ${msg}`);
+    setErrorToast(
+      `Не удалось загрузить данные юзеров, клубов, карт или скоров: ${msg}`
+    );
   } finally {
     isLoading.value = false;
   }
@@ -201,6 +224,21 @@ onMounted(async () => {
         width: 30px;
         height: 30px;
       }
+    }
+  }
+  &__divider {
+    width: 100%;
+  }
+  &__scores-headline {
+    @include default-headline(36px, 36px, var(--color-text));
+    text-align: center;
+    @media (max-width: $tablet-l) {
+      font-size: 28px;
+      line-height: 28px;
+    }
+    @media (max-width: $phone-l) {
+      font-size: 20px;
+      line-height: 20px;
     }
   }
   &__user-not-found-wrapper {

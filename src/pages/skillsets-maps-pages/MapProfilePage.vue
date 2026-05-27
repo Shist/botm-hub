@@ -68,6 +68,13 @@
             </v-tooltip>
           </div>
         </div>
+        <v-divider class="map-profile-page__divider border-opacity-100" />
+        <h2 class="map-profile-page__headline">BOTM Скоры Карты</h2>
+        <ScoresTable
+          :scoresList="mapScoresList"
+          :isLoading="isLoading"
+          :hiddenColumns="['mapId', 'cover', 'mapName', 'link']"
+        />
       </div>
       <div
         v-else-if="routeCategory && !mapInfo"
@@ -103,8 +110,11 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
+import ScoresTable from "@/components/scores/ScoresTable.vue";
 import useToast from "@/composables/useToast";
+import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
+import { useScoresStore } from "@/stores/scores";
 import {
   type IOsuMap,
   OsuMapCategory,
@@ -113,7 +123,9 @@ import {
 
 const route = useRoute();
 
+const usersStore = useUsersStore();
 const mapsStore = useOsumapsStore();
+const scoresStore = useScoresStore();
 
 const { setErrorToast } = useToast();
 
@@ -134,15 +146,26 @@ const mapInfo = computed<IOsuMap | null>(() => {
   return categoryMaps.find((m) => m.id === routeMapId.value) ?? null;
 });
 
+const mapScoresList = computed(() => {
+  if (!routeMapId.value) return [];
+  return scoresStore.getFlatScoresTableData(undefined, [routeMapId.value]);
+});
+
 onMounted(async () => {
   if (!routeCategory.value) return;
 
   try {
     isLoading.value = true;
-    await mapsStore.loadAllMaps();
+    await Promise.all([
+      usersStore.getAllUsersAndLoadClubs(),
+      mapsStore.loadAllMaps(),
+      scoresStore.loadAllScores(),
+    ]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить данные карты: ${msg}`);
+    setErrorToast(
+      `Не удалось загрузить данные карт, юзеров, скоров или клубов: ${msg}`
+    );
   } finally {
     isLoading.value = false;
   }
@@ -244,6 +267,9 @@ onMounted(async () => {
     &:hover {
       text-decoration: underline;
     }
+  }
+  &__divider {
+    width: 100%;
   }
   &__not-found-wrapper {
     display: flex;

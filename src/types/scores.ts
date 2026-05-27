@@ -1,5 +1,6 @@
 import { Timestamp } from "firebase/firestore/lite";
-import { type IOsuMap } from "@/types/osumaps";
+import { type IAllUsersListItem } from "@/types/users";
+import { type IOsuMap, OsuMapCategory } from "@/types/osumaps";
 
 export const VALID_OSU_SCORE_MODS = [
   "nm",
@@ -132,6 +133,23 @@ export interface IMpModalGroup {
   dbMapInfo: IOsuMap;
   stars: number;
   scores: IMpModalScore[];
+}
+
+export interface IScoreTableRow {
+  uidWithMapIdAndMods: string;
+  uid: string;
+  user: IAllUsersListItem;
+  mapId: number;
+  mapsetId: number;
+  mapCategories: OsuMapCategory[];
+  mapName: string;
+  mods: OsuScoreMod;
+  date: Date;
+  rank: string;
+  score: number;
+  accuracy: number;
+  combo: number;
+  points: number;
 }
 
 export function isOsuScoreMod(value: string): value is OsuScoreMod {

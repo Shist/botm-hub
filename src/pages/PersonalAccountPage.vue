@@ -98,6 +98,11 @@
           Загрузить .osr файл(ы)
         </v-btn>
       </div>
+      <ScoresTable
+        :scoresList="myScoresList"
+        :isLoading="isPageLoading"
+        :hiddenColumns="['user']"
+      />
       <v-divider class="border-opacity-100" />
       <h3 class="personal-account-page__small-headline">
         Здесь уже много, что есть, но я всё равно оставил здесь коллаб с eh-ами
@@ -118,9 +123,11 @@
 import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
+import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import MpLinkModal from "@/components/scores/MpLinkModal.vue";
+import ScoresTable from "@/components/scores/ScoresTable.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
 import ehCollabImage from "@/assets/images/eh-collab.png";
@@ -129,6 +136,7 @@ import { OsuMapCategory } from "@/types/osumaps";
 
 const authStore = useAuthStore();
 const usersStore = useUsersStore();
+const osumapsStore = useOsumapsStore();
 const scoresStore = useScoresStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
@@ -140,11 +148,12 @@ const chosenDigit = ref<DigitCategory | null>(null);
 const chosenCategories = ref<OsuMapCategory[]>([]);
 const isUpdating = ref(false);
 const ehCollabImagePath = ref(ehCollabImage);
-
 const isMpModalOpened = ref(false);
+const isDependenciesLoading = ref(false);
 
 const isPageLoading = computed(
-  () => authStore.user?.additionalInfo === "loading"
+  () =>
+    authStore.user?.additionalInfo === "loading" || isDependenciesLoading.value
 );
 
 const digitOptions = computed(() =>
@@ -165,6 +174,8 @@ const currentDigit = computed(() => {
 const currentSkillsets = computed(() => {
   return authStore.userAdditionalInfo?.skillsets ?? [];
 });
+const currentUserUid = computed(() => authStore.user?.uid);
+
 const isSomeInfoChanged = computed(() => {
   const osuIdFromStore =
     currentOsuId.value === null ? null : +currentOsuId.value;
@@ -177,6 +188,11 @@ const isSomeInfoChanged = computed(() => {
   );
 });
 const avatarSrc = computed(() => `https://a.ppy.sh/${currentOsuId.value}?.png`);
+
+const myScoresList = computed(() => {
+  if (!currentUserUid.value) return [];
+  return scoresStore.getFlatScoresTableData([currentUserUid.value]);
+});
 
 watch(currentOsuId, (valueFromStore) => {
   chosenOsuId.value = valueFromStore === null ? null : +valueFromStore;
@@ -198,9 +214,16 @@ onMounted(async () => {
   chosenCategories.value = currentSkillsets.value;
 
   try {
-    await scoresStore.loadAllScores();
+    isDependenciesLoading.value = true;
+    await Promise.all([
+      osumapsStore.loadAllMaps(),
+      scoresStore.loadAllScores(),
+    ]);
   } catch (error) {
-    console.error("Не удалось подгрузить скоры:", error);
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось загрузить данные карт и скоров: ${msg}`);
+  } finally {
+    isDependenciesLoading.value = false;
   }
 });
 

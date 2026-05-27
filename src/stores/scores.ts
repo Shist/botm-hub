@@ -5,18 +5,91 @@ import {
   loadAllScoresFromFirebase,
   uploadScoresToFirebase,
 } from "@/services/firebase/scores";
+import { useUsersStore } from "@/stores/users";
+import { useOsumapsStore } from "@/stores/osumaps";
+import { OsuMapCategory } from "@/types/osumaps";
 import {
   type IAllScores,
   type IFirebaseScoreRecord,
   type IMpModalScore,
+  type IScoreTableRow,
+  type OsuScoreMod,
   isOsuScoreMod,
 } from "@/types/scores";
 
 export const useScoresStore = defineStore("scores", () => {
+  const osumapsStore = useOsumapsStore();
+  const usersStore = useUsersStore();
+
   const allScores = ref<IAllScores>({});
 
   const isLoaded = ref(false);
   let loadPromise: Promise<void> | null = null;
+
+  const getFlatScoresTableData = (
+    uidsFilter?: string[],
+    mapIdsFilter?: number[]
+  ): IScoreTableRow[] => {
+    const flatScores: IScoreTableRow[] = [];
+
+    const allUsersMap = new Map(usersStore.users.map((u) => [u.uid, u]));
+
+    const allMapsList = Object.values(osumapsStore.osumaps).flat();
+    const mapsDataMap = new Map<
+      number,
+      { mapsetId: number; name: string; categories: OsuMapCategory[] }
+    >();
+
+    allMapsList.forEach((m) => {
+      if (!mapsDataMap.has(m.id)) {
+        mapsDataMap.set(m.id, {
+          mapsetId: m.mapsetId,
+          name: m.name,
+          categories: [],
+        });
+      }
+      const data = mapsDataMap.get(m.id)!;
+      if (!data.categories.includes(m.category)) {
+        data.categories.push(m.category);
+      }
+    });
+
+    for (const [uid, mapsRecord] of Object.entries(allScores.value)) {
+      if (uidsFilter && !uidsFilter.includes(uid)) continue;
+
+      const userInfo = allUsersMap.get(uid);
+      if (!userInfo) continue;
+
+      for (const [mapIdStr, modsRecord] of Object.entries(mapsRecord)) {
+        const mapIdNum = Number(mapIdStr);
+        if (mapIdsFilter && !mapIdsFilter.includes(mapIdNum)) continue;
+
+        const mapData = mapsDataMap.get(mapIdNum);
+        if (!mapData) continue;
+
+        for (const [modKey, scoreData] of Object.entries(modsRecord)) {
+          flatScores.push({
+            uidWithMapIdAndMods: `${uid}-${mapIdNum}-${modKey}`,
+            uid,
+            user: userInfo,
+            mapId: mapIdNum,
+            mapsetId: mapData.mapsetId,
+            mapCategories: mapData.categories,
+            mapName: mapData.name,
+            mods: modKey as OsuScoreMod,
+            date: scoreData.date,
+            rank: scoreData.rank,
+            score: scoreData.score,
+            accuracy: scoreData.accuracy,
+            combo: scoreData.combo,
+            points: scoreData.points,
+          });
+        }
+      }
+    }
+
+    return flatScores;
+  };
 
   const loadAllScores = async () => {
     if (isLoaded.value) return;
@@ -131,6 +204,7 @@ export const useScoresStore = defineStore("scores", () => {
   return {
     allScores,
     isLoaded,
+    getFlatScoresTableData,
     loadAllScores,
     uploadScores,
   };
