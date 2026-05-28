@@ -87,7 +87,6 @@ export interface IOsuApiEvent {
 }
 
 export interface IOsuApiMapInfo {
-  artist: string;
   title: string;
   version: string;
   coverUrl: string | null;
@@ -150,6 +149,28 @@ export interface IScoreTableRow {
   accuracy: number;
   combo: number;
   points: number;
+}
+
+export interface IParsedOsr {
+  mode: number;
+  version: number;
+  beatmapMD5: string;
+  playerName: string;
+  replayMD5: string;
+  count300: number;
+  count100: number;
+  count50: number;
+  countGeki: number;
+  countKatu: number;
+  countMiss: number;
+  totalScore: number;
+  maxCombo: number;
+  isPerfectCombo: boolean;
+  modsFlag: number;
+  parsedMods: string[];
+  accuracy: number;
+  date: Date;
+  isScoreV2: boolean;
 }
 
 export function isOsuScoreMod(value: string): value is OsuScoreMod {

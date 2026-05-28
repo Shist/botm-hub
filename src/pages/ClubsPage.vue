@@ -332,7 +332,7 @@ onMounted(async () => {
   }
   &__label {
     @include default-headline(16px, 16px, inherit);
-    font-weight: 700;
+    font-weight: bold;
     text-transform: uppercase;
   }
 }
@@ -379,8 +379,8 @@ onMounted(async () => {
     text-align: center;
   }
   &__details-btn {
-    color: var(--color-text-white) !important;
-    font-weight: 700;
+    color: var(--color-text-white);
+    font-weight: bold;
     letter-spacing: 0.5px;
     width: 100%;
   }

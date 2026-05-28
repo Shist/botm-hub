@@ -10,9 +10,9 @@ export function getFirebaseErrorMsg(error: IFirebaseError | Error): string {
     case "auth/missing-password":
       return "Вы не указали пароль!";
     case "auth/invalid-credential":
-      return "Указанные вами учетные данные неверны. Перепроверьте указанный адрес электронной почты и пароль!";
+      return "Указанные вами учетные данные неверны. Перепроверь указанный адрес электронной почты и пароль!";
     case "auth/email-already-in-use":
-      return "Указанный вами адрес электронной почты уже зарегистрирован. Войдите или зарегистрируйте другой.";
+      return "Указанный вами адрес электронной почты уже зарегистрирован. Войди или зарегистрируй другой.";
     default:
       return error.message;
   }

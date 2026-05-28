@@ -95,7 +95,7 @@
           height="50"
           prepend-icon="mdi-file-document"
           class="personal-account-page__action-btn personal-account-page__action-btn_osr"
-          disabled
+          @click="isOsrModalOpened = true"
         >
           Загрузить .osr файл(ы)
         </v-btn>
@@ -118,6 +118,10 @@
       :isOpened="isMpModalOpened"
       @closeModal="isMpModalOpened = false"
     />
+    <OsrModal
+      :isOpened="isOsrModalOpened"
+      @closeModal="isOsrModalOpened = false"
+    />
   </div>
 </template>
 
@@ -129,6 +133,7 @@ import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import MpLinkModal from "@/components/scores/MpLinkModal.vue";
+import OsrModal from "@/components/scores/OsrModal.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
@@ -151,6 +156,7 @@ const chosenCategories = ref<OsuMapCategory[]>([]);
 const isUpdating = ref(false);
 const ehCollabImagePath = ref(ehCollabImage);
 const isMpModalOpened = ref(false);
+const isOsrModalOpened = ref(false);
 const isDependenciesLoading = ref(false);
 
 const isPageLoading = computed(

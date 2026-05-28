@@ -167,7 +167,7 @@ const onConfirm = async () => {
   const allMaps = mapsStore.getMapsOfGivenCategories(chosenCategories.value);
 
   if (!allMaps.length) {
-    setErrorToast("В выбранных категориях пока нет карт.");
+    setErrorToast("В выбранных категориях пока нет карт");
     isPreparingMaps.value = false;
     return;
   }

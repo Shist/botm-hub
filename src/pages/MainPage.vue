@@ -90,7 +90,7 @@
     width: 100%;
     padding: 15px;
     font-family: $font-roboto;
-    font-weight: 700;
+    font-weight: bold;
     font-size: 28px;
     line-height: 28px;
     text-align: center;

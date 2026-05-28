@@ -452,7 +452,7 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
     background-color: rgba(128, 128, 128, 0.1);
     span {
       @include default-text(14px, 14px, var(--color-vuetify-progress));
-      font-weight: 700;
+      font-weight: bold;
       letter-spacing: 1px;
     }
   }

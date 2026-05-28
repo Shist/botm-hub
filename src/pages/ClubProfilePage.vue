@@ -757,7 +757,7 @@ onMounted(async () => {
     padding: 8px 0;
   }
   &__status-chip {
-    font-weight: 700;
+    font-weight: bold;
     letter-spacing: 0.5px;
   }
   &__points {

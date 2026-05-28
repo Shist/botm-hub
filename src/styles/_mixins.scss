@@ -3,7 +3,7 @@
 // Default settings of headlines, you only need to choose font size, line height and text color
 @mixin default-headline($font-size, $line-height, $text-color) {
   font-family: $font-roboto;
-  font-weight: 700;
+  font-weight: bold;
   font-size: $font-size;
   line-height: $line-height;
   color: $text-color;
@@ -25,7 +25,7 @@
   width: 100%;
   padding: $padding;
   font-family: $font-roboto;
-  font-weight: 700;
+  font-weight: bold;
   font-size: 16px;
   line-height: 16px;
   text-align: center;
