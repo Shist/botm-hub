@@ -88,7 +88,7 @@
       <ScoresTable
         :scoresList="allScoresList"
         :isLoading="isLoading"
-        :defaultSort="[{ key: 'date', order: 'asc' }]"
+        :defaultSort="[{ key: 'date', order: 'desc' }]"
       />
       <v-divider class="border-opacity-100" />
       <h2 class="clubs-page__headline">

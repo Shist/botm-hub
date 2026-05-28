@@ -152,7 +152,7 @@
             hover
             :sort-by="[{ key: 'points', order: 'desc' }]"
           >
-            <template #[`item.user`]="{ item }">
+            <template #[`item.userNick`]="{ item }">
               <div class="club-profile-page__table-user-wrapper">
                 <UserCard :user="item.fullUser" />
               </div>
@@ -355,7 +355,7 @@ const clubScoresList = computed(() => {
 const searchQuery = ref("");
 
 const tableHeaders = [
-  { title: "Игрок", key: "user", minWidth: "300px" },
+  { title: "Игрок", key: "userNick", minWidth: "300px" },
   {
     title: "Дата вступления",
     key: "joinedTimestamp",
@@ -427,6 +427,7 @@ const tableItems = computed(() => {
     items.push({
       rawMember: member,
       fullUser: fullUser,
+      userNick: fullUser.nick,
       searchString: fullUser.nick.toLowerCase(),
       joinedTimestamp: member.joinedAt ? member.joinedAt.getTime() : 0,
       totalScores,

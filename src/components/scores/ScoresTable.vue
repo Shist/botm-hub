@@ -182,7 +182,8 @@ type DataTableHeader = {
   sort?:
     | ((a: number, b: number) => number)
     | ((a: string, b: string) => number)
-    | ((a: Date, b: Date) => number);
+    | ((a: Date, b: Date) => number)
+    | ((a: { nick: string }, b: { nick: string }) => number);
 };
 
 const router = useRouter();
@@ -213,6 +214,11 @@ const allHeaders = reactive<DataTableHeader[]>([
     key: "user",
     title: "Игрок",
     minWidth: "300px",
+    sort: (a: { nick?: string }, b: { nick?: string }) => {
+      const nickA = a?.nick ?? "";
+      const nickB = b?.nick ?? "";
+      return nickA.localeCompare(nickB);
+    },
   },
   {
     key: "mapId",
@@ -274,13 +280,31 @@ const allHeaders = reactive<DataTableHeader[]>([
     title: "Ранг",
     minWidth: "84px",
     align: "center",
+    sort: (a: string, b: string) => {
+      const rankWeights: Record<string, number> = {
+        XH: 8,
+        SSH: 8,
+        X: 7,
+        SS: 7,
+        SH: 6,
+        S: 5,
+        A: 4,
+        B: 3,
+        C: 2,
+        D: 1,
+        F: 0,
+      };
+      const weightA = rankWeights[a.toUpperCase()] ?? 0;
+      const weightB = rankWeights[b.toUpperCase()] ?? 0;
+      return weightA - weightB;
+    },
   },
   {
     key: "date",
     title: "Дата",
     minWidth: "103px",
     align: "center",
-    sort: (a: Date, b: Date) => b.getTime() - a.getTime(),
+    sort: (a: Date, b: Date) => a.getTime() - b.getTime(),
   },
 ]);
 
