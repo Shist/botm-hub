@@ -90,6 +90,7 @@ import useToast from "@/composables/useToast";
 import { useAuthStore } from "@/stores/auth";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
+import { isValidModCombinationForCategory } from "@/utils";
 import { OsuMapCategory } from "@/types/osumaps";
 import {
   type IOsuApiEvent,
@@ -287,7 +288,11 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
   );
 
   rawScores.forEach((score) => {
-    const dbMap = allMaps.find((m) => m.id === score.mapId);
+    const dbMap = allMaps.find(
+      (m) =>
+        m.id === score.mapId &&
+        isValidModCombinationForCategory(score.mods, m.category)
+    );
     if (!dbMap) return;
 
     const stars = dbMap.starRate;

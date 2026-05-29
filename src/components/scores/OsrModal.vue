@@ -137,7 +137,9 @@ import useToast from "@/composables/useToast";
 import { useAuthStore } from "@/stores/auth";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
+import { isValidModCombinationForCategory } from "@/utils";
 import { OsrParser } from "@/utils/osr-parser";
+import { VALID_MODS_FOR_CATEGORY } from "@/constants";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import {
   type IMpModalScore,
@@ -318,8 +320,11 @@ const processFiles = async (files: FileList) => {
           continue;
         }
 
-        const dbMap = allMaps.find((m) => m.hashMd5 === parsedData.beatmapMD5);
-        if (!dbMap) {
+        const matchingMaps = allMaps.filter(
+          (m) => m.hashMd5 === parsedData.beatmapMD5
+        );
+
+        if (matchingMaps.length === 0) {
           errorsList.value.push({
             id: crypto.randomUUID(),
             text: `${file.name}: Карта не найдена в пулах BOTM`,
@@ -327,7 +332,40 @@ const processFiles = async (files: FileList) => {
           continue;
         }
 
-        validRawScores.push({ ...parsedData, dbMap });
+        const validDbMap = matchingMaps.find((m) =>
+          isValidModCombinationForCategory(parsedData.parsedMods, m.category)
+        );
+
+        if (!validDbMap) {
+          const playedModsStr = parsedData.parsedMods.length
+            ? parsedData.parsedMods.join("")
+            : "NM";
+
+          const allowedCategoriesStr = matchingMaps
+            .map((m) => m.category.toUpperCase())
+            .join(", ");
+
+          const allowedModsSet = new Set<string>();
+          matchingMaps.forEach((m) => {
+            const modsForCategory = VALID_MODS_FOR_CATEGORY[m.category] ?? [];
+            modsForCategory.forEach((mod) =>
+              allowedModsSet.add(mod.toUpperCase())
+            );
+          });
+          const allowedModsStr = Array.from(allowedModsSet).join(", ");
+
+          const playerModsPartStr = `Комбинация ${playedModsStr} недопустима!`;
+          const mapCategoriesPartStr = `Эта карта числится в этих категориях: ${allowedCategoriesStr}.`;
+          const mapModsPartStr = `Так что разрешены только эти комбинации модов: ${allowedModsStr}`;
+
+          errorsList.value.push({
+            id: crypto.randomUUID(),
+            text: `${file.name}: ${playerModsPartStr} ${mapCategoriesPartStr} ${mapModsPartStr}`,
+          });
+          continue;
+        }
+
+        validRawScores.push({ ...parsedData, dbMap: validDbMap });
       } catch (err) {
         const msg = err instanceof Error ? err.message : String(err);
         errorsList.value.push({

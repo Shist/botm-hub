@@ -1,4 +1,7 @@
+import { VALID_MODS_FOR_CATEGORY } from "@/constants";
 import { type IFirebaseError } from "@/types/global";
+import { OsuMapCategory } from "@/types/osumaps";
+import { isOsuScoreMod } from "@/types/scores";
 
 export function getFirebaseErrorMsg(error: IFirebaseError | Error): string {
   if (!("code" in error)) {
@@ -193,3 +196,23 @@ export function formatMapRank(rank: string): string {
   if (rank === "XH" || rank === "SSH") return "SS";
   return rank;
 }
+
+export const isValidModCombinationForCategory = (
+  playedMods: string[],
+  category: OsuMapCategory
+): boolean => {
+  const cleanedMods = playedMods
+    .map((m) => m.toUpperCase())
+    .filter((m) => m !== "NM" && m !== "NF" && m !== "SO")
+    .sort();
+
+  const modKey = (
+    cleanedMods.length > 0 ? cleanedMods.join("") : "nm"
+  ).toLowerCase();
+
+  const allowedMods = VALID_MODS_FOR_CATEGORY[category];
+
+  if (!allowedMods || !isOsuScoreMod(modKey)) return false;
+
+  return allowedMods.includes(modKey);
+};

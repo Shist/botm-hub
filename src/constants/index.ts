@@ -76,11 +76,11 @@ export const CATEGORIES_COLORS = {
   [OsuMapCategory.TB]: "#d4ac7c",
 };
 
-const MODS_ONLY_NM: OsuScoreMod[] = ["nm"];
-const MODS_ONLY_HD: OsuScoreMod[] = ["hd"];
-const MODS_ONLY_HR: OsuScoreMod[] = ["hr"];
-const MODS_ONLY_DT: OsuScoreMod[] = ["dt"];
-const MODS_WITHOUT_EZ: OsuScoreMod[] = [
+export const MODS_ONLY_NM: OsuScoreMod[] = ["nm"];
+export const MODS_ONLY_HD: OsuScoreMod[] = ["hd"];
+export const MODS_ONLY_HR: OsuScoreMod[] = ["hr"];
+export const MODS_ONLY_DT: OsuScoreMod[] = ["dt"];
+export const MODS_WITHOUT_EZ: OsuScoreMod[] = [
   "nm",
   "hd",
   "hr",
@@ -90,7 +90,7 @@ const MODS_WITHOUT_EZ: OsuScoreMod[] = [
   "flhr",
   "flhdhr",
 ];
-const MODS_WITH_EZ_OR_FL: OsuScoreMod[] = [
+export const MODS_WITH_EZ_OR_FL: OsuScoreMod[] = [
   "ez",
   "fl",
   "flhd",
@@ -100,8 +100,46 @@ const MODS_WITH_EZ_OR_FL: OsuScoreMod[] = [
   "ezfl",
   "ezflhd",
 ];
-const MODS_WITH_HD: OsuScoreMod[] = ["hd", "ezhd", "flhd", "ezflhd"];
-const MODS_WITH_HR: OsuScoreMod[] = ["hr", "hdhr", "flhr", "flhdhr"];
+export const MODS_WITH_HD: OsuScoreMod[] = ["hd", "ezhd", "flhd", "ezflhd"];
+export const MODS_WITH_HR: OsuScoreMod[] = ["hr", "hdhr", "flhr", "flhdhr"];
+export const ALL_FM_TB_MODS: OsuScoreMod[] = [
+  "nm",
+  "hd",
+  "hr",
+  "ez",
+  "fl",
+  "hdhr",
+  "ezhd",
+  "flhd",
+  "flhr",
+  "ezfl",
+  "flhdhr",
+  "ezflhd",
+];
+
+export const VALID_MODS_FOR_CATEGORY: Record<OsuMapCategory, OsuScoreMod[]> = {
+  [OsuMapCategory.NM1]: MODS_ONLY_NM,
+  [OsuMapCategory.NM2]: MODS_ONLY_NM,
+  [OsuMapCategory.NM3]: MODS_ONLY_NM,
+  [OsuMapCategory.NM4]: MODS_ONLY_NM,
+  [OsuMapCategory.NM5]: MODS_ONLY_NM,
+  [OsuMapCategory.NM6]: MODS_ONLY_NM,
+  [OsuMapCategory.NM7]: MODS_ONLY_NM,
+  [OsuMapCategory.HD1]: MODS_ONLY_HD,
+  [OsuMapCategory.HD2]: MODS_ONLY_HD,
+  [OsuMapCategory.HD3]: MODS_ONLY_HD,
+  [OsuMapCategory.HR1]: MODS_ONLY_HR,
+  [OsuMapCategory.HR2]: MODS_ONLY_HR,
+  [OsuMapCategory.HR3]: MODS_ONLY_HR,
+  [OsuMapCategory.DT1]: MODS_ONLY_DT,
+  [OsuMapCategory.DT2]: MODS_ONLY_DT,
+  [OsuMapCategory.DT3]: MODS_ONLY_DT,
+  [OsuMapCategory.DT4]: MODS_ONLY_DT,
+  [OsuMapCategory.FM1]: ALL_FM_TB_MODS,
+  [OsuMapCategory.FM2]: ALL_FM_TB_MODS,
+  [OsuMapCategory.FM3]: ALL_FM_TB_MODS,
+  [OsuMapCategory.TB]: ALL_FM_TB_MODS,
+};
 
 export const CLUB_SETTINGS: Record<BotmClub, IClubConfig> = {
   [BotmClub.AIM]: {
