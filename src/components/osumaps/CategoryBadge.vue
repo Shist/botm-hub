@@ -24,12 +24,14 @@ const categoryLabel = computed(() => `${props.category}`.toUpperCase());
   width: 45px;
   border-radius: 10px;
   @media (max-width: $phone-l) {
+    width: 34px;
     font-size: 12px;
     line-height: 12px;
     padding: 3px;
     border-radius: 7px;
   }
   @media (max-width: $phone-m) {
+    width: 28px;
     font-size: 10px;
     line-height: 10px;
     border-radius: 6px;

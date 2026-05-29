@@ -593,11 +593,16 @@ onMounted(async () => {
     }
   }
   &__skillsets-wrapper {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(6, auto);
     gap: 15px;
     justify-content: center;
-    max-width: 400px;
+    @media (max-width: $pc-s) {
+      grid-template-columns: repeat(3, auto);
+    }
+    @media (max-width: $laptop-l) {
+      grid-template-columns: repeat(6, auto);
+    }
   }
   &__skillset-item {
     cursor: help;
