@@ -117,6 +117,7 @@ import useToast from "@/composables/useToast";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
+import { isValidModCombinationForCategory } from "@/utils/index";
 import {
   type IOsuMap,
   OsuMapCategory,
@@ -149,8 +150,13 @@ const mapInfo = computed<IOsuMap | null>(() => {
 });
 
 const mapScoresList = computed(() => {
-  if (!routeMapId.value) return [];
-  return scoresStore.getFlatScoresTableData(undefined, [routeMapId.value]);
+  if (!routeMapId.value || !routeCategory.value) return [];
+  const allScoresForMap = scoresStore.getFlatScoresTableData(undefined, [
+    routeMapId.value,
+  ]);
+  return allScoresForMap.filter((score) =>
+    isValidModCombinationForCategory([score.mods], routeCategory.value!)
+  );
 });
 
 onMounted(async () => {
