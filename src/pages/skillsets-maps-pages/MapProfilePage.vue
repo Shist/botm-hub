@@ -75,7 +75,7 @@
         <ScoresTable
           :scoresList="mapScoresList"
           :isLoading="isLoading"
-          :hiddenColumns="['mapId', 'cover', 'mapName', 'link']"
+          :hiddenColumns="['mapId', 'cover', 'mapName', 'link', 'maxSr']"
         />
       </div>
       <div

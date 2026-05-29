@@ -12,7 +12,7 @@
     <v-skeleton-loader type="table" :loading="isLoading">
       <v-data-table-virtual
         :headers="visibleHeaders"
-        :items="scoresList"
+        :items="enrichedScoresList"
         :item-value="'uidWithMapIdAndMods'"
         :search="searchQuery"
         :custom-filter="customFilter"
@@ -91,6 +91,80 @@
             {{ item.mods.toUpperCase() }}
           </v-chip>
         </template>
+        <template #[`item.maxSr`]="{ item }">
+          <div class="scores-table__sr-cell">
+            <template
+              v-if="item.validSrInfo.length === 1 && item.validSrInfo[0]"
+            >
+              <div class="scores-table__sr-single">
+                <CategoryBadge :category="item.validSrInfo[0].category" />
+                <div class="scores-table__sr-wrapper">
+                  <span class="scores-table__sr-text">
+                    {{ item.validSrInfo[0].sr.toFixed(2) }}⭐
+                  </span>
+                  <v-tooltip
+                    v-if="item.validSrInfo[0].isFmTb"
+                    text="SR базовой карты (без учёта модов)"
+                    location="top"
+                  >
+                    <template #activator="{ props }">
+                      <v-icon
+                        v-bind="props"
+                        size="16"
+                        color="var(--color-text-gray)"
+                        class="scores-table__sr-info-icon"
+                      >
+                        mdi-information-outline
+                      </v-icon>
+                    </template>
+                  </v-tooltip>
+                </div>
+              </div>
+            </template>
+            <template v-else-if="item.validSrInfo.length > 1">
+              <v-tooltip
+                location="top"
+                content-class="scores-table__tooltip-bg"
+              >
+                <template #activator="{ props }">
+                  <div v-bind="props" class="scores-table__sr-mixed">
+                    <v-icon
+                      size="20"
+                      color="var(--color-table-score-sr-mixed-icon)"
+                    >
+                      mdi-star-circle-outline
+                    </v-icon>
+                    <span class="scores-table__sr-text">
+                      {{ item.maxSr.toFixed(2) }}⭐
+                    </span>
+                  </div>
+                </template>
+                <div class="scores-table__sr-tooltip">
+                  <span class="scores-table__sr-tooltip-title">
+                    Подходящие категории:
+                  </span>
+                  <div
+                    v-for="info in item.validSrInfo"
+                    :key="info.category"
+                    class="scores-table__sr-tooltip-row"
+                  >
+                    <CategoryBadge :category="info.category" />
+                    <div class="scores-table__sr-tooltip-sr-wrapper">
+                      <span> {{ info.sr.toFixed(2) }}⭐ </span>
+                      <span
+                        v-if="info.isFmTb"
+                        class="scores-table__sr-tooltip-nm"
+                      >
+                        (NM)
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </v-tooltip>
+            </template>
+            <span v-else>—</span>
+          </div>
+        </template>
         <template #[`item.date`]="{ item }">
           <div class="scores-table__date-wrapper">
             <span class="scores-table__date">
@@ -166,11 +240,12 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from "vue";
 import { useRouter } from "vue-router";
+import { useOsumapsStore } from "@/stores/osumaps";
 import useToast from "@/composables/useToast";
 import UserCard from "@/components/users/UserCard.vue";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
-import { formatMapRank } from "@/utils";
-import { type OsuMapCategory } from "@/types/osumaps";
+import { formatMapRank, isValidModCombinationForCategory } from "@/utils";
+import { OsuMapCategory } from "@/types/osumaps";
 import { type IScoreTableRow } from "@/types/scores";
 
 type DataTableHeader = {
@@ -187,6 +262,8 @@ type DataTableHeader = {
 };
 
 const router = useRouter();
+
+const mapsStore = useOsumapsStore();
 
 const props = withDefaults(
   defineProps<{
@@ -249,6 +326,12 @@ const allHeaders = reactive<DataTableHeader[]>([
     key: "mods",
     title: "Моды",
     minWidth: "96px",
+    align: "center",
+  },
+  {
+    key: "maxSr",
+    title: "Скиллсет / SR",
+    minWidth: "154px",
     align: "center",
   },
   {
@@ -316,17 +399,61 @@ const visibleHeaders = computed(() => {
   );
 });
 
+const enrichedScoresList = computed(() => {
+  const allMaps = mapsStore.getMapsOfGivenCategories(
+    Object.values(OsuMapCategory)
+  );
+
+  return props.scoresList.map((score) => {
+    const validDbMaps = allMaps.filter(
+      (m) =>
+        m.id === score.mapId &&
+        isValidModCombinationForCategory([score.mods], m.category)
+    );
+
+    const validSrInfo = validDbMaps
+      .map((m) => {
+        const catUpper = m.category.toUpperCase();
+        return {
+          category: m.category,
+          sr: m.starRate,
+          isFmTb: catUpper.startsWith("FM") || catUpper === "TB",
+        };
+      })
+      .sort((a, b) => b.sr - a.sr);
+
+    const maxSr = validSrInfo.length > 0 ? (validSrInfo[0]?.sr ?? 0) : 0;
+
+    return {
+      ...score,
+      validSrInfo,
+      maxSr,
+    };
+  });
+});
+
 const customFilter = (
   _: unknown,
   query: string,
-  item?: { raw: IScoreTableRow }
+  item?: {
+    raw: IScoreTableRow & {
+      validSrInfo?: { category: string; sr: number }[];
+      maxSr?: number;
+    };
+  }
 ) => {
   if (!query || !item) return true;
 
   const q = query.toLowerCase();
   const row = item.raw;
 
+  const matchesCategoryOrSr = row.validSrInfo?.some(
+    (info) =>
+      info.category.toLowerCase().includes(q) || info.sr.toFixed(2).includes(q)
+  );
+
   return (
+    matchesCategoryOrSr ||
     row.user.nick.toLowerCase().includes(q) ||
     row.mapName.toLowerCase().includes(q) ||
     row.mods.toLowerCase().includes(q) ||
@@ -483,6 +610,80 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
   &__mods-chip {
     font-weight: bold;
     color: var(--color-text-white);
+  }
+  &__sr-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    @media (max-width: $tablet-l) {
+      justify-content: flex-end;
+    }
+  }
+  &__sr-single {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  &__sr-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  &__sr-text {
+    font-weight: bold;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+  &__sr-info-icon {
+    margin-bottom: 1px;
+    cursor: help;
+    opacity: 0.7;
+    &:hover {
+      opacity: 1;
+    }
+  }
+  &__sr-mixed {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: help;
+    padding: 8px;
+    border-radius: 10px;
+    background-color: var(--color-table-score-sr-mixed-bg);
+    transition: background-color 0.3s;
+    &:hover {
+      background-color: var(--color-table-score-sr-mixed-bg-hover);
+    }
+  }
+  &__sr-tooltip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 4px;
+  }
+  &__sr-tooltip-title {
+    @include default-text(14px, 14px, inherit);
+  }
+  &__sr-tooltip-row {
+    @include default-text(14px, 14px, inherit);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: bold;
+  }
+  &__sr-tooltip-sr-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  &__sr-tooltip-nm {
+    margin-bottom: 1px;
+    font-size: 11px;
+    opacity: 0.7;
+    font-weight: normal;
+  }
+  &__tooltip-bg {
+    background-color: var(--color-bg);
+    border: 1px solid var(--color-vuetify-table-borders);
   }
   &__date-wrapper {
     display: flex;
