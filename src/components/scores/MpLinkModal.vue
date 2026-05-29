@@ -177,7 +177,24 @@ const fetchAndProcessLobby = async () => {
     const response = await fetch(
       `https://botm-hub-api.vercel.app/api/match?id=${chosenMpLinkId.value}`
     );
-    if (!response.ok) throw new Error(`Ошибка сервера: ${response.status}`);
+
+    if (!response.ok) {
+      let errorText = `Ошибка сервера: ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.error) errorText = errorData.error;
+      } catch (error) {
+        console.error("For some reason both-hub-api returned not JSON:", error);
+      }
+      if (response.status === 404 || errorText.includes("404")) {
+        throw new Error("Лобби с таким ID не существует!");
+      }
+      if (response.status === 401 || errorText.includes("401")) {
+        throw new Error("Это приватное лобби! API osu! не даёт к нему доступ!");
+      }
+      throw new Error(errorText);
+    }
+
     const data = await response.json();
 
     await loadDependencies();
