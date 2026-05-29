@@ -33,8 +33,8 @@
               </span>
             </div>
             <v-tooltip
-              :disabled="!isLeaderOfThisClub"
-              text="Лидер не может покинуть свой клуб!"
+              :disabled="!joinBtnTooltipText"
+              :text="joinBtnTooltipText"
               location="bottom"
             >
               <template #activator="{ props }">
@@ -43,7 +43,7 @@
                   class="w-100 club-profile-page__join-btn-wrapper"
                 >
                   <v-btn
-                    :disabled="isLeaderOfThisClub"
+                    :disabled="isJoinBtnDisabled"
                     :loading="isUpdatingMembership"
                     height="50"
                     class="club-profile-page__join-btn"
@@ -310,6 +310,15 @@ const isActiveMember = computed(() => !!currentUserMembershipRecord.value);
 const isLeaderOfThisClub = computed(
   () => clubLeader.value?.uid === currentUserUid.value
 );
+const isJoinBtnDisabled = computed(() => {
+  return !currentUserUid.value || isLeaderOfThisClub.value;
+});
+const joinBtnTooltipText = computed(() => {
+  if (!currentUserUid.value)
+    return "Для вступления в клуб необходимо войти в аккаунт!";
+  if (isLeaderOfThisClub.value) return "Лидер не может покинуть свой клуб!";
+  return "";
+});
 
 const membershipDuration = computed(() => {
   if (!isActiveMember.value || !currentUserMembershipRecord.value) return "";
