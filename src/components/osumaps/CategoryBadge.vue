@@ -21,6 +21,7 @@ const categoryLabel = computed(() => `${props.category}`.toUpperCase());
   padding: 4px;
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 45px;
   border-radius: 10px;
   @media (max-width: $phone-l) {

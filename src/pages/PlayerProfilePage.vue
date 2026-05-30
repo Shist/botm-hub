@@ -1,96 +1,98 @@
 <template>
   <div class="player-profile-page">
     <v-skeleton-loader type="image, paragraph" :loading="isLoading">
-      <div v-if="playerInfo" class="player-profile-page__user-info-wrapper">
-        <v-tooltip
-          :disabled="playerInfo?.osuId !== null"
-          text="Этот игрок пока не указал свой osu! ID"
-          location="top"
-        >
-          <template #activator="{ props }">
-            <AppImage
-              v-bind="props"
-              :imgPath="avatarSrc"
-              imgAlt="Аватар"
-              class="player-profile-page__avatar"
-            />
-          </template>
-        </v-tooltip>
-        <div class="player-profile-page__info-wrapper">
-          <span>Ник:</span>
-          <span>
-            {{ playerInfo?.nick ?? "(не указан)" }}
-          </span>
-          <span>osu! ID:</span>
-          <a
-            v-if="playerInfo?.osuId"
-            :href="`https://osu.ppy.sh/users/${playerInfo?.osuId}`"
-            target="_blank"
+      <div v-if="playerInfo" class="player-profile-page__user-data-wrapper">
+        <div class="player-profile-page__user-info-wrapper">
+          <v-tooltip
+            :disabled="playerInfo?.osuId !== null"
+            text="Этот игрок пока не указал свой osu! ID"
+            location="top"
           >
-            {{ playerInfo?.osuId }}
-          </a>
-          <span v-else>(не указан)</span>
-          <span>Скиллсеты:</span>
-          <div class="player-profile-page__categories-wrapper">
-            <template v-if="playerSkillsets.length">
-              <CategoryBadge
-                v-for="skillset in playerSkillsets"
-                :key="skillset"
-                :category="skillset"
+            <template #activator="{ props }">
+              <AppImage
+                v-bind="props"
+                :imgPath="avatarSrc"
+                imgAlt="Аватар"
+                class="player-profile-page__avatar"
               />
             </template>
-            <span v-else>(не указаны)</span>
-          </div>
-          <span>Особые тэги:</span>
-          <div class="player-profile-page__tags-wrapper">
-            <IconAdmin v-if="isShist" />
-            <IconRedactor v-if="isRedactor" />
-            <IconTrainer v-if="isTrainer" />
-            <IconAimLead v-if="isAimLead" />
-            <IconSpeedLead v-if="isSpeedLead" />
-            <IconTechLead v-if="isTechLead" />
-            <IconReadingLead v-if="isReadingLead" />
-            <IconHiddenLead v-if="isHiddenLead" />
-            <IconHardrockLead v-if="isHardrockLead" />
-            <component :is="digitIconComponent" />
-            <span
-              v-if="!hasSomeTags"
-              class="player-profile-page__no-tags-label"
+          </v-tooltip>
+          <div class="player-profile-page__info-wrapper">
+            <span>Ник:</span>
+            <span>
+              {{ playerInfo?.nick ?? "(не указан)" }}
+            </span>
+            <span>osu! ID:</span>
+            <a
+              v-if="playerInfo?.osuId"
+              :href="`https://osu.ppy.sh/users/${playerInfo?.osuId}`"
+              target="_blank"
             >
-              (пока нет)
-            </span>
-          </div>
-          <span>Клубы:</span>
-          <div class="player-profile-page__tags-wrapper">
-            <template v-if="playerClubs.length">
-              <IconAimMember
-                v-if="playerClubs.includes(BotmClub.AIM)"
-                class="player-profile-page__club-icon player-profile-page__club-icon_aim"
-              />
-              <IconSpeedMember
-                v-if="playerClubs.includes(BotmClub.SPEED)"
-                class="player-profile-page__club-icon player-profile-page__club-icon_speed"
-              />
-              <IconTechMember
-                v-if="playerClubs.includes(BotmClub.TECH)"
-                class="player-profile-page__club-icon player-profile-page__club-icon_tech"
-              />
-              <IconReadingMember
-                v-if="playerClubs.includes(BotmClub.READING)"
-                class="player-profile-page__club-icon player-profile-page__club-icon_reading"
-              />
-              <IconHiddenMember
-                v-if="playerClubs.includes(BotmClub.HIDDEN)"
-                class="player-profile-page__club-icon player-profile-page__club-icon_hidden"
-              />
-              <IconHardrockMember
-                v-if="playerClubs.includes(BotmClub.HARDROCK)"
-                class="player-profile-page__club-icon player-profile-page__club-icon_hardrock"
-              />
-            </template>
-            <span v-else class="player-profile-page__no-tags-label">
-              (не состоит)
-            </span>
+              {{ playerInfo?.osuId }}
+            </a>
+            <span v-else>(не указан)</span>
+            <span>Скиллсеты:</span>
+            <div class="player-profile-page__categories-wrapper">
+              <template v-if="playerSkillsets.length">
+                <CategoryBadge
+                  v-for="skillset in playerSkillsets"
+                  :key="skillset"
+                  :category="skillset"
+                />
+              </template>
+              <span v-else>(не указаны)</span>
+            </div>
+            <span>Особые тэги:</span>
+            <div class="player-profile-page__tags-wrapper">
+              <IconAdmin v-if="isShist" />
+              <IconRedactor v-if="isRedactor" />
+              <IconTrainer v-if="isTrainer" />
+              <IconAimLead v-if="isAimLead" />
+              <IconSpeedLead v-if="isSpeedLead" />
+              <IconTechLead v-if="isTechLead" />
+              <IconReadingLead v-if="isReadingLead" />
+              <IconHiddenLead v-if="isHiddenLead" />
+              <IconHardrockLead v-if="isHardrockLead" />
+              <component :is="digitIconComponent" />
+              <span
+                v-if="!hasSomeTags"
+                class="player-profile-page__no-tags-label"
+              >
+                (пока нет)
+              </span>
+            </div>
+            <span>Клубы:</span>
+            <div class="player-profile-page__tags-wrapper">
+              <template v-if="playerClubs.length">
+                <IconAimMember
+                  v-if="playerClubs.includes(BotmClub.AIM)"
+                  class="player-profile-page__club-icon player-profile-page__club-icon_aim"
+                />
+                <IconSpeedMember
+                  v-if="playerClubs.includes(BotmClub.SPEED)"
+                  class="player-profile-page__club-icon player-profile-page__club-icon_speed"
+                />
+                <IconTechMember
+                  v-if="playerClubs.includes(BotmClub.TECH)"
+                  class="player-profile-page__club-icon player-profile-page__club-icon_tech"
+                />
+                <IconReadingMember
+                  v-if="playerClubs.includes(BotmClub.READING)"
+                  class="player-profile-page__club-icon player-profile-page__club-icon_reading"
+                />
+                <IconHiddenMember
+                  v-if="playerClubs.includes(BotmClub.HIDDEN)"
+                  class="player-profile-page__club-icon player-profile-page__club-icon_hidden"
+                />
+                <IconHardrockMember
+                  v-if="playerClubs.includes(BotmClub.HARDROCK)"
+                  class="player-profile-page__club-icon player-profile-page__club-icon_hardrock"
+                />
+              </template>
+              <span v-else class="player-profile-page__no-tags-label">
+                (не состоит)
+              </span>
+            </div>
           </div>
         </div>
         <v-divider class="player-profile-page__divider border-opacity-100" />
@@ -233,11 +235,21 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .player-profile-page {
-  &__user-info-wrapper {
+  &__user-data-wrapper {
     display: flex;
     flex-direction: column;
     align-items: center;
     row-gap: 20px;
+  }
+  &__user-info-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    @media (max-width: $tablet-l) {
+      flex-direction: column;
+    }
   }
   &__avatar {
     max-width: 320px;
@@ -245,12 +257,15 @@ onMounted(async () => {
   }
   &__info-wrapper {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: auto 1fr;
     gap: 20px;
     @include default-text(24px, 24px, var(--color-text));
     :nth-child(odd) {
       justify-self: end;
       text-align: end;
+    }
+    @media (max-width: $tablet-l) {
+      grid-template-columns: 1fr 1fr;
     }
     @media (max-width: $phone-l) {
       font-size: 16px;
@@ -258,6 +273,7 @@ onMounted(async () => {
     }
   }
   &__categories-wrapper {
+    max-width: 600px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
