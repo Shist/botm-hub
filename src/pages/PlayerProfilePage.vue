@@ -60,6 +60,38 @@
               (пока нет)
             </span>
           </div>
+          <span>Клубы:</span>
+          <div class="player-profile-page__tags-wrapper">
+            <template v-if="playerClubs.length">
+              <IconAimMember
+                v-if="playerClubs.includes(BotmClub.AIM)"
+                class="player-profile-page__club-icon player-profile-page__club-icon_aim"
+              />
+              <IconSpeedMember
+                v-if="playerClubs.includes(BotmClub.SPEED)"
+                class="player-profile-page__club-icon player-profile-page__club-icon_speed"
+              />
+              <IconTechMember
+                v-if="playerClubs.includes(BotmClub.TECH)"
+                class="player-profile-page__club-icon player-profile-page__club-icon_tech"
+              />
+              <IconReadingMember
+                v-if="playerClubs.includes(BotmClub.READING)"
+                class="player-profile-page__club-icon player-profile-page__club-icon_reading"
+              />
+              <IconHiddenMember
+                v-if="playerClubs.includes(BotmClub.HIDDEN)"
+                class="player-profile-page__club-icon player-profile-page__club-icon_hidden"
+              />
+              <IconHardrockMember
+                v-if="playerClubs.includes(BotmClub.HARDROCK)"
+                class="player-profile-page__club-icon player-profile-page__club-icon_hardrock"
+              />
+            </template>
+            <span v-else class="player-profile-page__no-tags-label">
+              (не состоит)
+            </span>
+          </div>
         </div>
         <v-divider class="player-profile-page__divider border-opacity-100" />
         <h2 class="player-profile-page__scores-headline">
@@ -92,6 +124,7 @@ import { useRoute } from "vue-router";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
+import { useClubsStore } from "@/stores/clubs";
 import useUserTags from "@/composables/useUserTags";
 import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
@@ -99,20 +132,28 @@ import ScoresTable from "@/components/scores/ScoresTable.vue";
 import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
 import IconRedactor from "@/components/users/user-icons/IconRedactor.vue";
 import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
-import IconAimLead from "@/components/users/user-icons/IconAimLead.vue";
-import IconSpeedLead from "@/components/users/user-icons/IconSpeedLead.vue";
-import IconTechLead from "@/components/users/user-icons/IconTechLead.vue";
-import IconReadingLead from "@/components/users/user-icons/IconReadingLead.vue";
-import IconHiddenLead from "@/components/users/user-icons/IconHiddenLead.vue";
-import IconHardrockLead from "@/components/users/user-icons/IconHardrockLead.vue";
+import IconAimLead from "@/components/users/user-icons/clubs/leads/IconAimLead.vue";
+import IconSpeedLead from "@/components/users/user-icons/clubs/leads/IconSpeedLead.vue";
+import IconTechLead from "@/components/users/user-icons/clubs/leads/IconTechLead.vue";
+import IconReadingLead from "@/components/users/user-icons/clubs/leads/IconReadingLead.vue";
+import IconHiddenLead from "@/components/users/user-icons/clubs/leads/IconHiddenLead.vue";
+import IconHardrockLead from "@/components/users/user-icons/clubs/leads/IconHardrockLead.vue";
+import IconAimMember from "@/components/users/user-icons/clubs/members/IconAimMember.vue";
+import IconSpeedMember from "@/components/users/user-icons/clubs/members/IconSpeedMember.vue";
+import IconTechMember from "@/components/users/user-icons/clubs/members/IconTechMember.vue";
+import IconReadingMember from "@/components/users/user-icons/clubs/members/IconReadingMember.vue";
+import IconHiddenMember from "@/components/users/user-icons/clubs/members/IconHiddenMember.vue";
+import IconHardrockMember from "@/components/users/user-icons/clubs/members/IconHardrockMember.vue";
 import { type IAllUsersListItem } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
+import { BotmClub } from "@/types/clubs";
 
 const route = useRoute();
 
 const usersStore = useUsersStore();
 const osumapsStore = useOsumapsStore();
 const scoresStore = useScoresStore();
+const clubsStore = useClubsStore();
 
 const { setErrorToast } = useToast();
 
@@ -162,6 +203,14 @@ const hasSomeTags = computed(
     isHiddenLead.value ||
     isHardrockLead.value
 );
+
+const playerClubs = computed<BotmClub[]>(() => {
+  const uid = playerInfo.value?.uid;
+  if (!uid) return [];
+  return Object.values(clubsStore.clubs)
+    .filter((club) => club.members[uid])
+    .map((club) => club.id);
+});
 
 onMounted(async () => {
   try {
@@ -226,6 +275,32 @@ onMounted(async () => {
         width: 30px;
         height: 30px;
       }
+    }
+  }
+  &__club-icon {
+    width: 50px;
+    height: 50px;
+    @media (max-width: $phone-l) {
+      width: 30px;
+      height: 30px;
+    }
+    &_aim {
+      color: var(--color-club-aim);
+    }
+    &_speed {
+      color: var(--color-club-speed);
+    }
+    &_tech {
+      color: var(--color-club-tech);
+    }
+    &_reading {
+      color: var(--color-club-reading);
+    }
+    &_hidden {
+      color: var(--color-club-hidden);
+    }
+    &_hardrock {
+      color: var(--color-club-hardrock);
     }
   }
   &__divider {

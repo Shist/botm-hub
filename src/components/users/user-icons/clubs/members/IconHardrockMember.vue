@@ -1,0 +1,22 @@
+<template>
+  <v-tooltip text="Член Hardrock Клуба" location="top">
+    <template #activator="{ props }">
+      <svg
+        v-bind="props"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M21,3V15.5A3.5,3.5 0 0,1 17.5,19A3.5,3.5 0 0,1 14,15.5A3.5,3.5 0 0,1 17.5,12C18.04,12 18.55,12.12 19,12.34V6.47L9,8.6V17.5A3.5,3.5 0 0,1 5.5,21A3.5,3.5 0 0,1 2,17.5A3.5,3.5 0 0,1 5.5,14C6.04,14 6.55,14.12 7,14.34V6L21,3Z"
+          fill="var(--color-club-hardrock)"
+        />
+        <path
+          d="M6 17c-2 0-6 1-6 3v2h12v-2c0-2-4-3-6-3zm0-1a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"
+          fill="currentColor"
+          stroke="var(--color-global-bg)"
+          stroke-width="1.5"
+        />
+      </svg>
+    </template>
+  </v-tooltip>
+</template>
