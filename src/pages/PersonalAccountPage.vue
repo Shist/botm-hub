@@ -56,6 +56,20 @@
             hide-details
           />
           <SkillsetsSelect v-model="chosenCategories" />
+          <v-textarea
+            v-model="chosenDescription"
+            :counter="300"
+            :rules="[rules.max(300)]"
+            variant="solo"
+            prepend-inner-icon="mdi-text-box-outline"
+            label="О себе"
+            placeholder="Здесь ты можешь написать пару слов о себе..."
+            persistent-counter
+            clearable
+            auto-grow
+            rows="3"
+            max-rows="3"
+          />
         </v-form>
       </div>
       <v-btn
@@ -153,6 +167,7 @@ const chosenOsuId = ref<number | null>(null);
 const chosenNick = ref<string | null>(null);
 const chosenDigit = ref<DigitCategory | null>(null);
 const chosenCategories = ref<OsuMapCategory[]>([]);
+const chosenDescription = ref<string | null>(null);
 const isUpdating = ref(false);
 const ehCollabImagePath = ref(ehCollabImage);
 const isMpModalOpened = ref(false);
@@ -182,6 +197,9 @@ const currentDigit = computed(() => {
 const currentSkillsets = computed(() => {
   return authStore.userAdditionalInfo?.skillsets ?? [];
 });
+const currentDescription = computed(() => {
+  return authStore.userAdditionalInfo?.profileDescription ?? "";
+});
 const currentUserUid = computed(() => authStore.user?.uid);
 
 const isSomeInfoChanged = computed(() => {
@@ -191,6 +209,7 @@ const isSomeInfoChanged = computed(() => {
     chosenOsuId.value !== osuIdFromStore ||
     chosenNick.value !== currentNick.value ||
     chosenDigit.value !== currentDigit.value ||
+    chosenDescription.value !== currentDescription.value ||
     JSON.stringify(chosenCategories.value) !==
       JSON.stringify(currentSkillsets.value)
   );
@@ -214,12 +233,16 @@ watch(currentDigit, (valueFromStore) => {
 watch(currentSkillsets, (valueFromStore) => {
   chosenCategories.value = valueFromStore;
 });
+watch(currentDescription, (valueFromStore) => {
+  chosenDescription.value = valueFromStore;
+});
 
 onMounted(async () => {
   chosenOsuId.value = currentOsuId.value === null ? null : +currentOsuId.value;
   chosenNick.value = currentNick.value;
   chosenDigit.value = currentDigit.value;
   chosenCategories.value = currentSkillsets.value;
+  chosenDescription.value = currentDescription.value;
 
   try {
     isDependenciesLoading.value = true;
@@ -247,6 +270,7 @@ const onUpdate = async () => {
       nick: chosenNick.value ?? "",
       digitCategory: chosenDigit.value,
       skillsets: JSON.stringify(chosenCategories.value),
+      profileDescription: chosenDescription.value?.trim() || null,
     });
     await usersStore.loadAllUsers();
     setSuccessToast("🥳🥳🥳 Информация успешно обновлена!!! 🥳🥳🥳");
@@ -285,7 +309,7 @@ const onUpdate = async () => {
     }
   }
   &__avatar {
-    max-width: 276px;
+    max-width: 408px;
     width: 100%;
   }
   &__inputs-wrapper {

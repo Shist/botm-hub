@@ -11,6 +11,7 @@ export interface IUserAdditionalInfoBase {
   email: string;
   osuId: string | null;
   nick: string;
+  profileDescription: string | null;
   digitCategory: DigitCategory | null;
   isTrainer: boolean;
   isRedactor: boolean;

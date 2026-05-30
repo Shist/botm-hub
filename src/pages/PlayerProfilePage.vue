@@ -93,6 +93,10 @@
                 (не состоит)
               </span>
             </div>
+            <span>О себе:</span>
+            <span class="player-profile-page__description">
+              {{ playerInfo.profileDescription ?? "(пока не написал)" }}
+            </span>
           </div>
         </div>
         <v-divider class="player-profile-page__divider border-opacity-100" />
@@ -252,7 +256,7 @@ onMounted(async () => {
     }
   }
   &__avatar {
-    max-width: 320px;
+    max-width: 398px;
     width: 100%;
   }
   &__info-wrapper {
@@ -318,6 +322,16 @@ onMounted(async () => {
     &_hardrock {
       color: var(--color-club-hardrock);
     }
+  }
+  &__description {
+    padding: 10px;
+    max-width: 600px;
+    height: 92px;
+    overflow: auto;
+    background-color: var(--color-text-area-bg);
+    white-space: pre-wrap;
+    opacity: 0.9;
+    border-radius: 10px;
   }
   &__divider {
     width: 100%;

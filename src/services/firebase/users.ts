@@ -55,6 +55,7 @@ async function updateUserAdditionalInfoToFirebase(
         uid: userUid,
         osuId: additionalInfo.osuId,
         nick: additionalInfo.nick,
+        profileDescription: additionalInfo.profileDescription,
         digitCategory: additionalInfo.digitCategory,
         skillsets: additionalInfo.skillsets,
         isTrainer: additionalInfo.isTrainer,
@@ -65,6 +66,8 @@ async function updateUserAdditionalInfoToFirebase(
         additionalInfo.osuId;
       (allUsers[existingUserIndex] as IAllUsersListItem).nick =
         additionalInfo.nick;
+      (allUsers[existingUserIndex] as IAllUsersListItem).profileDescription =
+        additionalInfo.profileDescription;
       (allUsers[existingUserIndex] as IAllUsersListItem).digitCategory =
         additionalInfo.digitCategory;
       (allUsers[existingUserIndex] as IAllUsersListItem).skillsets =
@@ -98,6 +101,7 @@ async function signUpUserToFirebase(
     const fullAdditionalInfo: IUserFirebaseAdditionalInfo = {
       ...partialInfo,
       osuId: null,
+      profileDescription: null,
       digitCategory: null,
       skillsets: "[]",
       isTrainer: false,
