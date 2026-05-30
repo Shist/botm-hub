@@ -1,6 +1,6 @@
 <template>
   <div class="personal-account-page">
-    <v-skeleton-loader type="image, article" :loading="isPageLoading">
+    <v-skeleton-loader type="image, article, table" :loading="isPageLoading">
       <h2 class="personal-account-page__headline">Личный Кабинет</h2>
       <div class="personal-account-page__avatar-inputs-wrapper">
         <v-tooltip

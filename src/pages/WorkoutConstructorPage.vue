@@ -60,7 +60,7 @@
       v-if="isMapsSectionVisible"
       class="workout-constructor-page__maps-section-wrapper"
     >
-      <v-skeleton-loader type="paragraph" :loading="isPreparingMaps">
+      <v-skeleton-loader type="paragraph, table" :loading="isPreparingMaps">
         <div class="workout-constructor-page__session-info-wrapper">
           <div class="workout-constructor-page__session-block">
             <span>Всего карт:</span>

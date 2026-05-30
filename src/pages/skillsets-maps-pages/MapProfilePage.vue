@@ -1,6 +1,6 @@
 <template>
   <div class="map-profile-page">
-    <v-skeleton-loader type="image, paragraph" :loading="isLoading">
+    <v-skeleton-loader type="image, paragraph, table" :loading="isLoading">
       <div v-if="routeCategory && mapInfo" class="map-profile-page__content">
         <div class="map-profile-page__banner-wrapper">
           <v-img

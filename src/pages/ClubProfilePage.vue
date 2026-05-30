@@ -1,6 +1,6 @@
 <template>
   <div class="club-profile-page">
-    <v-skeleton-loader type="image, article" :loading="isLoading">
+    <v-skeleton-loader type="image, article, table" :loading="isLoading">
       <div v-if="isValidClub && clubData" class="club-profile-page__content">
         <h2
           class="club-profile-page__headline"

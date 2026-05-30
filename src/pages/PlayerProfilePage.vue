@@ -1,6 +1,6 @@
 <template>
   <div class="player-profile-page">
-    <v-skeleton-loader type="image, paragraph" :loading="isLoading">
+    <v-skeleton-loader type="image, paragraph, table" :loading="isLoading">
       <div v-if="playerInfo" class="player-profile-page__user-data-wrapper">
         <div class="player-profile-page__user-info-wrapper">
           <v-tooltip
