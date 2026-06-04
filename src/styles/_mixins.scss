@@ -39,6 +39,7 @@
     box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.2);
   }
   &:disabled {
+    color: $text-color;
     background-color: $bg-color;
     transform: none;
     filter: grayscale(50%);
