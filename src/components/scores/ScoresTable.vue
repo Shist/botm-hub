@@ -113,6 +113,7 @@
                         size="16"
                         color="var(--color-text-gray)"
                         class="scores-table__sr-info-icon"
+                        @click.stop
                       >
                         mdi-information-outline
                       </v-icon>
@@ -127,7 +128,11 @@
                 content-class="scores-table__tooltip-bg"
               >
                 <template #activator="{ props }">
-                  <div v-bind="props" class="scores-table__sr-mixed">
+                  <div
+                    v-bind="props"
+                    class="scores-table__sr-mixed"
+                    @click.stop
+                  >
                     <v-icon
                       size="20"
                       color="var(--color-table-score-sr-mixed-icon)"
