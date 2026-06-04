@@ -19,7 +19,14 @@
       <v-text-field
         v-model="nick"
         :counter="15"
-        :rules="[rules.min(3), rules.max(15)]"
+        :rules="[
+          rules.min(3),
+          rules.max(15),
+          rules.notOnlySpaces,
+          rules.noEdgeSpaces,
+          rules.noMultipleSpaces,
+          rules.noMultipleUnderscores,
+        ]"
         autocomplete="username"
         variant="solo"
         prepend-inner-icon="mdi-account"
@@ -111,7 +118,7 @@ const onConfirmBtnClicked = async () => {
   setLoadingToast("Регистрация...");
 
   try {
-    const partialInfo = { nick: nick.value, email: email.value };
+    const partialInfo = { nick: nick.value.trim(), email: email.value };
     await authStore.signUpUser(email.value, password.value, partialInfo);
 
     email.value = "";

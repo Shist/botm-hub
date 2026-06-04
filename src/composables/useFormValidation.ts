@@ -23,6 +23,18 @@ export default function useFormValidation() {
     isValidEmail: (emailValue: string | null) =>
       /^[a-z\d._%+-]+@[a-z\d.-]+\.[a-z]{2,}$/i.test(emailValue ?? "") ||
       "Требуется указать валидную почту!",
+    notOnlySpaces: (givenValue: string | null) =>
+      (givenValue ?? "").trim().length > 0 ||
+      "Требуется, чтобы поле не состояло только из пробелов!",
+    noEdgeSpaces: (givenValue: string | null) =>
+      !/^\s|\s$/.test(givenValue ?? "") ||
+      "Требуется, чтобы не было пробелов в начале или конце!",
+    noMultipleSpaces: (givenValue: string | null) =>
+      !/\s{2,}/.test(givenValue ?? "") ||
+      "Требуется, чтобы внутри поля не было нескольких пробелов подряд!",
+    noMultipleUnderscores: (givenValue: string | null) =>
+      !/_{2,}/.test(givenValue ?? "") ||
+      "Требуется, чтобы внутри поля не было нескольких подчеркиваний подряд!",
     isStrongPassword: (passwordValue: string | null) =>
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(passwordValue ?? "") ||
       "Требуется минимум одна строчная и одна заглавная латинские буквы, а также цифра!",

@@ -36,7 +36,14 @@
           <v-text-field
             v-model="chosenNick"
             :counter="15"
-            :rules="[rules.min(3), rules.max(15)]"
+            :rules="[
+              rules.min(3),
+              rules.max(15),
+              rules.notOnlySpaces,
+              rules.noEdgeSpaces,
+              rules.noMultipleSpaces,
+              rules.noMultipleUnderscores,
+            ]"
             autocomplete="username"
             variant="solo"
             prepend-inner-icon="mdi-account"
@@ -267,7 +274,7 @@ const onUpdate = async () => {
 
     await authStore.updateUserAdditionalInfo({
       osuId: chosenOsuId.value === null ? null : `${chosenOsuId.value}`,
-      nick: chosenNick.value ?? "",
+      nick: chosenNick.value?.trim() ?? "",
       digitCategory: chosenDigit.value,
       skillsets: JSON.stringify(chosenCategories.value),
       profileDescription: chosenDescription.value?.trim() || null,
