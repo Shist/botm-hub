@@ -1,18 +1,18 @@
 import { createRouter, createWebHistory } from "vue-router";
 import MainPage from "@/pages/MainPage.vue";
-import SignInPage from "@/pages/SignInPage.vue";
-import SignUpPage from "@/pages/SignUpPage.vue";
+import SignInPage from "@/pages/auth/SignInPage.vue";
+import SignUpPage from "@/pages/auth/SignUpPage.vue";
 import PersonalAccountPage from "@/pages/PersonalAccountPage.vue";
-import PlayersPage from "@/pages/PlayersPage.vue";
-import PlayerProfilePage from "@/pages/PlayerProfilePage.vue";
+import PlayersPage from "@/pages/players/PlayersPage.vue";
+import PlayerProfilePage from "@/pages/players/PlayerProfilePage.vue";
 import SkillsetsMapsPage from "@/pages/skillsets-maps/SkillsetsMapsPage.vue";
 import CategoryMapsPage from "@/pages/skillsets-maps/CategoryMapsPage.vue";
 import MapProfilePage from "@/pages/skillsets-maps/MapProfilePage.vue";
 import WorkoutConstructorPage from "@/pages/WorkoutConstructorPage.vue";
 import TrainingsPage from "@/pages/TrainingsPage.vue";
 import TournamentsPage from "@/pages/TournamentsPage.vue";
-import ClubsPage from "@/pages/ClubsPage.vue";
-import ClubProfilePage from "@/pages/ClubProfilePage.vue";
+import ClubsPage from "@/pages/clubs/ClubsPage.vue";
+import ClubProfilePage from "@/pages/clubs/ClubProfilePage.vue";
 import NotFoundPage from "@/pages/NotFoundPage.vue";
 import { useAuthStore } from "@/stores/auth";
 
