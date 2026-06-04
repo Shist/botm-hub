@@ -14,7 +14,7 @@
           color="currentColor"
         />
       </h2>
-      <SkillsetMapsTable :mapsList="categoryMapsList" :isLoading="isLoading" />
+      <SkillsetsMapsTable :mapsList="categoryMapsList" :isLoading="isLoading" />
     </template>
     <div v-else class="skillset-maps-page__not-found-wrapper">
       <h2 class="skillset-maps-page__not-found-headline">
@@ -34,7 +34,7 @@
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useOsumapsStore } from "@/stores/osumaps";
-import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
+import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import useToast from "@/composables/useToast";
 import { MAPS_CATEGORIES } from "@/constants";
 import { OsuMapCategory } from "@/types/osumaps";

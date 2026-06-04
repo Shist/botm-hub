@@ -13,14 +13,14 @@
         color="currentColor"
       />
     </h2>
-    <SkillsetMapsTable :mapsList="allMapsList" :isLoading="isLoading" />
+    <SkillsetsMapsTable :mapsList="allMapsList" :isLoading="isLoading" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
 import { useOsumapsStore } from "@/stores/osumaps";
-import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
+import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import useToast from "@/composables/useToast";
 
 const mapsStore = useOsumapsStore();

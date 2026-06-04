@@ -205,7 +205,11 @@
           <h3 class="club-profile-page__sub-headline">
             Профильные Мапы Клуба ({{ clubMaps.length }})
           </h3>
-          <SkillsetMapsTable :mapsList="clubMaps" :isLoading="isMapsLoading" />
+          <SkillsetsMapsTable
+            :mapsList="clubMaps"
+            :isLoading="isMapsLoading"
+            isFixedHeight
+          />
         </div>
       </div>
       <div v-else-if="!isValidClub" class="club-profile-page__not-found">
@@ -248,7 +252,7 @@ import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import { isBotmClub, BotmClub } from "@/types/clubs";
 import UserCard from "@/components/users/UserCard.vue";
-import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
+import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
 import LeaveClubModal from "@/components/clubs/LeaveClubModal.vue";
 import EditLeaderMsgModal from "@/components/clubs/EditLeaderMsgModal.vue";

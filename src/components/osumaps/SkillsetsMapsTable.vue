@@ -1,5 +1,5 @@
 <template>
-  <div class="skillset-maps-table">
+  <div class="skillsets-maps-table">
     <v-text-field
       v-model="searchQuery"
       variant="solo-filled"
@@ -20,12 +20,13 @@
         :fixed-header="true"
         hover
         hide-details
-        class="skillset-maps-table__content"
+        class="skillsets-maps-table__content"
+        :class="{ 'skillsets-maps-table__content_fixed-height': isFixedHeight }"
         @click:row="onRowClick"
       >
         <template #[`item.id`]="{ item }">
           <span
-            class="skillset-maps-table__id-label"
+            class="skillsets-maps-table__id-label"
             @click.stop="copyToClipboard(item.id)"
           >
             {{ item.id }}
@@ -48,14 +49,14 @@
           </v-tooltip>
         </template>
         <template #[`item.cover`]="{ item }">
-          <div class="skillset-maps-table__cover-wrapper">
+          <div class="skillsets-maps-table__cover-wrapper">
             <v-img
               :src="`https://assets.ppy.sh/beatmaps/${item.mapsetId}/covers/cover.jpg`"
               cover
               height="100%"
             >
               <template #placeholder>
-                <div class="skillset-maps-table__cover-loader">
+                <div class="skillsets-maps-table__cover-loader">
                   <v-progress-circular
                     indeterminate
                     size="16"
@@ -65,7 +66,7 @@
                 </div>
               </template>
               <template #error>
-                <div class="skillset-maps-table__cover-error">
+                <div class="skillsets-maps-table__cover-error">
                   <span>NO BG</span>
                 </div>
               </template>
@@ -75,10 +76,10 @@
         <template #[`item.category`]="{ item }">
           <CategoryBadge
             :category="item.category"
-            class="skillset-maps-table__badge"
+            class="skillsets-maps-table__badge"
           /> </template
         ><template #no-data>
-          <div class="skillset-maps-table__no-data">Нет данных о картах</div>
+          <div class="skillsets-maps-table__no-data">Нет данных о картах</div>
         </template>
       </v-data-table-virtual>
     </v-skeleton-loader>
@@ -111,9 +112,11 @@ const props = withDefaults(
     mapsList: IOsuMap[];
     isLoading: boolean;
     defaultSort?: { key: string; order?: "asc" | "desc" }[];
+    isFixedHeight?: boolean;
   }>(),
   {
     defaultSort: () => [{ key: "starRate", order: "asc" }],
+    isFixedHeight: false,
   }
 );
 
@@ -248,7 +251,7 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
 </script>
 
 <style lang="scss" scoped>
-.skillset-maps-table {
+.skillsets-maps-table {
   width: 100%;
   border: 4px solid var(--color-vuetify-table-borders);
   border-radius: 4px;
@@ -266,6 +269,9 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
     }
     @media (max-width: $phone-l) {
       height: calc(100dvh - 329px);
+    }
+    &_fixed-height {
+      height: 600px;
     }
   }
   &__id-label {

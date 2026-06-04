@@ -84,10 +84,11 @@
           </div>
         </div>
       </v-skeleton-loader>
-      <SkillsetMapsTable
+      <SkillsetsMapsTable
         v-if="isMapsSectionVisible"
         :mapsList="suggestedMapsList"
         :isLoading="isPreparingMaps"
+        isFixedHeight
       />
     </div>
   </div>
@@ -97,7 +98,7 @@
 import { ref, reactive, computed, watch } from "vue";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useAuthStore } from "@/stores/auth";
-import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
+import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
