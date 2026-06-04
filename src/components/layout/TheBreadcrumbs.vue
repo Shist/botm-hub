@@ -91,6 +91,22 @@ const breadcrumbs = computed(() => {
     return items;
   }
 
+  if (routeName === "skillsets-maps-all") {
+    items.push({
+      title: ROUTE_LABELS["skillsets-maps"] ?? "Карты Скиллсетов",
+      disabled: false,
+      to: "/skillsets-maps",
+    });
+
+    items.push({
+      title: "Все BOTM Мапы",
+      disabled: true,
+      to: route.path,
+    });
+
+    return items;
+  }
+
   if (routeName === "skillset-maps-category") {
     const categoryKey = String(route.params.category).toLowerCase();
 

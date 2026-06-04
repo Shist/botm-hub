@@ -90,11 +90,6 @@
         :isLoading="isLoading"
         :defaultSort="[{ key: 'date', order: 'desc' }]"
       />
-      <v-divider class="border-opacity-100" />
-      <h2 class="clubs-page__headline">
-        Все BOTM Мапы ({{ allMapsList.length }})
-      </h2>
-      <SkillsetMapsTable :mapsList="allMapsList" :isLoading="isLoading" />
     </v-skeleton-loader>
   </div>
 </template>
@@ -107,7 +102,6 @@ import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import UserCard from "@/components/users/UserCard.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
-import SkillsetMapsTable from "@/components/osumaps/SkillsetMapsTable.vue";
 import useToast from "@/composables/useToast";
 import { pluralizeRu } from "@/utils";
 import { CLUB_SETTINGS } from "@/constants";
@@ -172,11 +166,6 @@ const maxClubPoints = computed(() => {
 const allScoresList = computed(() => {
   if (isLoading.value) return [];
   return scoresStore.getFlatScoresTableData();
-});
-
-const allMapsList = computed(() => {
-  if (isLoading.value) return [];
-  return Object.values(mapsStore.osumaps).flat();
 });
 
 onMounted(async () => {

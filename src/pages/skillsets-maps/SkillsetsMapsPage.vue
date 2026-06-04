@@ -1,7 +1,13 @@
 <template>
   <div class="skillsets-maps-page">
     <h2 class="skillsets-maps-page__headline">Карты Скиллсетов</h2>
-    <nav>
+    <nav class="skillsets-maps-page__nav-wrapper">
+      <router-link
+        to="/skillsets-maps/all"
+        class="skillsets-maps-page__btn skillsets-maps-page__btn_all"
+      >
+        Все BOTM Мапы
+      </router-link>
       <ul class="skillsets-maps-page__links-list">
         <li
           v-for="(mapCategoryName, mapCategoryKey) in MAPS_CATEGORIES"
@@ -38,14 +44,21 @@ import { MAPS_CATEGORIES } from "@/constants";
       line-height: 20px;
     }
   }
-  &__links-list {
+  &__nav-wrapper {
     padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    @media (max-width: $tablet-l) {
+      padding: 15px;
+    }
+  }
+  &__links-list {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(7, 1fr);
     gap: 20px;
     @media (max-width: $tablet-l) {
-      padding: 15px;
       grid-template-columns: repeat(1, 1fr);
       grid-template-rows: repeat(21, 1fr);
     }
@@ -95,6 +108,9 @@ import { MAPS_CATEGORIES } from "@/constants";
     @media (max-width: $phone-l) {
       font-size: 20px;
       line-height: 20px;
+    }
+    &_all {
+      background-color: var(--color-btn-bg-skillsets-maps);
     }
     &_nm1 {
       background-color: var(--color-btn-bg-nm1);
