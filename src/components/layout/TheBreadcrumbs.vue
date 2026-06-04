@@ -91,11 +91,12 @@ const breadcrumbs = computed(() => {
     return items;
   }
 
-  if (routeName.startsWith("skillsets-maps-")) {
-    const categoryKey = routeName.replace("skillsets-maps-", "");
+  if (routeName === "skillset-maps-category") {
+    const categoryKey = String(route.params.category).toLowerCase();
+
     const readableTitle = isOsuMapCategory(categoryKey)
       ? MAPS_CATEGORIES[categoryKey]
-      : categoryKey.toUpperCase();
+      : `Категория '${route.params.category}' не найдена`;
 
     items.push({
       title: ROUTE_LABELS["skillsets-maps"] ?? "Карты Скиллсетов",

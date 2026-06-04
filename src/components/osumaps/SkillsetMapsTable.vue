@@ -265,7 +265,7 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
       height: calc(100dvh - 334px);
     }
     @media (max-width: $phone-l) {
-      height: calc(100dvh - 321px);
+      height: calc(100dvh - 329px);
     }
   }
   &__id-label {
