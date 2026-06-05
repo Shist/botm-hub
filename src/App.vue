@@ -1,38 +1,69 @@
 <template>
-  <AppModal
-    :isOpened="isNewPatchModalOpened"
-    title="🛠️ Встречайте новую версию 🛠️"
-    closeBtnText="Понятно"
-    :isClosableByClickOutside="false"
-    @closeModal="closeNewPatchModal"
+  <div
+    v-if="!metaStore.isLoaded"
+    class="app-splash-screen"
+    :class="{ 'light-theme': isLightTheme }"
   >
-    <template #default>
-      <div class="new-patch-modal-wrapper">
-        <AppImage
-          :imgPath="newPatchImagePath"
-          imgAlt="Новый патч"
-          class="new-patch-modal-img"
-        />
-        <p class="new-patch-label">
-          Вышла новая версия веб-приложения BOTM Hub -
-          {{ metaStore.metaConfig?.appVersion }}! Вы можете взглянуть на полный
-          список изменений по кнопке `Последние обновления`, находящейся в
-          бургер-меню. Это окно больше не будет показываться, пока не выйдет
-          новый патч или пока вы не почистите кэш браузера.
-        </p>
-      </div>
-    </template>
-  </AppModal>
-  <div class="global-container" :class="{ 'light-theme': isLightTheme }">
-    <TheHeader :style="{ paddingRight: scrollbarWidth }" />
-    <main class="main-wrapper" :style="{ paddingRight: scrollbarWidth }">
-      <div class="main-wrapper__container">
-        <TheBreadcrumbs class="main-wrapper__breadcrumbs" />
-        <router-view />
-      </div>
-    </main>
-    <TheFooter :style="{ paddingRight: scrollbarWidth }" />
+    <div class="app-splash-screen__skeleton"></div>
   </div>
+  <div
+    v-else-if="metaStore.metaConfig?.isMaintenance"
+    class="maintenance-screen"
+    :class="{ 'light-theme': isLightTheme }"
+  >
+    <div class="maintenance-screen__content">
+      <AppImage
+        :imgPath="newPatchImagePath"
+        imgAlt="Технические работы"
+        class="maintenance-screen__img"
+      />
+      <h1 class="maintenance-screen__headline">
+        🛠️ Ведутся технические работы 🛠️
+      </h1>
+      <p class="maintenance-screen__text">
+        В данный момент база данных BOTM Hub обновляется. Все функции временно
+        заблокированы, чтобы записанные во время обновления новые данные не
+        потерялись. Пожалуйста, подождите немного. Веб-приложение скоро снова
+        будет доступно...
+      </p>
+    </div>
+  </div>
+  <template v-else>
+    <AppModal
+      :isOpened="isNewPatchModalOpened"
+      title="🛠️ Встречайте новую версию 🛠️"
+      closeBtnText="Понятно"
+      :isClosableByClickOutside="false"
+      @closeModal="closeNewPatchModal"
+    >
+      <template #default>
+        <div class="new-patch-modal-wrapper">
+          <AppImage
+            :imgPath="newPatchImagePath"
+            imgAlt="Новый патч"
+            class="new-patch-modal-img"
+          />
+          <p class="new-patch-label">
+            Вышла новая версия веб-приложения BOTM Hub -
+            {{ metaStore.metaConfig?.appVersion }}! Вы можете взглянуть на
+            полный список изменений по кнопке `Последние обновления`,
+            находящейся в бургер-меню. Это окно больше не будет показываться,
+            пока не выйдет новый патч или пока вы не почистите кэш браузера.
+          </p>
+        </div>
+      </template>
+    </AppModal>
+    <div class="global-container" :class="{ 'light-theme': isLightTheme }">
+      <TheHeader :style="{ paddingRight: scrollbarWidth }" />
+      <main class="main-wrapper" :style="{ paddingRight: scrollbarWidth }">
+        <div class="main-wrapper__container">
+          <TheBreadcrumbs class="main-wrapper__breadcrumbs" />
+          <router-view />
+        </div>
+      </main>
+      <TheFooter :style="{ paddingRight: scrollbarWidth }" />
+    </div>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -74,6 +105,8 @@ const closeNewPatchModal = () => {
 onMounted(async () => {
   await metaStore.loadMeta();
 
+  if (metaStore.metaConfig?.isMaintenance) return;
+
   mapsStore.loadAllMaps();
 
   const currentVersion = metaStore.metaConfig?.appVersion;
@@ -90,6 +123,60 @@ onMounted(async () => {
 </script>
 
 <style lang="scss">
+.app-splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background-color: var(--color-global-bg);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  &__skeleton {
+    @include sample(1920px, 100%, 0);
+  }
+}
+
+.maintenance-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100dvh;
+  background-color: var(--color-global-bg);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 800px;
+    padding: 20px;
+    gap: 20px;
+  }
+  &__img {
+    max-width: 800px;
+  }
+  &__headline {
+    @include default-headline(36px, 36px, var(--color-text));
+    @media (max-width: $phone-l) {
+      font-size: 28px;
+      line-height: 28px;
+    }
+  }
+  &__text {
+    @include default-text(22px, 22px, var(--color-text-gray));
+    @media (max-width: $phone-l) {
+      font-size: 16px;
+      line-height: 16px;
+    }
+  }
+}
+
 .new-patch-modal-wrapper {
   max-height: 420px;
   overflow-y: auto;
