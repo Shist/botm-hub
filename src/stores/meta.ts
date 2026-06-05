@@ -1,6 +1,6 @@
 import { ref } from "vue";
 import { defineStore } from "pinia";
-import { getFirestore, doc, getDoc } from "firebase/firestore/lite";
+import { loadMetaFromFirebase } from "@/services/firebase/meta";
 import { type IMetaConfig } from "@/types/meta";
 
 export const useMetaStore = defineStore("meta", () => {
@@ -13,18 +13,9 @@ export const useMetaStore = defineStore("meta", () => {
     if (loadPromise) return loadPromise;
 
     loadPromise = (async () => {
-      try {
-        const db = getFirestore();
-        const metaRef = doc(db, "global", "meta");
-        const snap = await getDoc(metaRef);
-
-        if (snap.exists()) {
-          metaConfig.value = snap.data() as IMetaConfig;
-        }
-        isLoaded.value = true;
-      } catch (error) {
-        console.error("Ошибка при загрузке meta-конфига:", error);
-      }
+      const data = await loadMetaFromFirebase();
+      if (data) metaConfig.value = data;
+      isLoaded.value = true;
     })();
 
     await loadPromise;
