@@ -8,6 +8,7 @@ import {
   resetUserPasswordInFirebase,
   loadUserInfoFromFirebase,
 } from "@/services/firebase/users";
+import { useMetaStore } from "@/stores/meta";
 import {
   type IUser,
   type IUserLocalAdditionalInfo,
@@ -15,6 +16,8 @@ import {
 } from "@/types/users";
 
 export const useAuthStore = defineStore("auth", () => {
+  const metaStore = useMetaStore();
+
   const user = ref<IUser | null>(null);
 
   const userAdditionalInfo = computed<IUserLocalAdditionalInfo | null>(() => {
@@ -61,14 +64,17 @@ export const useAuthStore = defineStore("auth", () => {
     password: string,
     partialInfo: Pick<IUserFirebaseAdditionalInfo, "nick" | "email">
   ) => {
-    const authServerData = await signUpUserToFirebase(
-      email,
-      password,
-      partialInfo
-    );
+    const result = await signUpUserToFirebase(email, password, partialInfo);
 
-    if (authServerData) {
-      setBaseUserInfo(authServerData.user.uid, authServerData.user.email ?? "");
+    if (result) {
+      if (result.newChunksCount && metaStore.metaConfig) {
+        metaStore.metaConfig.chunks.users = result.newChunksCount;
+      }
+
+      setBaseUserInfo(
+        result.authData.user.uid,
+        result.authData.user.email ?? ""
+      );
       const userInfo = await loadUserInfoFromFirebase();
       setAdditionalUserInfo(userInfo);
     }
@@ -113,7 +119,13 @@ export const useAuthStore = defineStore("auth", () => {
       isRedactor: user.value.additionalInfo.isRedactor,
       ...additionalInfo,
     };
-    await updateUserAdditionalInfoToFirebase(user.value.uid, newUserInfo);
+    const newChunksCount = await updateUserAdditionalInfoToFirebase(
+      user.value.uid,
+      newUserInfo
+    );
+    if (newChunksCount && metaStore.metaConfig) {
+      metaStore.metaConfig.chunks.users = newChunksCount;
+    }
     setAdditionalUserInfo(newUserInfo);
   };
 

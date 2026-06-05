@@ -5,6 +5,7 @@ import {
   loadAllScoresFromFirebase,
   uploadScoresToFirebase,
 } from "@/services/firebase/scores";
+import { useMetaStore } from "@/stores/meta";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { OsuMapCategory } from "@/types/osumaps";
@@ -18,6 +19,7 @@ import {
 } from "@/types/scores";
 
 export const useScoresStore = defineStore("scores", () => {
+  const metaStore = useMetaStore();
   const osumapsStore = useOsumapsStore();
   const usersStore = useUsersStore();
 
@@ -95,18 +97,22 @@ export const useScoresStore = defineStore("scores", () => {
     if (isLoaded.value) return;
     if (loadPromise) return loadPromise;
 
+    const chunksCount = metaStore.metaConfig?.chunks?.scores ?? 1;
+
     loadPromise = (async () => {
       try {
-        const rawData = await loadAllScoresFromFirebase();
+        const rawDataArray = await loadAllScoresFromFirebase(chunksCount);
 
-        if (rawData) {
-          const parsedScores: IAllScores = {};
+        const parsedScores: IAllScores = {};
+
+        for (const rawData of rawDataArray) {
+          if (!rawData) continue;
 
           for (const [uid, mapsRecord] of Object.entries(rawData)) {
-            parsedScores[uid] = {};
+            parsedScores[uid] ??= {};
 
             for (const [mapId, modsRecord] of Object.entries(mapsRecord)) {
-              parsedScores[uid][mapId] = {};
+              parsedScores[uid][mapId] ??= {};
 
               for (const [mods, scoreArr] of Object.entries(modsRecord)) {
                 if (!isOsuScoreMod(mods)) continue;
@@ -121,8 +127,8 @@ export const useScoresStore = defineStore("scores", () => {
               }
             }
           }
-          allScores.value = parsedScores;
         }
+        allScores.value = parsedScores;
       } catch (error) {
         throw error;
       }
@@ -168,7 +174,13 @@ export const useScoresStore = defineStore("scores", () => {
 
     if (Object.keys(formattedForFirebase).length === 0) return;
 
-    await uploadScoresToFirebase(uid, formattedForFirebase);
+    const newChunksCount = await uploadScoresToFirebase(
+      uid,
+      formattedForFirebase
+    );
+    if (newChunksCount && metaStore.metaConfig) {
+      metaStore.metaConfig.chunks.scores = newChunksCount;
+    }
 
     newScores.forEach((score) => {
       if (!score.mapId) return;

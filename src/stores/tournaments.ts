@@ -7,6 +7,8 @@ import {
   deleteTournamentFromFirebase,
   archiveTournamentInFirebase,
 } from "@/services/firebase/tournaments";
+import { useMetaStore } from "@/stores/meta";
+import { useUsersStore } from "@/stores/users";
 import {
   isRegisteredPlayer,
   type IAllUsersListItem,
@@ -18,9 +20,9 @@ import {
   type IAllTournamentsListItem,
   type IAllTournamentsFirebaseOutgoingItem,
 } from "@/types/tournaments";
-import { useUsersStore } from "@/stores/users";
 
 export const useTournamentsStore = defineStore("tournaments", () => {
+  const metaStore = useMetaStore();
   const usersStore = useUsersStore();
 
   const tournaments = reactive<IAllTournamentsListItem[]>([]);
@@ -36,61 +38,63 @@ export const useTournamentsStore = defineStore("tournaments", () => {
   const loadAllTournaments = async (): Promise<IAllTournamentsListItem[]> => {
     if (loadPromise) return loadPromise;
 
+    const chunksCount = metaStore.metaConfig?.chunks?.tournaments ?? 1;
+
     loadPromise = (async () => {
       try {
         const allUsers = await usersStore.getAllUsersAndLoadClubs();
 
-        const allTournaments = (await loadAllTournamentsFromFirebase()).map(
-          (tournament) => {
-            const rostersInfoFromFirebase = tournament.rostersInfo ?? [];
+        const allTournaments = (
+          await loadAllTournamentsFromFirebase(chunksCount)
+        ).map((tournament) => {
+          const rostersInfoFromFirebase = tournament.rostersInfo ?? [];
 
-            const rostersInfo: IRosterInfo<IAllUsersListItem>[] =
-              rostersInfoFromFirebase.map((rosterInfo) => {
-                return {
-                  ...rosterInfo,
-                  players: rosterInfo.players.reduce(
-                    (
-                      acc: (IAllUsersListItem | IUnregisteredUser | null)[],
-                      player
-                    ) => {
-                      if (typeof player === "string") {
-                        const userInfo = allUsers.find((u) => u.uid === player);
-                        if (userInfo) acc.push(userInfo);
-                      } else {
-                        acc.push(player);
-                      }
-                      return acc;
-                    },
-                    []
-                  ),
-                };
-              });
+          const rostersInfo: IRosterInfo<IAllUsersListItem>[] =
+            rostersInfoFromFirebase.map((rosterInfo) => {
+              return {
+                ...rosterInfo,
+                players: rosterInfo.players.reduce(
+                  (
+                    acc: (IAllUsersListItem | IUnregisteredUser | null)[],
+                    player
+                  ) => {
+                    if (typeof player === "string") {
+                      const userInfo = allUsers.find((u) => u.uid === player);
+                      if (userInfo) acc.push(userInfo);
+                    } else {
+                      acc.push(player);
+                    }
+                    return acc;
+                  },
+                  []
+                ),
+              };
+            });
 
-            const datesInfo = {
-              startDate: tournament.datesInfo.startDate.toDate(),
-              endDate: tournament.datesInfo.endDate.toDate(),
-            } as ITournamentDatesInfo;
+          const datesInfo = {
+            startDate: tournament.datesInfo.startDate.toDate(),
+            endDate: tournament.datesInfo.endDate.toDate(),
+          } as ITournamentDatesInfo;
 
-            return {
-              id: tournament.id,
-              redactorUid: tournament.redactorUid,
-              title: tournament.title,
-              rankRange: tournament.rankRange,
-              description: tournament.description,
-              format: tournament.format,
-              teamSize: tournament.teamSize,
-              isDoubleElimination: tournament.isDoubleElimination,
-              forumPostLink: tournament.forumPostLink,
-              mainSheetLink: tournament.mainSheetLink,
-              challongeLink: tournament.challongeLink,
-              twitchFirstLink: tournament.twitchFirstLink,
-              twitchSecondLink: tournament.twitchSecondLink,
-              isArchived: tournament.isArchived,
-              rostersInfo,
-              datesInfo,
-            };
-          }
-        );
+          return {
+            id: tournament.id,
+            redactorUid: tournament.redactorUid,
+            title: tournament.title,
+            rankRange: tournament.rankRange,
+            description: tournament.description,
+            format: tournament.format,
+            teamSize: tournament.teamSize,
+            isDoubleElimination: tournament.isDoubleElimination,
+            forumPostLink: tournament.forumPostLink,
+            mainSheetLink: tournament.mainSheetLink,
+            challongeLink: tournament.challongeLink,
+            twitchFirstLink: tournament.twitchFirstLink,
+            twitchSecondLink: tournament.twitchSecondLink,
+            isArchived: tournament.isArchived,
+            rostersInfo,
+            datesInfo,
+          };
+        });
 
         tournaments.splice(0, tournaments.length, ...allTournaments);
         return allTournaments;
@@ -109,7 +113,10 @@ export const useTournamentsStore = defineStore("tournaments", () => {
     tournament: IAllTournamentsFirebaseOutgoingItem
   ) => {
     try {
-      await uploadTournamentToFirebase(tournament);
+      const newChunksCount = await uploadTournamentToFirebase(tournament);
+      if (newChunksCount && metaStore.metaConfig) {
+        metaStore.metaConfig.chunks.tournaments = newChunksCount;
+      }
       await loadAllTournaments();
     } catch (error) {
       throw error;

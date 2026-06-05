@@ -11,7 +11,7 @@ export class OsrParser {
 
   private readByte(): number {
     const val = this.view.getUint8(this.offset);
-    this.offset += 1;
+    this.offset++;
     return val;
   }
 

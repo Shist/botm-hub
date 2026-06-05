@@ -9,14 +9,16 @@ import {
   subscribeTrainingParticipantInFirebase,
   unsubscribeTrainingParticipantInFirebase,
 } from "@/services/firebase/trainings";
+import { useMetaStore } from "@/stores/meta";
+import { useUsersStore } from "@/stores/users";
 import { OsuMapCategory } from "@/types/osumaps";
 import {
   type IAllTrainingsListItem,
   type IAllTrainingsFirebaseOutgoingItem,
 } from "@/types/trainings";
-import { useUsersStore } from "@/stores/users";
 
 export const useTrainingsStore = defineStore("trainings", () => {
+  const metaStore = useMetaStore();
   const usersStore = useUsersStore();
 
   const trainings = reactive<IAllTrainingsListItem[]>([]);
@@ -32,32 +34,34 @@ export const useTrainingsStore = defineStore("trainings", () => {
   const loadAllTrainings = async (): Promise<IAllTrainingsListItem[]> => {
     if (loadPromise) return loadPromise;
 
+    const chunksCount = metaStore.metaConfig?.chunks?.trainings ?? 1;
+
     loadPromise = (async () => {
       try {
         const allUsers = await usersStore.getAllUsersAndLoadClubs();
 
-        const allTrainings = (await loadAllTrainingsFromFirebase()).map(
-          (training) => {
-            const participantsUids = JSON.parse(
-              training.participantsUids
-            ) as string[];
+        const allTrainings = (
+          await loadAllTrainingsFromFirebase(chunksCount)
+        ).map((training) => {
+          const participantsUids = JSON.parse(
+            training.participantsUids
+          ) as string[];
 
-            return {
-              id: training.id,
-              title: training.title,
-              trainerUid: training.trainerUid,
-              skillsets: JSON.parse(training.skillsets) as OsuMapCategory[],
-              dateTime: training.dateTime.toDate(),
-              durationMins: training.durationMins,
-              description: training.description,
-              participants: allUsers.filter((u) =>
-                participantsUids.includes(u.uid)
-              ),
-              mpLinkId: training.mpLinkId,
-              isArchived: training.isArchived,
-            };
-          }
-        );
+          return {
+            id: training.id,
+            title: training.title,
+            trainerUid: training.trainerUid,
+            skillsets: JSON.parse(training.skillsets) as OsuMapCategory[],
+            dateTime: training.dateTime.toDate(),
+            durationMins: training.durationMins,
+            description: training.description,
+            participants: allUsers.filter((u) =>
+              participantsUids.includes(u.uid)
+            ),
+            mpLinkId: training.mpLinkId,
+            isArchived: training.isArchived,
+          };
+        });
 
         trainings.splice(0, trainings.length, ...allTrainings);
         return allTrainings;
@@ -76,7 +80,10 @@ export const useTrainingsStore = defineStore("trainings", () => {
     training: IAllTrainingsFirebaseOutgoingItem
   ) => {
     try {
-      await uploadTrainingToFirebase(training);
+      const newChunksCount = await uploadTrainingToFirebase(training);
+      if (newChunksCount && metaStore.metaConfig) {
+        metaStore.metaConfig.chunks.trainings = newChunksCount;
+      }
       await loadAllTrainings();
     } catch (error) {
       throw error;

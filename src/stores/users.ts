@@ -1,10 +1,12 @@
 import { ref, reactive } from "vue";
 import { defineStore } from "pinia";
 import { loadAllUsersFromFirebase } from "@/services/firebase/users";
+import { useMetaStore } from "@/stores/meta";
 import { useClubsStore } from "@/stores/clubs";
 import { type IAllUsersListItem, DigitCategory } from "@/types/users";
 
 export const useUsersStore = defineStore("users", () => {
+  const metaStore = useMetaStore();
   const clubsStore = useClubsStore();
 
   const users = reactive<IAllUsersListItem[]>([]);
@@ -26,10 +28,12 @@ export const useUsersStore = defineStore("users", () => {
   const loadAllUsers = async (): Promise<IAllUsersListItem[]> => {
     if (loadPromise) return loadPromise;
 
+    const chunksCount = metaStore.metaConfig?.chunks?.users ?? 1;
+
     loadPromise = (async () => {
       try {
         const [allUsers] = await Promise.all([
-          loadAllUsersFromFirebase(),
+          loadAllUsersFromFirebase(chunksCount),
           clubsStore.loadAllClubs(),
         ]);
         users.splice(0, users.length, ...allUsers);
