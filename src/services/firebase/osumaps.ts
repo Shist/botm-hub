@@ -34,7 +34,7 @@ async function loadAllMapsFromFirebase(): Promise<IOsuMap[]> {
     return allMaps;
   } catch (error) {
     console.error("Ошибка при загрузке всех карт:", error);
-    return [];
+    throw error;
   }
 }
 

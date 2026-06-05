@@ -46,10 +46,16 @@ export const useOsumapsStore = defineStore("osumaps", () => {
       if (serverTimestamp && localTimestamp === serverTimestamp && localMaps) {
         try {
           const parsedMaps: IOsuMap[] = JSON.parse(localMaps);
-          populateStore(parsedMaps);
-          isLoading.value = false;
-          isLoaded.value = true;
-          return;
+          if (parsedMaps.length > 0) {
+            populateStore(parsedMaps);
+            isLoading.value = false;
+            isLoaded.value = true;
+            return;
+          } else {
+            console.warn(
+              "В localStorage обнаружен пустой массив карт. Принудительная загрузка с сервера..."
+            );
+          }
         } catch (e) {
           console.error("Ошибка парсинга карт из localStorage:", e);
         }
