@@ -4,6 +4,8 @@ import { type OsuScoreMod } from "@/types/scores";
 
 export const SHIST_UID = "mjFMxVxnVrdAuYf0wYHY7Zb3KRl2";
 
+export const MAX_ROSTERS_COUNT = 32;
+
 export const MAPS_CATEGORIES: Record<OsuMapCategory, string> = {
   [OsuMapCategory.NM1]: "NM1 (Raw Aim)",
   [OsuMapCategory.NM2]: "NM2 (Flow Tapping)",

@@ -229,14 +229,16 @@
           </span>
           <v-tooltip
             v-if="isUserRedactor && isTournamentEditable"
-            :disabled="isRecordOwner"
-            :text="`Нельзя добавлять команды в записи турниров других редакторов. Для внесения правок обратись к ${recordOwnerNick}`"
+            :disabled="isAddRosterTooltipDisabled"
+            :text="addRosterTooltipText"
             location="top"
           >
             <template #activator="{ props: tooltipProps }">
-              <div v-bind="isRecordOwner ? undefined : tooltipProps">
+              <div
+                v-bind="isAddRosterTooltipDisabled ? undefined : tooltipProps"
+              >
                 <v-btn
-                  :disabled="!isRecordOwner"
+                  :disabled="isAddRosterBtnDisabled"
                   height="50"
                   class="tournament-card__btn tournament-card__btn_add-roster"
                   prepend-icon="mdi-plus"
@@ -267,6 +269,7 @@ import {
   type IAllTournamentsListItem,
 } from "@/types/tournaments";
 import { fromSecondsToDurationLabel } from "@/utils";
+import { MAX_ROSTERS_COUNT } from "@/constants";
 
 const props = defineProps<{
   tournament: IAllTournamentsListItem;
@@ -400,6 +403,24 @@ const sortedRosters = computed(() => {
     }
     return a.teamName.localeCompare(b.teamName);
   });
+});
+const isMaxRostersReached = computed(() => {
+  return props.tournament.rostersInfo.length >= MAX_ROSTERS_COUNT;
+});
+const isAddRosterBtnDisabled = computed(() => {
+  return !isRecordOwner.value || isMaxRostersReached.value;
+});
+const isAddRosterTooltipDisabled = computed(() => {
+  return isRecordOwner.value && !isMaxRostersReached.value;
+});
+const addRosterTooltipText = computed(() => {
+  if (!isRecordOwner.value) {
+    return `Нельзя добавлять команды в записи турниров других редакторов. Для внесения правок обратись к ${recordOwnerNick.value}`;
+  }
+  if (isMaxRostersReached.value) {
+    return `Достигнут лимит в ${MAX_ROSTERS_COUNT} команды на одну запись турнира. Нельзя добавить больше`;
+  }
+  return "";
 });
 </script>
 
