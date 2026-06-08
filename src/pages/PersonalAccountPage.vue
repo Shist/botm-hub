@@ -1,7 +1,19 @@
 <template>
   <div class="personal-account-page">
     <v-skeleton-loader type="image, article, table" :loading="isPageLoading">
-      <h2 class="personal-account-page__headline">Личный Кабинет</h2>
+      <div class="personal-account-page__header-wrapper">
+        <h2 class="personal-account-page__headline">Личный Кабинет</h2>
+        <v-btn
+          v-if="currentNick"
+          :to="`/players/${encodeURIComponent(currentNick)}`"
+          variant="outlined"
+          color="var(--color-text)"
+          prepend-icon="mdi-account-eye"
+          class="personal-account-page__public-link-btn"
+        >
+          Публичный профиль
+        </v-btn>
+      </div>
       <div class="personal-account-page__avatar-inputs-wrapper">
         <v-tooltip
           :disabled="currentOsuId !== null"
@@ -295,6 +307,22 @@ const onUpdate = async () => {
   display: flex;
   flex-direction: column;
   row-gap: 20px;
+  &__header-wrapper {
+    padding: 10px 20px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    @media (max-width: $tablet-l) {
+      padding: 0;
+      flex-direction: column;
+      gap: 15px;
+    }
+  }
+  &__public-link-btn {
+    @media (max-width: $tablet-l) {
+      width: 100%;
+    }
+  }
   &__headline {
     @include default-headline(36px, 36px, var(--color-text));
     text-align: center;
