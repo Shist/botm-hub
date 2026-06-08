@@ -14,6 +14,9 @@ import TrainingsPage from "@/pages/TrainingsPage.vue";
 import TournamentsPage from "@/pages/TournamentsPage.vue";
 import ClubsPage from "@/pages/clubs/ClubsPage.vue";
 import ClubProfilePage from "@/pages/clubs/ClubProfilePage.vue";
+import LeaderboardsPage from "@/pages/leaderboards/LeaderboardsPage.vue";
+import GlobalLeaderboardPage from "@/pages/leaderboards/GlobalLeaderboardPage.vue";
+import CategoryLeaderboardPage from "@/pages/leaderboards/CategoryLeaderboardPage.vue";
 import NotFoundPage from "@/pages/NotFoundPage.vue";
 import { useAuthStore } from "@/stores/auth";
 
@@ -99,6 +102,26 @@ const router = createRouter({
       path: "/clubs/:clubId",
       name: "club-profile",
       component: ClubProfilePage,
+    },
+    {
+      path: "/leaderboards",
+      children: [
+        {
+          path: "",
+          component: LeaderboardsPage,
+          name: "leaderboards",
+        },
+        {
+          path: "all",
+          component: GlobalLeaderboardPage,
+          name: "leaderboards-all",
+        },
+        {
+          path: ":category",
+          component: CategoryLeaderboardPage,
+          name: "leaderboards-category",
+        },
+      ],
     },
     {
       path: "/:catchAll(.*)",

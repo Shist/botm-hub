@@ -23,10 +23,6 @@ export interface IClub {
   members: Record<string, IClubMember>;
 }
 
-export function isBotmClub(value: string): value is BotmClub {
-  return Object.values(BotmClub).includes(value as BotmClub);
-}
-
 export interface IClubFirebase {
   leaderUid: string | null;
   leaderMessage: string;
@@ -42,4 +38,8 @@ export interface IClubConfig {
   id: BotmClub;
   title: string;
   skillsets: IClubSkillsetRule[];
+}
+
+export function isBotmClub(value: string): value is BotmClub {
+  return Object.values(BotmClub).includes(value as BotmClub);
 }

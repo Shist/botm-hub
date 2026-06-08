@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 import { Timestamp } from "firebase/firestore/lite";
 import {
@@ -8,15 +8,34 @@ import {
 import { useMetaStore } from "@/stores/meta";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
-import { OsuMapCategory } from "@/types/osumaps";
+import {
+  MAPS_CATEGORIES,
+  CLUB_SETTINGS,
+  VALID_MODS_FOR_CATEGORY,
+} from "@/constants";
+import { OsuMapCategory, isOsuMapCategory } from "@/types/osumaps";
 import {
   type IAllScores,
   type IFirebaseScoreRecord,
   type IMpModalScore,
   type IScoreTableRow,
   type OsuScoreMod,
+  type IStatBucket,
+  type IPlayerLeaderboardStats,
   isOsuScoreMod,
 } from "@/types/scores";
+import { BotmClub } from "@/types/clubs";
+
+const createEmptyStatBucket = (): IStatBucket => ({
+  points: 0,
+  totalScores: 0,
+  sumScore: 0,
+  sumAcc: 0,
+  sumCombo: 0,
+  avgScore: 0,
+  avgAcc: 0,
+  avgCombo: 0,
+});
 
 export const useScoresStore = defineStore("scores", () => {
   const metaStore = useMetaStore();
@@ -27,6 +46,110 @@ export const useScoresStore = defineStore("scores", () => {
 
   const isLoaded = ref(false);
   let loadPromise: Promise<void> | null = null;
+
+  const leaderboardsData = computed<IPlayerLeaderboardStats[]>(() => {
+    const statsMap = new Map<string, IPlayerLeaderboardStats>();
+
+    usersStore.users.forEach((u) => {
+      const clubsBuckets = {} as Record<BotmClub, IStatBucket>;
+      Object.values(BotmClub).forEach((club) => {
+        clubsBuckets[club] = createEmptyStatBucket();
+      });
+
+      const skillsetsBuckets = {} as Record<OsuMapCategory, IStatBucket>;
+      Object.keys(MAPS_CATEGORIES).forEach((category) => {
+        if (isOsuMapCategory(category)) {
+          skillsetsBuckets[category] = createEmptyStatBucket();
+        }
+      });
+
+      statsMap.set(u.uid, {
+        uid: u.uid,
+        user: u,
+        overall: createEmptyStatBucket(),
+        clubs: clubsBuckets,
+        skillsets: skillsetsBuckets,
+      });
+    });
+
+    const allMapsList = Object.values(osumapsStore.osumaps).flat();
+    const mapsDataMap = new Map<number, OsuMapCategory[]>();
+    allMapsList.forEach((m) => {
+      if (!mapsDataMap.has(m.id)) mapsDataMap.set(m.id, []);
+      const categories = mapsDataMap.get(m.id)!;
+      if (!categories.includes(m.category)) categories.push(m.category);
+    });
+
+    for (const [uid, mapsRecord] of Object.entries(allScores.value)) {
+      const userStats = statsMap.get(uid);
+      if (!userStats) continue;
+
+      for (const [mapIdStr, modsRecord] of Object.entries(mapsRecord)) {
+        const mapIdNum = Number(mapIdStr);
+        const mapCategories = mapsDataMap.get(mapIdNum);
+        if (!mapCategories) continue;
+
+        for (const [modKey, scoreData] of Object.entries(modsRecord)) {
+          const addToBucket = (bucket: IStatBucket) => {
+            bucket.points += scoreData.points;
+            bucket.totalScores++;
+            bucket.sumScore += scoreData.score;
+            bucket.sumAcc += scoreData.accuracy;
+            bucket.sumCombo += scoreData.combo;
+          };
+
+          addToBucket(userStats.overall);
+
+          mapCategories.forEach((category) => {
+            const allowedMods = VALID_MODS_FOR_CATEGORY[category];
+            if (isOsuScoreMod(modKey) && allowedMods.includes(modKey)) {
+              addToBucket(userStats.skillsets[category]);
+            }
+          });
+
+          const validClubs = new Set<BotmClub>();
+          mapCategories.forEach((category) => {
+            Object.values(CLUB_SETTINGS).forEach((clubConfig) => {
+              const rule = clubConfig.skillsets.find(
+                (s) => s.category === category
+              );
+              if (
+                rule &&
+                isOsuScoreMod(modKey) &&
+                rule.allowedMods.includes(modKey)
+              ) {
+                validClubs.add(clubConfig.id);
+              }
+            });
+          });
+          validClubs.forEach((clubId) => {
+            addToBucket(userStats.clubs[clubId]);
+          });
+        }
+      }
+    }
+
+    const result = Array.from(statsMap.values()).map((stats) => {
+      const finalizeBucket = (bucket: IStatBucket) => {
+        if (bucket.totalScores > 0) {
+          bucket.points = Math.round(bucket.points * 100) / 100;
+          bucket.avgScore = Math.round(bucket.sumScore / bucket.totalScores);
+          bucket.avgAcc = Number(
+            (bucket.sumAcc / bucket.totalScores).toFixed(2)
+          );
+          bucket.avgCombo = Math.round(bucket.sumCombo / bucket.totalScores);
+        }
+      };
+
+      finalizeBucket(stats.overall);
+      Object.values(stats.clubs).forEach(finalizeBucket);
+      Object.values(stats.skillsets).forEach(finalizeBucket);
+
+      return stats;
+    });
+
+    return result.sort((a, b) => b.overall.points - a.overall.points);
+  });
 
   const getFlatScoresTableData = (
     uidsFilter?: string[],
@@ -215,6 +338,7 @@ export const useScoresStore = defineStore("scores", () => {
 
   return {
     allScores,
+    leaderboardsData,
     isLoaded,
     getFlatScoresTableData,
     loadAllScores,

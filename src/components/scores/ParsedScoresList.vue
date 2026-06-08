@@ -329,7 +329,7 @@ const getModsChipColor = (mods: string[]): string => {
     font-weight: bold;
   }
   &__score-subtext-points {
-    color: var(--color-club-points);
+    color: var(--color-points);
     font-weight: bold;
     &_db {
       color: var(--color-db-score-label);
@@ -338,7 +338,7 @@ const getModsChipColor = (mods: string[]): string => {
   &__score-rank {
     @include default-text(18px, 18px, var(--color-text-white));
     font-weight: 900;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     &.rank-X,
     &.rank-SS,
     &.rank-S {

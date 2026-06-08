@@ -77,8 +77,9 @@
           <CategoryBadge
             :category="item.category"
             class="skillsets-maps-table__badge"
-          /> </template
-        ><template #no-data>
+          />
+        </template>
+        <template #no-data>
           <div class="skillsets-maps-table__no-data">Нет данных о картах</div>
         </template>
       </v-data-table-virtual>

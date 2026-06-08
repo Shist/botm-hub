@@ -1,6 +1,46 @@
 <template>
   <div class="players-page">
-    <h2 class="players-page__headline">Наши Игроки</h2>
+    <h2 class="players-page__headline">
+      Наши Игроки
+      <template v-if="!isLoading">
+        <v-tooltip location="bottom" content-class="players-page__tooltip-bg">
+          <template #activator="{ props }">
+            <span
+              v-bind="props"
+              class="players-page__count players-page__count-hoverable"
+            >
+              ({{ totalPlayersCount }})
+            </span>
+          </template>
+          <div class="players-page__tooltip-content">
+            <div class="players-page__tooltip-row">
+              <span>4 Дигитов:</span>
+              <span>{{ playersBreakdown.four }}</span>
+            </div>
+            <div class="players-page__tooltip-row">
+              <span>5 Дигитов:</span>
+              <span>{{ playersBreakdown.five }}</span>
+            </div>
+            <div class="players-page__tooltip-row">
+              <span>6 Дигитов:</span>
+              <span>{{ playersBreakdown.six }}</span>
+            </div>
+            <div class="players-page__tooltip-row">
+              <span>Не указанных:</span>
+              <span>{{ playersBreakdown.unspecified }}</span>
+            </div>
+          </div>
+        </v-tooltip>
+      </template>
+      <v-progress-circular
+        v-else
+        indeterminate
+        size="16"
+        width="2"
+        color="currentColor"
+        class="ml-2"
+      />
+    </h2>
     <div class="players-page__tabs-wrapper">
       <v-tabs v-model="currTab" show-arrows grow>
         <v-tab value="all" class="players-page__tab-title">Все</v-tab>
@@ -141,7 +181,7 @@ const usersStore = useUsersStore();
 
 const { setErrorToast } = useToast();
 
-const currTab = ref("all");
+const currTab = ref<"all" | DigitCategory>("all");
 const isLoading = ref(false);
 
 const allUsersCategoriesMap = computed(
@@ -155,6 +195,7 @@ const allUsersCategoriesMap = computed(
       ])
     ) as Record<OsuMapCategory, IAllUsersListItem[]>
 );
+
 const digitsCategoriesMap = computed(
   () =>
     Object.fromEntries(
@@ -171,6 +212,29 @@ const digitsCategoriesMap = computed(
       ])
     ) as Record<DigitCategory, Record<OsuMapCategory, IAllUsersListItem[]>>
 );
+
+const totalPlayersCount = computed(() => usersStore.users.length);
+
+const playersBreakdown = computed(() => {
+  let four = 0;
+  let five = 0;
+  let six = 0;
+  let unspecified = 0;
+
+  usersStore.users.forEach((user) => {
+    if (user.digitCategory === DigitCategory.FOUR_DIGIT) {
+      four++;
+    } else if (user.digitCategory === DigitCategory.FIVE_DIGIT) {
+      five++;
+    } else if (user.digitCategory === DigitCategory.SIX_DIGIT) {
+      six++;
+    } else {
+      unspecified++;
+    }
+  });
+
+  return { four, five, six, unspecified };
+});
 
 onMounted(async () => {
   try {
@@ -192,7 +256,11 @@ onMounted(async () => {
   row-gap: 20px;
   &__headline {
     @include default-headline(36px, 36px, var(--color-text));
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
     @media (max-width: $tablet-l) {
       font-size: 28px;
       line-height: 28px;
@@ -200,6 +268,46 @@ onMounted(async () => {
     @media (max-width: $phone-l) {
       font-size: 20px;
       line-height: 20px;
+    }
+  }
+  &__count {
+    @include default-text(32px, 32px, var(--color-text));
+    @media (max-width: $tablet-l) {
+      font-size: 24px;
+      line-height: 24px;
+    }
+    @media (max-width: $phone-l) {
+      font-size: 18px;
+      line-height: 18px;
+    }
+  }
+  &__count-hoverable {
+    cursor: help;
+    border-bottom: 1px dashed var(--color-hoverable-bottom-border);
+    transition: opacity 0.2s;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+  &__tooltip-bg {
+    background-color: var(--color-modal-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-vuetify-table-borders);
+  }
+  &__tooltip-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 6px 4px;
+  }
+  &__tooltip-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    font-size: 14px;
+    span:last-child {
+      font-weight: bold;
     }
   }
   &__tabs-wrapper {

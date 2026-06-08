@@ -42,26 +42,33 @@
   --color-btn-bg-trainings: #ffad5e;
   --color-btn-bg-tournaments: #3a76e7;
   --color-btn-bg-clubs: #8dda5a;
-  --color-btn-bg-nm1: #64b5f6;
-  --color-btn-bg-nm2: #42a5f5;
-  --color-btn-bg-nm3: #2196f3;
-  --color-btn-bg-nm4: #1976d2;
-  --color-btn-bg-nm5: #1565c0;
-  --color-btn-bg-nm6: #0d47a1;
-  --color-btn-bg-nm7: #003366;
-  --color-btn-bg-hd1: #ffd600;
-  --color-btn-bg-hd2: #f9a825;
-  --color-btn-bg-hd3: #c66900;
-  --color-btn-bg-hr1: #f0baba;
-  --color-btn-bg-hr2: #e57373;
+  --color-btn-bg-leaderboards: #ae52be;
+
+  --color-btn-bg-nm1: #90caf9;
+  --color-btn-bg-nm2: #64b5f6;
+  --color-btn-bg-nm3: #42a5f5;
+  --color-btn-bg-nm4: #2196f3;
+  --color-btn-bg-nm5: #1e88e5;
+  --color-btn-bg-nm6: #1976d2;
+  --color-btn-bg-nm7: #1565c0;
+
+  --color-btn-bg-hd1: #eedd47;
+  --color-btn-bg-hd2: #fbc02d;
+  --color-btn-bg-hd3: #f57f17;
+
+  --color-btn-bg-hr1: #ef9a9a;
+  --color-btn-bg-hr2: #e53935;
   --color-btn-bg-hr3: #c62828;
-  --color-btn-bg-dt1: #cda6d5;
-  --color-btn-bg-dt2: #ba68c8;
-  --color-btn-bg-dt3: #7e57c2;
-  --color-btn-bg-dt4: #5b259d;
-  --color-btn-bg-fm1: #94c596;
-  --color-btn-bg-fm2: #55aa59;
-  --color-btn-bg-fm3: #277d2b;
+
+  --color-btn-bg-dt1: #ce93d8;
+  --color-btn-bg-dt2: #ab47bc;
+  --color-btn-bg-dt3: #8e24aa;
+  --color-btn-bg-dt4: #6a1b9a;
+
+  --color-btn-bg-fm1: #a5d6a7;
+  --color-btn-bg-fm2: #66bb6a;
+  --color-btn-bg-fm3: #388e3c;
+
   --color-btn-bg-tb: #d4ac7c;
 
   --color-training-waiting: #ffc107;
@@ -90,16 +97,17 @@
 
   --color-roster-card-bg: rgba(0, 0, 0, 0.2);
 
-  --color-club-aim: #22a2a2;
-  --color-club-speed: #6622aa;
-  --color-club-tech: #2222dd;
-  --color-club-reading: #229222;
-  --color-club-hidden: #a2a222;
-  --color-club-hardrock: #922222;
+  --color-club-aim: #4dd0e1;
+  --color-club-speed: #ba68c8;
+  --color-club-tech: #5c6bc0;
+  --color-club-reading: #81c784;
+  --color-club-hidden: #fdd835;
+  --color-club-hardrock: #e57373;
 
   --color-club-join: #bb8800;
   --color-club-exit: #e74c3c;
-  --color-club-points: #ffec8b;
+
+  --color-points: #ffec8b;
 
   --color-btn-mp: #4f46e5;
   --color-map-star-rate: #fb8c00;
@@ -111,12 +119,14 @@
   --color-rank-c: #cc88ff;
   --color-rank-d: #ff5555;
   --color-rank-f: #bb1111;
+
   --color-mod-combination-dt: #9c5fc5;
   --color-mod-combination-fl: #555555;
   --color-mod-combination-hr: #d54d4d;
   --color-mod-combination-hd: #df8812;
   --color-mod-combination-ez: #358538;
   --color-mod-combination-nm: #319df4;
+
   --color-rank-shadow-rgba: rgba(0, 0, 0, 0.5);
   --color-scores-group-card-border: rgba(128, 128, 128, 0.2);
   --color-group-overlay-bg-gradient-left: rgba(0, 0, 0, 0.9);
@@ -131,6 +141,7 @@
   --color-table-score-sr-mixed-icon: #bb8800;
   --color-table-score-sr-mixed-bg: rgba(255, 255, 255, 0.05);
   --color-table-score-sr-mixed-bg-hover: rgba(255, 255, 255, 0.1);
+  --color-hoverable-bottom-border: rgba(255, 255, 255, 0.3);
 
   --color-flask-bg: rgba(0, 0, 0, 0.4);
   --color-flask-border: rgba(255, 255, 255, 0.1);
@@ -203,11 +214,12 @@
   --color-club-hidden: #fbc02d;
   --color-club-hardrock: #f44336;
 
-  --color-club-points: #c6a325;
+  --color-points: #c6a325;
 
   --color-table-score-sr-mixed-icon: #ddaa22;
   --color-table-score-sr-mixed-bg: rgba(0, 0, 0, 0.05);
   --color-table-score-sr-mixed-bg-hover: rgba(0, 0, 0, 0.1);
+  --color-hoverable-bottom-border: rgba(0, 0, 0, 0.3);
 
   --color-flask-bg: rgba(0, 0, 0, 0.05);
   --color-flask-border: rgba(0, 0, 0, 0.2);

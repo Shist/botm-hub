@@ -1,6 +1,7 @@
 import { Timestamp } from "firebase/firestore/lite";
 import { type IAllUsersListItem } from "@/types/users";
 import { type IOsuMap, OsuMapCategory } from "@/types/osumaps";
+import { BotmClub } from "@/types/clubs";
 
 export const VALID_OSU_SCORE_MODS = [
   "nm",
@@ -171,6 +172,25 @@ export interface IParsedOsr {
   accuracy: number;
   date: Date;
   isScoreV2: boolean;
+}
+
+export interface IStatBucket {
+  points: number;
+  totalScores: number;
+  sumScore: number;
+  sumAcc: number;
+  sumCombo: number;
+  avgScore: number;
+  avgAcc: number;
+  avgCombo: number;
+}
+
+export interface IPlayerLeaderboardStats {
+  uid: string;
+  user: IAllUsersListItem;
+  overall: IStatBucket;
+  clubs: Record<BotmClub, IStatBucket>;
+  skillsets: Record<OsuMapCategory, IStatBucket>;
 }
 
 export function isOsuScoreMod(value: string): value is OsuScoreMod {

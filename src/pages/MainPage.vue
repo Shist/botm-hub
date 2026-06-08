@@ -47,7 +47,15 @@
         </li>
         <li>
           <router-link to="/clubs" class="main-page__btn main-page__btn_clubs">
-            Клубы и Лидерборды
+            Профильные Клубы
+          </router-link>
+        </li>
+        <li>
+          <router-link
+            to="/leaderboards"
+            class="main-page__btn main-page__btn_leaderboards"
+          >
+            Лидерборды и Скоры
           </router-link>
         </li>
       </ul>
@@ -57,7 +65,6 @@
 
 <style lang="scss" scoped>
 .main-page {
-  padding: 10px;
   &__welcome-msg {
     @include default-headline(36px, 36px, var(--color-text));
     margin-bottom: 10px;
@@ -72,10 +79,9 @@
     }
   }
   &__links-list {
-    padding: 10px 20px;
     display: flex;
     flex-direction: column;
-    row-gap: 15px;
+    row-gap: 10px;
     li {
       display: flex;
     }
@@ -83,7 +89,7 @@
   &__btn {
     position: relative;
     text-decoration: none;
-    height: 90px;
+    height: 85px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -143,6 +149,9 @@
     }
     &_clubs {
       background-color: var(--color-btn-bg-clubs);
+    }
+    &_leaderboards {
+      background-color: var(--color-btn-bg-leaderboards);
     }
   }
 }

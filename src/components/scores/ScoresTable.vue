@@ -712,7 +712,7 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
     font-weight: bold;
   }
   &__points {
-    color: var(--color-club-points);
+    color: var(--color-points);
     font-weight: bold;
   }
   &__no-data {

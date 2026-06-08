@@ -81,15 +81,6 @@
           </div>
         </div>
       </div>
-      <v-divider class="border-opacity-100" />
-      <h2 class="clubs-page__headline">
-        Все BOTM Скоры ({{ allScoresList.length }})
-      </h2>
-      <ScoresTable
-        :scoresList="allScoresList"
-        :isLoading="isLoading"
-        :defaultSort="[{ key: 'date', order: 'desc' }]"
-      />
     </v-skeleton-loader>
   </div>
 </template>
@@ -101,7 +92,6 @@ import { useClubsStore } from "@/stores/clubs";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import UserCard from "@/components/users/UserCard.vue";
-import ScoresTable from "@/components/scores/ScoresTable.vue";
 import useToast from "@/composables/useToast";
 import { pluralizeRu } from "@/utils";
 import { CLUB_SETTINGS } from "@/constants";
@@ -161,11 +151,6 @@ const maxClubPoints = computed(() => {
   if (clubsData.value.length === 0) return 1;
   const max = Math.max(...clubsData.value.map((club) => club.totalPoints));
   return max > 0 ? max : 1;
-});
-
-const allScoresList = computed(() => {
-  if (isLoading.value) return [];
-  return scoresStore.getFlatScoresTableData();
 });
 
 onMounted(async () => {
@@ -232,7 +217,7 @@ onMounted(async () => {
     gap: 10px;
   }
   &__points {
-    @include default-headline(20px, 20px, var(--color-club-points));
+    @include default-headline(20px, 20px, var(--color-points));
     font-weight: bold;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     height: 24px;

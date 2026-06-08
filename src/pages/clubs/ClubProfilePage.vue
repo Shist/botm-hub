@@ -124,7 +124,10 @@
         <div class="club-profile-page__table-section">
           <div class="club-profile-page__table-header">
             <h3 class="club-profile-page__sub-headline">
-              Участники клуба ({{ tableItems.length }})
+              Участники клуба
+              <span class="club-profile-page__count">
+                ({{ tableItems.length }})
+              </span>
             </h3>
             <v-text-field
               v-model="searchQuery"
@@ -193,7 +196,10 @@
         <v-divider class="club-profile-page__divider border-opacity-100" />
         <div class="club-profile-page__scores-section">
           <h3 class="club-profile-page__sub-headline">
-            Профильные Скоры Участников Клуба ({{ clubScoresList.length }})
+            Профильные Скоры Участников Клуба
+            <span class="club-profile-page__count">
+              ({{ clubScoresList.length }})
+            </span>
           </h3>
           <ScoresTable
             :scoresList="clubScoresList"
@@ -203,7 +209,10 @@
         <v-divider class="club-profile-page__divider border-opacity-100" />
         <div class="club-profile-page__maps-section">
           <h3 class="club-profile-page__sub-headline">
-            Профильные Мапы Клуба ({{ clubMaps.length }})
+            Профильные Мапы Клуба
+            <span class="club-profile-page__count">
+              ({{ clubMaps.length }})
+            </span>
           </h3>
           <SkillsetsMapsTable
             :mapsList="clubMaps"
@@ -536,6 +545,14 @@ onMounted(async () => {
   &__sub-headline {
     @include default-headline(28px, 28px, var(--color-text));
     text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  &__count {
+    @include default-text(24px, 24px, var(--color-text));
   }
   &__divider {
     width: 100%;
@@ -780,7 +797,7 @@ onMounted(async () => {
     letter-spacing: 0.5px;
   }
   &__points {
-    color: var(--color-club-points);
+    color: var(--color-points);
     font-weight: bold;
   }
   &__score {

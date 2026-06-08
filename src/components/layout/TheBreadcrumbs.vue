@@ -35,7 +35,8 @@ const ROUTE_LABELS: Record<string, string> = {
   "workout-constructor": "Конструктор Тренировочной Сессии",
   trainings: "Расписания Качалочек",
   tournaments: "Турниры и Наши Ростеры",
-  clubs: "Клубы и Лидерборды",
+  clubs: "Профильные Клубы",
+  leaderboards: "Лидерборды и Скоры",
 };
 
 const breadcrumbs = computed(() => {
@@ -129,6 +130,44 @@ const breadcrumbs = computed(() => {
     return items;
   }
 
+  if (routeName === "leaderboards-all") {
+    items.push({
+      title: ROUTE_LABELS["leaderboards"] ?? "Лидерборды и Скоры",
+      disabled: false,
+      to: "/leaderboards",
+    });
+
+    items.push({
+      title: "Глобальный Лидерборд BOTM",
+      disabled: true,
+      to: route.path,
+    });
+
+    return items;
+  }
+
+  if (routeName === "leaderboards-category") {
+    const categoryKey = String(route.params.category).toLowerCase();
+
+    const readableTitle = isOsuMapCategory(categoryKey)
+      ? `Лидерборд ${MAPS_CATEGORIES[categoryKey]}`
+      : `Категория '${route.params.category}' не найдена`;
+
+    items.push({
+      title: ROUTE_LABELS["leaderboards"] ?? "Лидерборды и Скоры",
+      disabled: false,
+      to: "/leaderboards",
+    });
+
+    items.push({
+      title: readableTitle,
+      disabled: true,
+      to: route.path,
+    });
+
+    return items;
+  }
+
   if (routeName === "player-profile") {
     items.push({
       title: ROUTE_LABELS["players"] ?? "Наши Игроки",
@@ -155,7 +194,7 @@ const breadcrumbs = computed(() => {
 
   if (routeName === "club-profile") {
     items.push({
-      title: ROUTE_LABELS["clubs"] ?? "Клубы и Лидерборды",
+      title: ROUTE_LABELS["clubs"] ?? "Профильные Клубы",
       disabled: false,
       to: "/clubs",
     });
