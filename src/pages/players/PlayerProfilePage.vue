@@ -100,8 +100,41 @@
           </div>
         </div>
         <v-divider class="player-profile-page__divider border-opacity-100" />
+        <div class="player-profile-page__charts-section">
+          <div class="player-profile-page__chart-container">
+            <h3 class="player-profile-page__sub-headline">Абсолютный Скилл</h3>
+            <p class="player-profile-page__chart-desc">
+              Относительно других участников BOTM
+            </p>
+            <SkillsetsRadarChart
+              :points="playerClubPoints"
+              labelName="Очков"
+              :maxScale="100"
+              :drawPoints="absoluteNormalizedPoints"
+              :additionalTooltipLines="absoluteTopTooltips"
+            />
+          </div>
+          <div class="player-profile-page__chart-container">
+            <h3 class="player-profile-page__sub-headline">
+              Специализация Игрока
+            </h3>
+            <p class="player-profile-page__chart-desc">
+              На основе внутреннего баланса скиллсетов
+            </p>
+            <SkillsetsRadarChart
+              :points="playerClubPoints"
+              labelName="Очков"
+              :maxScale="playerMaxClubPoints"
+              :additionalTooltipLines="balanceTooltips"
+            />
+          </div>
+        </div>
+        <v-divider class="player-profile-page__divider border-opacity-100" />
         <h2 class="player-profile-page__scores-headline">
-          Скоры Игрока ({{ playerScoresList.length }})
+          Скоры Игрока
+          <span class="player-profile-page__count">
+            ({{ playerScoresList.length }})
+          </span>
         </h2>
         <ScoresTable
           :scoresList="playerScoresList"
@@ -135,6 +168,7 @@ import useUserTags from "@/composables/useUserTags";
 import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
+import SkillsetsRadarChart from "@/components/users/SkillsetsRadarChart.vue";
 import IconAdmin from "@/components/users/user-icons/IconAdmin.vue";
 import IconRedactor from "@/components/users/user-icons/IconRedactor.vue";
 import IconTrainer from "@/components/users/user-icons/IconTrainer.vue";
@@ -182,6 +216,103 @@ const playerSkillsets = computed<OsuMapCategory[]>(() => {
 const playerScoresList = computed(() => {
   if (!playerInfo.value) return [];
   return scoresStore.getFlatScoresTableData([playerInfo.value.uid]);
+});
+
+const playerStats = computed(() => {
+  if (!playerInfo.value) return null;
+  return (
+    scoresStore.leaderboardsData.find(
+      (stat) => stat.uid === playerInfo.value?.uid
+    ) || null
+  );
+});
+
+const playerClubPoints = computed(() => {
+  if (!playerStats.value) return [0, 0, 0, 0, 0, 0];
+  const clubs = playerStats.value.clubs;
+  return [
+    clubs[BotmClub.AIM].points,
+    clubs[BotmClub.HIDDEN].points,
+    clubs[BotmClub.READING].points,
+    clubs[BotmClub.TECH].points,
+    clubs[BotmClub.SPEED].points,
+    clubs[BotmClub.HARDROCK].points,
+  ];
+});
+
+const hubMaxInfo = computed(() => {
+  const maxes = [
+    { points: 0, nick: "" },
+    { points: 0, nick: "" },
+    { points: 0, nick: "" },
+    { points: 0, nick: "" },
+    { points: 0, nick: "" },
+    { points: 0, nick: "" },
+  ];
+
+  scoresStore.leaderboardsData.forEach((stat) => {
+    const clubs = stat.clubs;
+    const currentPoints = [
+      clubs[BotmClub.AIM].points,
+      clubs[BotmClub.HIDDEN].points,
+      clubs[BotmClub.READING].points,
+      clubs[BotmClub.TECH].points,
+      clubs[BotmClub.SPEED].points,
+      clubs[BotmClub.HARDROCK].points,
+    ];
+
+    currentPoints.forEach((pts, index) => {
+      if (maxes[index] && pts > maxes[index].points) {
+        maxes[index].points = pts;
+        maxes[index].nick = stat.user.nick;
+      }
+    });
+  });
+
+  return maxes;
+});
+
+const absoluteNormalizedPoints = computed(() => {
+  return playerClubPoints.value.map((pts, index) => {
+    if (!hubMaxInfo.value[index]) return 0;
+    const maxPts =
+      hubMaxInfo.value[index].points > 0 ? hubMaxInfo.value[index].points : 10;
+    return (pts / maxPts) * 100;
+  });
+});
+
+const absoluteTopTooltips = computed(() => {
+  return hubMaxInfo.value.map((info) => {
+    return info.nick
+      ? [
+          `Лучший показатель BOTM:`,
+          `${info.points.toFixed(2)} очков (${info.nick})`,
+        ]
+      : "";
+  });
+});
+
+const balanceTooltips = computed(() => {
+  const points = playerClubPoints.value;
+  const maxPts = Math.max(...points);
+
+  if (maxPts <= 0) return Array(6).fill("");
+
+  const maxIndex = points.indexOf(maxPts);
+  const labels = ["Aim", "Hidden", "Reading", "Tech", "Speed", "Hardrock"];
+  const bestLabel = labels[maxIndex];
+
+  const text = [
+    `Лучший скиллсет:`,
+    `${maxPts.toFixed(2)} очков (${bestLabel})`,
+  ];
+
+  return Array(6).fill(text);
+});
+
+const playerMaxClubPoints = computed(() => {
+  const max = Math.max(...playerClubPoints.value);
+  return max > 0 ? Math.ceil(max) : 10;
 });
 
 const {
@@ -336,8 +467,48 @@ onMounted(async () => {
   &__divider {
     width: 100%;
   }
+  &__charts-section {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    gap: 20px;
+    @media (max-width: $tablet-l) {
+      flex-direction: column;
+    }
+  }
+  &__chart-container {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: var(--color-tabs-bg);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+  &__sub-headline {
+    @include default-headline(28px, 28px, var(--color-text));
+    text-align: center;
+    @media (max-width: $tablet-l) {
+      font-size: 24px;
+      line-height: 24px;
+    }
+  }
+  &__chart-desc {
+    @include default-text(16px, 16px, var(--color-text-gray));
+    margin-top: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    opacity: 0.8;
+  }
   &__scores-headline {
     @include default-headline(36px, 36px, var(--color-text));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
     text-align: center;
     @media (max-width: $tablet-l) {
       font-size: 28px;
@@ -346,6 +517,17 @@ onMounted(async () => {
     @media (max-width: $phone-l) {
       font-size: 20px;
       line-height: 20px;
+    }
+  }
+  &__count {
+    @include default-text(32px, 32px, var(--color-text));
+    @media (max-width: $tablet-l) {
+      font-size: 24px;
+      line-height: 24px;
+    }
+    @media (max-width: $phone-l) {
+      font-size: 18px;
+      line-height: 18px;
     }
   }
   &__user-not-found-wrapper {

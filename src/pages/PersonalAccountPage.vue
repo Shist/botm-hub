@@ -101,8 +101,11 @@
         Обновить информацию
       </v-btn>
       <v-divider class="border-opacity-100" />
-      <h2 class="personal-account-page__headline">
-        Мои Скоры ({{ myScoresList.length }})
+      <h2 class="personal-account-page__scores-headline">
+        Мои Скоры
+        <span class="personal-account-page__count">
+          ({{ myScoresList.length }})
+        </span>
       </h2>
       <div class="personal-account-page__scores-actions">
         <v-tooltip
@@ -333,6 +336,34 @@ const onUpdate = async () => {
     @media (max-width: $phone-l) {
       font-size: 20px;
       line-height: 20px;
+    }
+  }
+  &__scores-headline {
+    @include default-headline(36px, 36px, var(--color-text));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    text-align: center;
+    @media (max-width: $tablet-l) {
+      font-size: 28px;
+      line-height: 28px;
+    }
+    @media (max-width: $phone-l) {
+      font-size: 20px;
+      line-height: 20px;
+    }
+  }
+  &__count {
+    @include default-text(32px, 32px, var(--color-text));
+    @media (max-width: $tablet-l) {
+      font-size: 24px;
+      line-height: 24px;
+    }
+    @media (max-width: $phone-l) {
+      font-size: 18px;
+      line-height: 18px;
     }
   }
   &__avatar-inputs-wrapper {
