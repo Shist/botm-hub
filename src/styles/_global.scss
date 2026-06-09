@@ -6,7 +6,8 @@
 :root {
   color-scheme: dark;
 
-  --color-global-bg: #292929;
+  --color-global-bg-base: #292929;
+  --color-global-bg: var(--color-global-bg-base);
 
   --color-header: #181818;
   --color-footer: #181818;
@@ -162,6 +163,8 @@
   --color-modal-text: #ffffff;
   --color-modal-back-bg-rgb: 255, 255, 255;
 
+  --color-dropdown-bg: #212121;
+
   --color-vuetify-table-borders: #212121;
 
   --burger-menu-btn-img: url("@/assets/icons/burger-btn-white.svg");
@@ -189,7 +192,8 @@
 .light-theme {
   color-scheme: light;
 
-  --color-global-bg: #fafafa;
+  --color-global-bg-base: #fafafa;
+  --color-global-bg: var(--color-global-bg-base);
 
   --color-header: #ddaa22;
   --color-footer: #ddaa22;
@@ -242,6 +246,8 @@
   --color-modal-text: #2b2b2b;
   --color-modal-back-bg-rgb: 0, 0, 0;
 
+  --color-dropdown-bg: #ffffff;
+
   --color-vuetify-table-borders: #ffffff;
 
   --burger-menu-btn-img: url("@/assets/icons/burger-btn-black.svg");
@@ -257,4 +263,39 @@
   --color-skeleton-bg: #888888;
 
   --color-app-spinner: #333333;
+}
+
+.v-menu > .v-overlay__content.v-select__content > .v-list,
+.v-overlay__content > .v-sheet.v-color-picker {
+  background-color: var(--color-dropdown-bg, rgb(var(--v-theme-surface)));
+}
+
+.v-overlay__content,
+.modal__window-wrapper {
+  .v-field.v-field--variant-solo,
+  .v-field.v-field--variant-solo-filled {
+    background-color: var(
+      --color-table-hover-solid-bg,
+      rgb(var(--v-theme-surface))
+    );
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-scrollbar-thumb);
+  border-radius: 4px;
+  &:hover {
+    background-color: var(--color-text-gray);
+  }
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) transparent;
 }

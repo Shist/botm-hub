@@ -47,6 +47,7 @@ const chartKey = ref(crypto.randomUUID());
 const colorText = ref("#ffffff");
 const colorPoints = ref("#ffec8b");
 const colorBtnBg = ref("#bb8800");
+const colorRadarBorder = ref("#bb8800");
 const colorRadarBg = ref("rgba(187, 136, 0, 0.3)");
 const colorRadarGrid = ref("rgba(255, 255, 255, 0.15)");
 const colorRadarTooltipBg = ref("rgba(24, 24, 24, 0.9)");
@@ -60,7 +61,7 @@ const chartDataConfig = computed(() => ({
       label: props.labelName,
       data: props.drawPoints || props.points,
       backgroundColor: colorRadarBg.value,
-      borderColor: colorBtnBg.value,
+      borderColor: colorRadarBorder.value,
       pointBackgroundColor: colorText.value,
       pointBorderColor: colorText.value,
       pointHoverBackgroundColor: colorPoints.value,
@@ -155,6 +156,8 @@ const updateColors = () => {
   const newPoints =
     style.getPropertyValue("--color-points").trim() || "#ffec8b";
   const newBtnBg = style.getPropertyValue("--color-btn-bg").trim() || "#bb8800";
+  const newRadarBorder =
+    style.getPropertyValue("--color-radar-border").trim() || newBtnBg;
   const newRadarBg =
     style.getPropertyValue("--color-radar-bg").trim() ||
     "rgba(187, 136, 0, 0.3)";
@@ -175,11 +178,14 @@ const updateColors = () => {
   ];
 
   const isThemeChanged =
-    colorText.value !== newText || colorRadarBg.value !== newRadarBg;
+    colorText.value !== newText ||
+    colorRadarBg.value !== newRadarBg ||
+    colorRadarBorder.value !== newRadarBorder;
 
   colorText.value = newText;
   colorPoints.value = newPoints;
   colorBtnBg.value = newBtnBg;
+  colorRadarBorder.value = newRadarBorder;
   colorRadarBg.value = newRadarBg;
   colorRadarGrid.value = newRadarGrid;
   colorRadarTooltipBg.value = newRadarTooltipBg;

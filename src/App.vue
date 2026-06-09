@@ -1,15 +1,10 @@
 <template>
-  <div
-    v-if="!metaStore.isLoaded"
-    class="app-splash-screen"
-    :class="{ 'light-theme': isLightTheme }"
-  >
+  <div v-if="!metaStore.isLoaded" class="app-splash-screen">
     <div class="app-splash-screen__skeleton"></div>
   </div>
   <div
     v-else-if="metaStore.metaConfig?.isMaintenance"
     class="maintenance-screen"
-    :class="{ 'light-theme': isLightTheme }"
   >
     <div class="maintenance-screen__content">
       <AppImage
@@ -53,7 +48,7 @@
         </div>
       </template>
     </AppModal>
-    <div class="global-container" :class="{ 'light-theme': isLightTheme }">
+    <div class="global-container">
       <TheHeader :style="{ paddingRight: scrollbarWidth }" />
       <main class="main-wrapper" :style="{ paddingRight: scrollbarWidth }">
         <div class="main-wrapper__container">
@@ -67,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, nextTick } from "vue";
+import { ref, computed, watch, onMounted, nextTick } from "vue";
 import { useThemeStore } from "@/stores/theme";
 import { useMetaStore } from "@/stores/meta";
 import { useOsumapsStore } from "@/stores/osumaps";
@@ -101,6 +96,18 @@ const closeNewPatchModal = () => {
     localStorage.setItem("appVersion", metaStore.metaConfig.appVersion);
   }
 };
+
+watch(
+  isLightTheme,
+  (isLight) => {
+    if (isLight) {
+      document.documentElement.classList.add("light-theme");
+    } else {
+      document.documentElement.classList.remove("light-theme");
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(async () => {
   await metaStore.loadMeta();

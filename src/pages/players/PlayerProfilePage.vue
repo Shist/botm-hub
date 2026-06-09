@@ -1,7 +1,18 @@
 <template>
-  <div class="player-profile-page">
-    <v-skeleton-loader type="image, paragraph, table" :loading="isLoading">
+  <div
+    class="player-profile-page"
+    :class="{ 'player-profile-page__colored-skeleton': !!playerThemeColor }"
+  >
+    <v-skeleton-loader type="image, article, table" :loading="isLoading">
       <div v-if="playerInfo" class="player-profile-page__user-data-wrapper">
+        <div v-if="playerBannerUrl" class="player-profile-page__banner">
+          <AppImage
+            :imgPath="playerBannerUrl"
+            imgAlt="Баннер профиля"
+            class="player-profile-page__banner-img"
+          />
+          <div class="player-profile-page__banner-overlay"></div>
+        </div>
         <div class="player-profile-page__user-info-wrapper">
           <v-tooltip
             :disabled="playerInfo?.osuId !== null"
@@ -164,8 +175,6 @@ import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import { useClubsStore } from "@/stores/clubs";
-import useUserTags from "@/composables/useUserTags";
-import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
 import SkillsetsRadarChart from "@/components/users/SkillsetsRadarChart.vue";
@@ -184,6 +193,9 @@ import IconTechMember from "@/components/users/user-icons/clubs/members/IconTech
 import IconReadingMember from "@/components/users/user-icons/clubs/members/IconReadingMember.vue";
 import IconHiddenMember from "@/components/users/user-icons/clubs/members/IconHiddenMember.vue";
 import IconHardrockMember from "@/components/users/user-icons/clubs/members/IconHardrockMember.vue";
+import useUserTags from "@/composables/useUserTags";
+import useToast from "@/composables/useToast";
+import useProfileTheme from "@/composables/useProfileTheme";
 import { type IAllUsersListItem } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
 import { BotmClub } from "@/types/clubs";
@@ -212,6 +224,14 @@ const avatarSrc = computed(
 const playerSkillsets = computed<OsuMapCategory[]>(() => {
   return JSON.parse(playerInfo.value?.skillsets ?? "[]");
 });
+const playerThemeColor = computed(
+  () => playerInfo.value?.profileThemeColor ?? null
+);
+const playerBannerUrl = computed(
+  () => playerInfo.value?.profileBannerUrl ?? null
+);
+
+useProfileTheme(() => playerThemeColor.value);
 
 const playerScoresList = computed(() => {
   if (!playerInfo.value) return [];
@@ -376,7 +396,50 @@ onMounted(async () => {
     align-items: center;
     row-gap: 20px;
   }
+  &__banner {
+    width: 100%;
+    height: 250px;
+    border-radius: 12px;
+    margin-bottom: -40px;
+    position: relative;
+    overflow: hidden;
+    @media (max-width: $tablet-l) {
+      height: 200px;
+      margin-bottom: -20px;
+    }
+  }
+  &__banner-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    :deep(.main-img),
+    :deep(.img-skeleton) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    :deep(.img-error) {
+      position: relative;
+      z-index: 2;
+    }
+  }
+  &__banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1),
+      var(--color-global-bg)
+    );
+    z-index: 1;
+  }
   &__user-info-wrapper {
+    position: relative;
+    z-index: 2;
     width: 100%;
     display: flex;
     justify-content: center;
@@ -463,6 +526,22 @@ onMounted(async () => {
     white-space: pre-wrap;
     opacity: 0.9;
     border-radius: 10px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-scrollbar-thumb) transparent;
+    &::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--color-scrollbar-thumb);
+      border-radius: 4px;
+      &:hover {
+        background-color: var(--color-text-gray);
+      }
+    }
   }
   &__divider {
     width: 100%;
@@ -577,6 +656,70 @@ onMounted(async () => {
     @media (max-width: $phone-l) {
       font-size: 24px;
       line-height: 24px;
+    }
+  }
+  &__colored-skeleton {
+    :deep(.v-skeleton-loader) {
+      background: transparent;
+    }
+    :deep(.v-skeleton-loader__bone) {
+      background-color: var(--color-skeleton-bg);
+    }
+  }
+}
+
+:deep(.v-field--variant-solo),
+:deep(.v-field--variant-solo-filled) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+}
+:deep(.v-table),
+:deep(.v-table__wrapper > table) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+}
+:deep(
+  .v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th
+) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+  color: var(--color-text);
+  box-shadow: inset 0 -1px 0
+    var(
+      --color-theme-border,
+      rgba(var(--v-border-color), var(--v-border-opacity))
+    );
+}
+:deep(tbody .v-data-table__td) {
+  background: transparent;
+  border-bottom: 1px solid
+    var(
+      --color-theme-border,
+      rgba(var(--v-border-color), var(--v-border-opacity))
+    );
+}
+:deep(.v-data-table__tr) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+  transition: background-color 0.2s ease-in-out;
+  &:hover {
+    background-color: var(
+      --color-table-hover-solid-bg,
+      rgba(var(--v-theme-on-surface), var(--v-hover-opacity))
+    );
+  }
+}
+:deep(.v-table__wrapper) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) transparent;
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-scrollbar-thumb);
+    border-radius: 4px;
+    &:hover {
+      background-color: var(--color-text-gray);
     }
   }
 }

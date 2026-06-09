@@ -779,7 +779,7 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
   &__category-cancel {
     @include default-btn(
       100%,
-      var(--color-btn-text),
+      var(--color-text-white),
       var(--color-btn-cancel-bg),
       0
     );

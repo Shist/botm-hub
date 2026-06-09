@@ -58,6 +58,7 @@ onMounted(() => {
     cursor: pointer;
     background-color: var(--color-theme-slider-light);
     border-radius: 34px;
+    box-shadow: inset 0 0 0 1px rgba(128, 128, 128, 0.3);
     transition: 0.4s;
     &::before {
       content: "";
@@ -68,6 +69,9 @@ onMounted(() => {
       left: 4px;
       background-color: var(--color-theme-slider-circle);
       border-radius: 50%;
+      box-shadow:
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        0 0 2px rgba(0, 0, 0, 0.3);
       transition: 0.4s;
     }
   }

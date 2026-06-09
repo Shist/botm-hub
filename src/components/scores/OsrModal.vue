@@ -732,7 +732,7 @@ const confirmAndUpload = async () => {
     flex: 1;
     @include default-btn(
       100%,
-      var(--color-btn-text),
+      var(--color-text-white),
       var(--color-btn-cancel-bg),
       0
     );

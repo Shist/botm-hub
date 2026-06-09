@@ -104,7 +104,13 @@ export const useAuthStore = defineStore("auth", () => {
   const updateUserAdditionalInfo = async (
     additionalInfo: Pick<
       IUserFirebaseAdditionalInfo,
-      "osuId" | "nick" | "digitCategory" | "skillsets" | "profileDescription"
+      | "osuId"
+      | "nick"
+      | "digitCategory"
+      | "profileThemeColor"
+      | "profileBannerUrl"
+      | "skillsets"
+      | "profileDescription"
     >
   ) => {
     if (

@@ -4,18 +4,18 @@ export default function useFormValidation() {
   const isFormValid = ref(false);
 
   const rules = {
-    min: (minLength: number) => (givenValue: string | null) =>
-      (givenValue ?? "").length >= minLength ||
+    min: (minLength: number) => (givenValue: string | number | null) =>
+      String(givenValue ?? "").length >= minLength ||
       `Требуется не менее ${minLength} символов!`,
     optionalMin: (minLength: number) => (givenValue: string | null) => {
       if (!givenValue) return true;
       return (
-        givenValue.length >= minLength ||
+        String(givenValue).length >= minLength ||
         `Требуется не менее ${minLength} символов!`
       );
     },
-    max: (maxLength: number) => (givenValue: string | null) =>
-      (givenValue ?? "").length <= maxLength ||
+    max: (maxLength: number) => (givenValue: string | number | null) =>
+      String(givenValue ?? "").length <= maxLength ||
       `Требуется не более ${maxLength} символов!`,
     wordsNotMoreThan: (maxLetters: number) => (givenText: string | null) =>
       (givenText ?? "").split(" ").every((word) => word.length <= maxLetters) ||
@@ -35,6 +35,14 @@ export default function useFormValidation() {
     noMultipleUnderscores: (givenValue: string | null) =>
       !/_{2,}/.test(givenValue ?? "") ||
       "Требуется, чтобы внутри поля не было нескольких подчеркиваний подряд!",
+    isOptionalUrl: (givenValue: string | null) => {
+      const val = (givenValue ?? "").trim();
+      if (!val) return true;
+      return (
+        /^(https?:\/\/[^\s]+)$/i.test(val) ||
+        "Требуется корректная ссылка (начинается с http:// или https://)!"
+      );
+    },
     isStrongPassword: (passwordValue: string | null) =>
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/.test(passwordValue ?? "") ||
       "Требуется минимум одна строчная и одна заглавная латинские буквы, а также цифра!",

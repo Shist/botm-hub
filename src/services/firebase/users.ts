@@ -86,9 +86,11 @@ async function updateUserAdditionalInfoToFirebase(
         uid: userUid,
         osuId: additionalInfo.osuId,
         nick: additionalInfo.nick,
-        profileDescription: additionalInfo.profileDescription,
         digitCategory: additionalInfo.digitCategory,
+        profileThemeColor: additionalInfo.profileThemeColor,
+        profileBannerUrl: additionalInfo.profileBannerUrl,
         skillsets: additionalInfo.skillsets,
+        profileDescription: additionalInfo.profileDescription,
         isTrainer: additionalInfo.isTrainer,
         isRedactor: additionalInfo.isRedactor,
       };
@@ -120,9 +122,11 @@ async function updateUserAdditionalInfoToFirebase(
         uid: userUid,
         osuId: additionalInfo.osuId,
         nick: additionalInfo.nick,
-        profileDescription: additionalInfo.profileDescription,
         digitCategory: additionalInfo.digitCategory,
+        profileThemeColor: additionalInfo.profileThemeColor,
+        profileBannerUrl: additionalInfo.profileBannerUrl,
         skillsets: additionalInfo.skillsets,
+        profileDescription: additionalInfo.profileDescription,
         isTrainer: additionalInfo.isTrainer,
         isRedactor: additionalInfo.isRedactor,
       });
@@ -162,9 +166,11 @@ async function signUpUserToFirebase(
     const fullAdditionalInfo: IUserFirebaseAdditionalInfo = {
       ...partialInfo,
       osuId: null,
-      profileDescription: null,
       digitCategory: null,
+      profileThemeColor: null,
+      profileBannerUrl: null,
       skillsets: "[]",
+      profileDescription: null,
       isTrainer: false,
       isRedactor: false,
     };

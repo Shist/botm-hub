@@ -1,6 +1,17 @@
 <template>
-  <div class="personal-account-page">
+  <div
+    class="personal-account-page"
+    :class="{ 'personal-account-page__colored-skeleton': !!chosenThemeColor }"
+  >
     <v-skeleton-loader type="image, article, table" :loading="isPageLoading">
+      <div v-if="chosenBannerUrl" class="personal-account-page__banner">
+        <AppImage
+          :imgPath="chosenBannerUrl"
+          imgAlt="Баннер профиля"
+          class="personal-account-page__banner-img"
+        />
+        <div class="personal-account-page__banner-overlay"></div>
+      </div>
       <div class="personal-account-page__header-wrapper">
         <h2 class="personal-account-page__headline">Личный Кабинет</h2>
         <v-btn
@@ -33,46 +44,88 @@
           v-model="isFormValid"
           class="personal-account-page__inputs-wrapper"
         >
-          <v-number-input
-            v-model="chosenOsuId"
-            :min="1"
-            :max="1000000000"
-            variant="solo"
-            control-variant="hidden"
-            prepend-inner-icon="mdi-identifier"
-            label="osu! ID"
-            placeholder="Введи свой osu! ID ('https://osu.ppy.sh/users/<ID>')"
-            clearable
-            hide-details
-          />
+          <div class="personal-account-page__input-row">
+            <v-number-input
+              v-model="chosenOsuId"
+              :min="1"
+              :max="1000000000000"
+              :counter="13"
+              :rules="[rules.min(1), rules.max(13)]"
+              variant="solo"
+              control-variant="hidden"
+              prepend-inner-icon="mdi-identifier"
+              label="osu! ID"
+              placeholder="Введи свой osu! ID"
+              clearable
+              persistent-counter
+            />
+            <v-text-field
+              v-model="chosenNick"
+              :counter="15"
+              :rules="[
+                rules.min(3),
+                rules.max(15),
+                rules.notOnlySpaces,
+                rules.noEdgeSpaces,
+                rules.noMultipleSpaces,
+                rules.noMultipleUnderscores,
+              ]"
+              autocomplete="username"
+              variant="solo"
+              prepend-inner-icon="mdi-account"
+              label="osu! Ник"
+              placeholder="Введи свой osu! ник"
+              persistent-counter
+              clearable
+            />
+          </div>
+          <div class="personal-account-page__input-row">
+            <v-select
+              v-model="chosenDigit"
+              :items="digitOptions"
+              variant="solo"
+              prepend-inner-icon="mdi-star-half-full"
+              label="Digit-категория"
+              placeholder="Выбери Digit-категорию"
+              clearable
+              hide-details
+            />
+            <v-menu :close-on-content-click="false" location="bottom">
+              <template #activator="{ props }">
+                <v-text-field
+                  v-model="chosenThemeColor"
+                  v-bind="props"
+                  variant="solo"
+                  label="Цвет Профиля"
+                  placeholder="Выбери цвет через палитру"
+                  clearable
+                  readonly
+                  hide-details
+                >
+                  <template #prepend-inner>
+                    <v-icon :color="chosenThemeColor || 'var(--color-text)'">
+                      mdi-palette
+                    </v-icon>
+                  </template>
+                </v-text-field>
+              </template>
+              <v-color-picker
+                v-model="chosenThemeColor"
+                mode="hex"
+                elevation="5"
+              />
+            </v-menu>
+          </div>
           <v-text-field
-            v-model="chosenNick"
-            :counter="15"
-            :rules="[
-              rules.min(3),
-              rules.max(15),
-              rules.notOnlySpaces,
-              rules.noEdgeSpaces,
-              rules.noMultipleSpaces,
-              rules.noMultipleUnderscores,
-            ]"
-            autocomplete="username"
+            v-model="chosenBannerUrl"
+            :counter="300"
+            :rules="[rules.max(300), rules.isOptionalUrl]"
             variant="solo"
-            prepend-inner-icon="mdi-account"
-            label="osu! Ник"
-            placeholder="Введи свой osu! ник"
+            prepend-inner-icon="mdi-image-area"
+            label="URL Баннера"
+            placeholder="Вставь прямую ссылку на картинку (imgur, imgbb и т.д.)"
             persistent-counter
             clearable
-          />
-          <v-select
-            v-model="chosenDigit"
-            :items="digitOptions"
-            variant="solo"
-            prepend-inner-icon="mdi-star-half-full"
-            label="Digit-категория"
-            placeholder="Выбери Digit-категорию"
-            clearable
-            hide-details
           />
           <SkillsetsSelect v-model="chosenCategories" />
           <v-textarea
@@ -173,6 +226,7 @@ import OsrModal from "@/components/scores/OsrModal.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
+import useProfileTheme from "@/composables/useProfileTheme";
 import ehCollabImage from "@/assets/images/eh-collab.png";
 import { DigitCategory } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
@@ -188,6 +242,8 @@ const { isFormValid, rules } = useFormValidation();
 const chosenOsuId = ref<number | null>(null);
 const chosenNick = ref<string | null>(null);
 const chosenDigit = ref<DigitCategory | null>(null);
+const chosenThemeColor = ref<string | null>(null);
+const chosenBannerUrl = ref<string | null>(null);
 const chosenCategories = ref<OsuMapCategory[]>([]);
 const chosenDescription = ref<string | null>(null);
 const isUpdating = ref(false);
@@ -195,6 +251,8 @@ const ehCollabImagePath = ref(ehCollabImage);
 const isMpModalOpened = ref(false);
 const isOsrModalOpened = ref(false);
 const isDependenciesLoading = ref(false);
+
+useProfileTheme(() => chosenThemeColor.value);
 
 const isPageLoading = computed(
   () =>
@@ -216,6 +274,12 @@ const currentNick = computed(() => {
 const currentDigit = computed(() => {
   return authStore.userAdditionalInfo?.digitCategory ?? null;
 });
+const currentThemeColor = computed(() => {
+  return authStore.userAdditionalInfo?.profileThemeColor ?? null;
+});
+const currentBannerUrl = computed(() => {
+  return authStore.userAdditionalInfo?.profileBannerUrl ?? null;
+});
 const currentSkillsets = computed(() => {
   return authStore.userAdditionalInfo?.skillsets ?? [];
 });
@@ -231,6 +295,8 @@ const isSomeInfoChanged = computed(() => {
     chosenOsuId.value !== osuIdFromStore ||
     chosenNick.value !== currentNick.value ||
     chosenDigit.value !== currentDigit.value ||
+    chosenThemeColor.value !== currentThemeColor.value ||
+    chosenBannerUrl.value !== currentBannerUrl.value ||
     chosenDescription.value !== currentDescription.value ||
     JSON.stringify(chosenCategories.value) !==
       JSON.stringify(currentSkillsets.value)
@@ -252,6 +318,12 @@ watch(currentNick, (valueFromStore) => {
 watch(currentDigit, (valueFromStore) => {
   chosenDigit.value = valueFromStore;
 });
+watch(currentThemeColor, (valueFromStore) => {
+  chosenThemeColor.value = valueFromStore;
+});
+watch(currentBannerUrl, (valueFromStore) => {
+  chosenBannerUrl.value = valueFromStore;
+});
 watch(currentSkillsets, (valueFromStore) => {
   chosenCategories.value = valueFromStore;
 });
@@ -263,6 +335,8 @@ onMounted(async () => {
   chosenOsuId.value = currentOsuId.value === null ? null : +currentOsuId.value;
   chosenNick.value = currentNick.value;
   chosenDigit.value = currentDigit.value;
+  chosenThemeColor.value = currentThemeColor.value;
+  chosenBannerUrl.value = currentBannerUrl.value;
   chosenCategories.value = currentSkillsets.value;
   chosenDescription.value = currentDescription.value;
 
@@ -291,6 +365,8 @@ const onUpdate = async () => {
       osuId: chosenOsuId.value === null ? null : `${chosenOsuId.value}`,
       nick: chosenNick.value?.trim() ?? "",
       digitCategory: chosenDigit.value,
+      profileThemeColor: chosenThemeColor.value || null,
+      profileBannerUrl: chosenBannerUrl.value?.trim() || null,
       skillsets: JSON.stringify(chosenCategories.value),
       profileDescription: chosenDescription.value?.trim() || null,
     });
@@ -310,7 +386,50 @@ const onUpdate = async () => {
   display: flex;
   flex-direction: column;
   row-gap: 20px;
+  &__banner {
+    width: 100%;
+    height: 250px;
+    border-radius: 12px;
+    margin-bottom: -40px;
+    position: relative;
+    overflow: hidden;
+    @media (max-width: $tablet-l) {
+      height: 180px;
+      margin-bottom: -20px;
+    }
+  }
+  &__banner-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    :deep(.main-img),
+    :deep(.img-skeleton) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    :deep(.img-error) {
+      position: relative;
+      z-index: 2;
+    }
+  }
+  &__banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.1),
+      var(--color-global-bg)
+    );
+    z-index: 1;
+  }
   &__header-wrapper {
+    position: relative;
+    z-index: 2;
     padding: 10px 20px 0;
     display: flex;
     justify-content: space-between;
@@ -375,7 +494,7 @@ const onUpdate = async () => {
     }
   }
   &__avatar {
-    max-width: 408px;
+    max-width: 430px;
     width: 100%;
   }
   &__inputs-wrapper {
@@ -383,6 +502,14 @@ const onUpdate = async () => {
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+  &__input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    @media (max-width: $tablet-l) {
+      grid-template-columns: 1fr;
+    }
   }
   &__confirm-btn {
     @include default-btn(100%, var(--color-btn-text), var(--color-btn-bg), 0);
@@ -435,6 +562,88 @@ const onUpdate = async () => {
     }
     @media (max-width: $tablet-l) {
       flex: auto;
+    }
+  }
+  &__colored-skeleton {
+    :deep(.v-skeleton-loader) {
+      background: transparent;
+    }
+    :deep(.v-skeleton-loader__bone) {
+      background-color: var(--color-skeleton-bg);
+    }
+  }
+}
+
+:deep(.v-field--variant-solo),
+:deep(.v-field--variant-solo-filled) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+}
+:deep(.v-table),
+:deep(.v-table__wrapper > table) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+}
+:deep(
+  .v-table.v-table--fixed-header > .v-table__wrapper > table > thead > tr > th
+) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+  color: var(--color-text);
+  box-shadow: inset 0 -1px 0
+    var(
+      --color-theme-border,
+      rgba(var(--v-border-color), var(--v-border-opacity))
+    );
+}
+:deep(tbody .v-data-table__td) {
+  background: transparent;
+  border-bottom: 1px solid
+    var(
+      --color-theme-border,
+      rgba(var(--v-border-color), var(--v-border-opacity))
+    );
+}
+:deep(.v-data-table__tr) {
+  background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));
+  transition: background-color 0.2s ease-in-out;
+  &:hover {
+    background-color: var(
+      --color-table-hover-solid-bg,
+      rgba(var(--v-theme-on-surface), var(--v-hover-opacity))
+    );
+  }
+}
+:deep(.v-table__wrapper) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) transparent;
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-scrollbar-thumb);
+    border-radius: 4px;
+    &:hover {
+      background-color: var(--color-text-gray);
+    }
+  }
+}
+:deep(textarea) {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar-thumb) transparent;
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--color-scrollbar-thumb);
+    border-radius: 4px;
+    &:hover {
+      background-color: var(--color-text-gray);
     }
   }
 }
