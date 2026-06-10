@@ -8,6 +8,7 @@ import {
 import { useMetaStore } from "@/stores/meta";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
+import { calculateFinalCategoryPoints } from "@/utils/scores-calcs";
 import {
   MAPS_CATEGORIES,
   CLUB_SETTINGS,
@@ -90,41 +91,61 @@ export const useScoresStore = defineStore("scores", () => {
         if (!mapCategories) continue;
 
         for (const [modKey, scoreData] of Object.entries(modsRecord)) {
-          const addToBucket = (bucket: IStatBucket) => {
-            bucket.points += scoreData.points;
+          const basePoints = scoreData.points;
+
+          const modsArray =
+            modKey === "nm"
+              ? ["NM"]
+              : (modKey.toUpperCase().match(/.{1,2}/g) ?? []);
+
+          let maxOverallPoints = 0;
+          const clubMaxPoints = new Map<BotmClub, number>();
+
+          const addStatsToBucket = (bucket: IStatBucket, pts: number) => {
+            bucket.points += pts;
             bucket.totalScores++;
             bucket.sumScore += scoreData.score;
             bucket.sumAcc += scoreData.accuracy;
             bucket.sumCombo += scoreData.combo;
           };
 
-          addToBucket(userStats.overall);
-
           mapCategories.forEach((category) => {
             const allowedMods = VALID_MODS_FOR_CATEGORY[category];
             if (isOsuScoreMod(modKey) && allowedMods.includes(modKey)) {
-              addToBucket(userStats.skillsets[category]);
+              const finalCategoryPoints = calculateFinalCategoryPoints(
+                basePoints,
+                category,
+                modsArray
+              );
+
+              addStatsToBucket(
+                userStats.skillsets[category],
+                finalCategoryPoints
+              );
+
+              if (finalCategoryPoints > maxOverallPoints) {
+                maxOverallPoints = finalCategoryPoints;
+              }
+
+              Object.values(CLUB_SETTINGS).forEach((clubConfig) => {
+                const rule = clubConfig.skillsets.find(
+                  (s) => s.category === category
+                );
+                if (rule && rule.allowedMods.includes(modKey)) {
+                  const currentClubMax = clubMaxPoints.get(clubConfig.id) ?? 0;
+                  if (finalCategoryPoints > currentClubMax) {
+                    clubMaxPoints.set(clubConfig.id, finalCategoryPoints);
+                  }
+                }
+              });
             }
           });
 
-          const validClubs = new Set<BotmClub>();
-          mapCategories.forEach((category) => {
-            Object.values(CLUB_SETTINGS).forEach((clubConfig) => {
-              const rule = clubConfig.skillsets.find(
-                (s) => s.category === category
-              );
-              if (
-                rule &&
-                isOsuScoreMod(modKey) &&
-                rule.allowedMods.includes(modKey)
-              ) {
-                validClubs.add(clubConfig.id);
-              }
-            });
-          });
-          validClubs.forEach((clubId) => {
-            addToBucket(userStats.clubs[clubId]);
-          });
+          addStatsToBucket(userStats.overall, maxOverallPoints);
+
+          for (const [clubId, maxClubPoints] of clubMaxPoints.entries()) {
+            addStatsToBucket(userStats.clubs[clubId], maxClubPoints);
+          }
         }
       }
     }
@@ -156,9 +177,7 @@ export const useScoresStore = defineStore("scores", () => {
     mapIdsFilter?: number[]
   ): IScoreTableRow[] => {
     const flatScores: IScoreTableRow[] = [];
-
     const allUsersMap = new Map(usersStore.users.map((u) => [u.uid, u]));
-
     const allMapsList = Object.values(osumapsStore.osumaps).flat();
     const mapsDataMap = new Map<
       number,
@@ -193,6 +212,32 @@ export const useScoresStore = defineStore("scores", () => {
         if (!mapData) continue;
 
         for (const [modKey, scoreData] of Object.entries(modsRecord)) {
+          const basePoints = scoreData.points;
+          const modsArray =
+            modKey === "nm"
+              ? ["NM"]
+              : (modKey.toUpperCase().match(/.{1,2}/g) ?? []);
+
+          let maxFinalPoints = basePoints;
+          let hasValidCategory = false;
+
+          if (mapData.categories.length > 0) {
+            let maxCalculated = 0;
+            mapData.categories.forEach((category) => {
+              const allowedMods = VALID_MODS_FOR_CATEGORY[category];
+              if (isOsuScoreMod(modKey) && allowedMods.includes(modKey)) {
+                hasValidCategory = true;
+                const finalPts = calculateFinalCategoryPoints(
+                  basePoints,
+                  category,
+                  modsArray
+                );
+                if (finalPts > maxCalculated) maxCalculated = finalPts;
+              }
+            });
+            if (hasValidCategory) maxFinalPoints = maxCalculated;
+          }
+
           flatScores.push({
             uidWithMapIdAndMods: `${uid}-${mapIdNum}-${modKey}`,
             uid,
@@ -207,7 +252,8 @@ export const useScoresStore = defineStore("scores", () => {
             score: scoreData.score,
             accuracy: scoreData.accuracy,
             combo: scoreData.combo,
-            points: scoreData.points,
+            basePoints: basePoints,
+            points: maxFinalPoints,
           });
         }
       }

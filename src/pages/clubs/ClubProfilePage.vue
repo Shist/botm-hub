@@ -424,26 +424,24 @@ const tableItems = computed(() => {
     const fullUser = usersStore.users.find((u) => u.uid === member.uid);
     if (!fullUser) continue;
 
-    const userClubScores = clubScoresList.value.filter(
-      (s) => s.uid === member.uid
-    );
-
     let points = 0;
-    const totalScores = userClubScores.length;
+    let totalScores = 0;
     let avgScore = 0;
     let avgAcc = 0;
     let avgCombo = 0;
 
-    if (totalScores > 0) {
-      const sumPoints = userClubScores.reduce((acc, s) => acc + s.points, 0);
-      const sumScore = userClubScores.reduce((acc, s) => acc + s.score, 0);
-      const sumAcc = userClubScores.reduce((acc, s) => acc + s.accuracy, 0);
-      const sumCombo = userClubScores.reduce((acc, s) => acc + s.combo, 0);
-
-      points = sumPoints;
-      avgScore = Math.round(sumScore / totalScores);
-      avgAcc = Number((sumAcc / totalScores).toFixed(2));
-      avgCombo = Math.round(sumCombo / totalScores);
+    const userStats = scoresStore.leaderboardsData.find(
+      (st) => st.uid === member.uid
+    );
+    if (userStats) {
+      const clubStats = userStats.clubs[normalizedClubId.value];
+      if (clubStats) {
+        points = clubStats.points;
+        totalScores = clubStats.totalScores;
+        avgScore = clubStats.avgScore;
+        avgAcc = clubStats.avgAcc;
+        avgCombo = clubStats.avgCombo;
+      }
     }
 
     items.push({

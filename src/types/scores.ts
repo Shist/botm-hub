@@ -149,6 +149,7 @@ export interface IScoreTableRow {
   score: number;
   accuracy: number;
   combo: number;
+  basePoints: number;
   points: number;
 }
 

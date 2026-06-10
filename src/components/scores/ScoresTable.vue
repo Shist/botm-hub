@@ -186,9 +186,28 @@
           </span>
         </template>
         <template #[`item.score`]="{ item }">
-          <span class="scores-table__score">
-            {{ item.score.toLocaleString("ru-RU") }}
-          </span>
+          <div class="scores-table__score-wrapper">
+            <span class="scores-table__score">
+              {{ item.score.toLocaleString("ru-RU") }}
+            </span>
+            <v-tooltip
+              v-if="item.modsArray.includes('EZ')"
+              text="Скор с учётом множителя x1.8 для EZ"
+              location="top"
+            >
+              <template #activator="{ props }">
+                <v-icon
+                  v-bind="props"
+                  size="16"
+                  color="var(--color-text-gray)"
+                  class="scores-table__sr-info-icon"
+                  @click.stop
+                >
+                  mdi-information-outline
+                </v-icon>
+              </template>
+            </v-tooltip>
+          </div>
         </template>
         <template #[`item.accuracy`]="{ item }">
           <span>{{ item.accuracy.toFixed(2) }}%</span>
@@ -197,9 +216,56 @@
           <span>{{ item.combo }}x</span>
         </template>
         <template #[`item.points`]="{ item }">
-          <span class="scores-table__points">
-            {{ item.points.toFixed(2) }}
-          </span>
+          <div class="scores-table__sr-cell">
+            <template
+              v-if="item.validSrInfo.length === 1 && item.validSrInfo[0]"
+            >
+              <span class="scores-table__points">
+                {{ item.validSrInfo[0].finalPoints.toFixed(2) }}
+              </span>
+            </template>
+            <template v-else-if="item.validSrInfo.length > 1">
+              <v-tooltip
+                location="top"
+                content-class="scores-table__tooltip-bg"
+              >
+                <template #activator="{ props }">
+                  <div
+                    v-bind="props"
+                    class="scores-table__sr-mixed"
+                    @click.stop
+                  >
+                    <v-icon size="20" color="var(--color-points)">
+                      mdi-bullseye-arrow
+                    </v-icon>
+                    <span class="scores-table__points">
+                      {{ item.points.toFixed(2) }}
+                    </span>
+                  </div>
+                </template>
+                <div class="scores-table__sr-tooltip">
+                  <span class="scores-table__sr-tooltip-title">
+                    Очки по категориям:
+                  </span>
+                  <div
+                    v-for="info in item.validSrInfo"
+                    :key="info.category"
+                    class="scores-table__sr-tooltip-row"
+                  >
+                    <CategoryBadge :category="info.category" />
+                    <div class="scores-table__sr-tooltip-sr-wrapper">
+                      <span
+                        class="scores-table__points scores-table__points_outlined"
+                      >
+                        {{ info.finalPoints.toFixed(2) }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </v-tooltip>
+            </template>
+            <span v-else>—</span>
+          </div>
         </template>
         <template #no-data>
           <div class="scores-table__no-data">Нет данных о скорах</div>
@@ -250,6 +316,7 @@ import useToast from "@/composables/useToast";
 import UserCard from "@/components/users/UserCard.vue";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { formatMapRank, isValidModCombinationForCategory } from "@/utils";
+import { calculateFinalCategoryPoints } from "@/utils/scores-calcs";
 import { OsuMapCategory } from "@/types/osumaps";
 import { type IScoreTableRow } from "@/types/scores";
 
@@ -267,17 +334,18 @@ type DataTableHeader = {
 };
 
 const router = useRouter();
-
 const mapsStore = useOsumapsStore();
 
 const props = withDefaults(
   defineProps<{
     scoresList: IScoreTableRow[];
     isLoading: boolean;
+    targetCategory?: OsuMapCategory | null;
     hiddenColumns?: string[];
     defaultSort?: { key: string; order?: "asc" | "desc" }[];
   }>(),
   {
+    targetCategory: null,
     hiddenColumns: () => [],
     defaultSort: () => [{ key: "points", order: "desc" }],
   }
@@ -325,7 +393,7 @@ const allHeaders = reactive<DataTableHeader[]>([
   {
     key: "mapName",
     title: "Название карты",
-    minWidth: "335px",
+    minWidth: "322px",
   },
   {
     key: "mods",
@@ -342,13 +410,13 @@ const allHeaders = reactive<DataTableHeader[]>([
   {
     key: "points",
     title: "Очки",
-    minWidth: "100px",
+    minWidth: "129px",
     align: "center",
   },
   {
     key: "score",
     title: "Скор",
-    minWidth: "96px",
+    minWidth: "114px",
     align: "center",
   },
   {
@@ -410,27 +478,45 @@ const enrichedScoresList = computed(() => {
   );
 
   return props.scoresList.map((score) => {
+    const modsArray =
+      score.mods === "nm"
+        ? ["NM"]
+        : (score.mods.toUpperCase().match(/.{1,2}/g) ?? []);
+
     const validDbMaps = allMaps.filter(
       (m) =>
         m.id === score.mapId &&
-        isValidModCombinationForCategory([score.mods], m.category)
+        isValidModCombinationForCategory(modsArray, m.category) &&
+        (!props.targetCategory || m.category === props.targetCategory)
     );
 
     const validSrInfo = validDbMaps
       .map((m) => {
-        const catUpper = m.category.toUpperCase();
+        const categoryUpper = m.category.toUpperCase();
+        const basePts = calculateFinalCategoryPoints(
+          score.basePoints,
+          m.category,
+          modsArray
+        );
+
         return {
           category: m.category,
           sr: m.starRate,
-          isFmTb: catUpper.startsWith("FM") || catUpper === "TB",
+          isFmTb: categoryUpper.startsWith("FM") || categoryUpper === "TB",
+          finalPoints: basePts,
         };
       })
-      .sort((a, b) => b.sr - a.sr);
+      .sort((a, b) => b.finalPoints - a.finalPoints);
 
-    const maxSr = validSrInfo.length > 0 ? (validSrInfo[0]?.sr ?? 0) : 0;
+    const maxSr =
+      validSrInfo.length > 0 ? Math.max(...validSrInfo.map((i) => i.sr)) : 0;
+    const maxPoints =
+      validSrInfo.length > 0 ? (validSrInfo[0]?.finalPoints ?? 0) : 0;
 
     return {
       ...score,
+      points: maxPoints,
+      modsArray,
       validSrInfo,
       maxSr,
     };
@@ -442,8 +528,9 @@ const customFilter = (
   query: string,
   item?: {
     raw: IScoreTableRow & {
-      validSrInfo?: { category: string; sr: number }[];
+      validSrInfo?: { category: string; sr: number; finalPoints: number }[];
       maxSr?: number;
+      modsArray?: string[];
     };
   }
 ) => {
@@ -452,13 +539,15 @@ const customFilter = (
   const q = query.toLowerCase();
   const row = item.raw;
 
-  const matchesCategoryOrSr = row.validSrInfo?.some(
+  const matchesCategoryOrSrOrPoints = row.validSrInfo?.some(
     (info) =>
-      info.category.toLowerCase().includes(q) || info.sr.toFixed(2).includes(q)
+      info.category.toLowerCase().includes(q) ||
+      info.sr.toFixed(2).includes(q) ||
+      info.finalPoints.toFixed(2).includes(q)
   );
 
   return (
-    matchesCategoryOrSr ||
+    matchesCategoryOrSrOrPoints ||
     row.user.nick.toLowerCase().includes(q) ||
     row.mapName.toLowerCase().includes(q) ||
     row.mods.toLowerCase().includes(q) ||
@@ -536,13 +625,14 @@ const navigateToMapProfile = (
 const onRowClick = (event: MouseEvent, { item }: { item: IScoreTableRow }) => {
   const isNewTab = event.ctrlKey || event.metaKey;
 
-  if (item.mapCategories.length > 1) {
+  if (item.mapCategories.length > 1 && !props.targetCategory) {
     selectedMapCategories.value = item.mapCategories;
     pendingMapId.value = item.mapId;
     isPendingNewTab.value = isNewTab;
     isCategoryModalOpen.value = true;
-  } else if (item.mapCategories.length === 1 && item.mapCategories[0]) {
-    navigateToMapProfile(item.mapCategories[0], item.mapId, isNewTab);
+  } else {
+    const target = props.targetCategory || item.mapCategories[0];
+    if (target) navigateToMapProfile(target, item.mapId, isNewTab);
   }
 };
 
@@ -708,12 +798,25 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
     color: var(--color-text-gray);
     font-size: 12px;
   }
+  &__score-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
   &__score {
     font-weight: bold;
   }
   &__points {
     color: var(--color-points);
     font-weight: bold;
+    &_outlined {
+      text-shadow:
+        1px 1px 0 #000000,
+        -1px -1px 0 #000000,
+        1px -1px 0 #000000,
+        -1px 1px 0 #000000;
+    }
   }
   &__no-data {
     padding: 40px;

@@ -87,7 +87,7 @@
                       v-if="score.isInsufficient"
                       class="parsed-scores-list__score-subtext-error"
                     >
-                      ({{ !score.passed ? "Скор зафейлен" : "<70% скора" }}, 0
+                      ({{ !score.passed ? "Скор зафейлен" : "<60% скора" }}, 0
                       очков)
                     </span>
                     <span

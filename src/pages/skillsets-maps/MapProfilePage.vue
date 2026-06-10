@@ -75,6 +75,7 @@
         <ScoresTable
           :scoresList="mapScoresList"
           :isLoading="isLoading"
+          :targetCategory="routeCategory"
           :hiddenColumns="['mapId', 'cover', 'mapName', 'link', 'maxSr']"
         />
       </div>

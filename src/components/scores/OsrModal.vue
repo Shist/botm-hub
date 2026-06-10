@@ -138,6 +138,11 @@ import { useAuthStore } from "@/stores/auth";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import { isValidModCombinationForCategory } from "@/utils";
+import {
+  getAdjustedScore,
+  getMaxScoreForMods,
+  calculateBasePoints,
+} from "@/utils/scores-calcs";
 import { OsrParser } from "@/utils/osr-parser";
 import { VALID_MODS_FOR_CATEGORY } from "@/constants";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
@@ -395,16 +400,6 @@ const processFiles = async (files: FileList) => {
   }
 };
 
-const getMaxScoreForMods = (mods: string[]) => {
-  let multiplier = 1.0;
-  if (mods.includes("EZ")) multiplier *= 0.5;
-  if (mods.includes("DT")) multiplier *= 1.2;
-  if (mods.includes("HR")) multiplier *= 1.1;
-  if (mods.includes("HD")) multiplier *= 1.06;
-  if (mods.includes("FL")) multiplier *= 1.12;
-  return 1000000 * multiplier;
-};
-
 const groupAndFormatScores = (
   rawScores: (IParsedOsr & { dbMap: IOsuMap })[]
 ): IMpModalGroup[] => {
@@ -433,19 +428,22 @@ const groupAndFormatScores = (
       });
     }
 
+    const adjustedScore = getAdjustedScore(
+      parsed.totalScore,
+      parsed.parsedMods
+    );
     const maxScore = getMaxScoreForMods(parsed.parsedMods);
-    const percentage = (parsed.totalScore / maxScore) * 100;
-    const isInsufficient = percentage < 70;
+    const percentage = (adjustedScore / maxScore) * 100;
+    const isInsufficient = percentage < 60;
 
     let calculatedPoints = 0;
-    if (!isInsufficient && parsed.totalScore > 0) {
-      const multiplier = 1 + Math.pow((percentage - 70) / 30, 2) * 2;
-      calculatedPoints = Math.pow(stars, 2) * multiplier;
+    if (!isInsufficient && adjustedScore > 0) {
+      calculatedPoints = calculateBasePoints(percentage, stars);
     }
 
     groupsMap.get(groupKey)!.scores.push({
       gameId: parsed.replayMD5 || crypto.randomUUID(),
-      score: parsed.totalScore,
+      score: adjustedScore,
       accuracy: parsed.accuracy,
       combo: parsed.maxCombo,
       rank: getRankFromStats(parsed),

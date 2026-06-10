@@ -115,6 +115,7 @@
           <ScoresTable
             :scoresList="categoryScoresList"
             :isLoading="isLoading"
+            :targetCategory="currentCategory"
           />
         </div>
       </div>

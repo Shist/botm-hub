@@ -13,6 +13,30 @@ export const CHUNKS_LIMITS = {
   TOURNAMENTS: 30,
 };
 
+export const CATEGORY_MULTIPLIERS: Record<OsuMapCategory, number> = {
+  [OsuMapCategory.NM1]: 1.07,
+  [OsuMapCategory.NM2]: 1.36,
+  [OsuMapCategory.NM3]: 1.64,
+  [OsuMapCategory.NM4]: 1.69,
+  [OsuMapCategory.NM5]: 1.57,
+  [OsuMapCategory.NM6]: 1.93,
+  [OsuMapCategory.NM7]: 1.95,
+  [OsuMapCategory.HD1]: 1.31,
+  [OsuMapCategory.HD2]: 1.9,
+  [OsuMapCategory.HD3]: 1.64,
+  [OsuMapCategory.HR1]: 1.48,
+  [OsuMapCategory.HR2]: 1.79,
+  [OsuMapCategory.HR3]: 1.86,
+  [OsuMapCategory.DT1]: 1.0,
+  [OsuMapCategory.DT2]: 1.55,
+  [OsuMapCategory.DT3]: 1.67,
+  [OsuMapCategory.DT4]: 1.81,
+  [OsuMapCategory.FM1]: 1.24,
+  [OsuMapCategory.FM2]: 1.67,
+  [OsuMapCategory.FM3]: 1.6,
+  [OsuMapCategory.TB]: 1.74,
+};
+
 export const MAPS_CATEGORIES: Record<OsuMapCategory, string> = {
   [OsuMapCategory.NM1]: "NM1 (Raw Aim)",
   [OsuMapCategory.NM2]: "NM2 (Flow Tapping)",
