@@ -803,6 +803,9 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
     align-items: center;
     justify-content: center;
     gap: 2px;
+    @media (max-width: $tablet-l) {
+      justify-content: flex-end;
+    }
   }
   &__score {
     font-weight: bold;
