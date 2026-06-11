@@ -90,7 +90,11 @@
               clearable
               hide-details
             />
-            <v-menu :close-on-content-click="false" location="bottom">
+            <v-menu
+              :close-on-content-click="false"
+              content-class="vuetify-color-picker-wrapper"
+              location="bottom"
+            >
               <template #activator="{ props }">
                 <v-text-field
                   v-model="chosenThemeColor"

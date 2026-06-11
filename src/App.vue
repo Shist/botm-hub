@@ -269,4 +269,9 @@ onMounted(async () => {
     left: calc(50dvw - 160px) !important;
   }
 }
+.vuetify-color-picker-wrapper {
+  @media (max-width: $phone-m) {
+    left: calc(50dvw - 155px) !important;
+  }
+}
 </style>
