@@ -1,6 +1,6 @@
 <template>
   <div class="clubs-page">
-    <h2 class="clubs-page__headline">Клубы и Лидерборды</h2>
+    <h2 class="clubs-page__headline">Профильные Клубы</h2>
     <v-skeleton-loader type="image, article, table" :loading="isLoading">
       <div class="clubs-flasks">
         <div

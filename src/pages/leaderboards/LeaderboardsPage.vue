@@ -1,6 +1,6 @@
 <template>
   <div class="leaderboards-page">
-    <h2 class="leaderboards-page__headline">Лидерборды</h2>
+    <h2 class="leaderboards-page__headline">Лидерборды и Скоры</h2>
     <nav class="leaderboards-page__nav-wrapper">
       <router-link
         to="/leaderboards/all"
