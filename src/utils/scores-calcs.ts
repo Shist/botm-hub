@@ -29,7 +29,7 @@ export const calculateBasePoints = (
   stars: number
 ): number => {
   if (percentage < 60) return 0;
-  const multiplier = 1 + Math.pow((percentage - 60) / 40, 2) * 2;
+  const multiplier = 1 + Math.pow((percentage - 60) / 40, 2);
   return Math.pow(stars, 3) * multiplier;
 };
 

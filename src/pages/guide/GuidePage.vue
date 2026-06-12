@@ -110,7 +110,7 @@
               <sup>3</sup>
               &times;
               <span class="math-bracket">(</span>
-              2 &times;
+              1 +
               <span class="math-bracket">(</span>
               <div class="math-fraction">
                 <span class="math-num">Percent &minus; 60</span>
@@ -118,7 +118,6 @@
               </div>
               <span class="math-bracket">)</span>
               <sup>2</sup>
-              + 1
               <span class="math-bracket">)</span>
             </div>
           </div>
