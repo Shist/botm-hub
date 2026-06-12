@@ -131,7 +131,7 @@
             persistent-counter
             clearable
           />
-          <SkillsetsSelect v-model="chosenCategories" />
+          <SkillsetsSelect v-model="chosenCategories" isMultiple />
           <v-textarea
             v-model="chosenDescription"
             :counter="300"

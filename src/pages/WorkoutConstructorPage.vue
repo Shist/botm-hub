@@ -4,7 +4,7 @@
       Конструктор Тренировочной Сессии
     </h2>
     <v-skeleton-loader type="paragraph" :loading="isUserDataLoading">
-      <SkillsetsSelect v-model="chosenCategories" />
+      <SkillsetsSelect v-model="chosenCategories" isMultiple />
       <div class="workout-constructor-page__inputs-wrapper">
         <v-number-input
           v-model="chosenStarRate"

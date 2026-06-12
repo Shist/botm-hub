@@ -29,6 +29,7 @@ const HIDDEN_ON_ROUTES = ["sign-in", "sign-up", "not-found", "main"];
 
 const ROUTE_LABELS: Record<string, string> = {
   "personal-account": "Личный Кабинет",
+  guide: "Памятка и Калькулятор Скоров",
   players: "Наши Игроки",
   "player-by-uid": "Профиль Игрока",
   "skillsets-maps": "Карты Скиллсетов",

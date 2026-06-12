@@ -61,6 +61,11 @@
               </a>
             </li>
             <li class="burger-menu__nav-list-item">
+              <a class="burger-menu__link" @click.stop="onGuideBtnClicked">
+                Памятка и Калькулятор Скоров
+              </a>
+            </li>
+            <li class="burger-menu__nav-list-item">
               <button
                 class="burger-menu__btn"
                 @click.stop="openPatchNotesModal"
@@ -143,8 +148,12 @@ const closePatchNotesModal = () => {
 
 const onProfileBtnClicked = () => {
   isMenuOpened.value = false;
-
   router.push({ name: "personal-account" });
+};
+
+const onGuideBtnClicked = () => {
+  isMenuOpened.value = false;
+  router.push({ name: "guide" });
 };
 
 const closeMenu = (event: MouseEvent) => {
@@ -157,16 +166,13 @@ const closeMenu = (event: MouseEvent) => {
 
 const onLogInBtnClicked = () => {
   isMenuOpened.value = false;
-
   router.push({ name: "sign-in" });
 };
 
 const onLogOutBtnClicked = async () => {
   try {
     await authStore.signOutUser();
-
     isMenuOpened.value = false;
-
     router.push({ name: "sign-in" });
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -261,7 +267,7 @@ const onLogOutBtnClicked = async () => {
       padding: 10px;
     }
     .burger-menu__curr-acc-wrapper {
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -343,7 +349,7 @@ const onLogOutBtnClicked = async () => {
     }
     .burger-menu__headline {
       @include default-headline(48px, 48px, var(--color-burger-menu-text));
-      margin-bottom: 40px;
+      margin-bottom: 35px;
       text-align: center;
       @media (max-width: $tablet-l) {
         font-size: 36px;
@@ -351,7 +357,7 @@ const onLogOutBtnClicked = async () => {
       }
     }
     .burger-menu__option-wrapper {
-      margin-bottom: 30px;
+      margin-bottom: 25px;
       display: flex;
       flex-direction: column;
       align-items: center;

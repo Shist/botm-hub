@@ -21,7 +21,7 @@
           persistent-counter
           clearable
         />
-        <SkillsetsSelect v-model="trainingCategories" />
+        <SkillsetsSelect v-model="trainingCategories" isMultiple />
         <v-tooltip
           :disabled="!training"
           text="Изменение даты начала качалочки может изменить её статус!"
