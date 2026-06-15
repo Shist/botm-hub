@@ -21,7 +21,6 @@
         hover
         hide-details
         class="skillsets-maps-table__content"
-        :class="{ 'skillsets-maps-table__content_fixed-height': isFixedHeight }"
         @click:row="onRowClick"
       >
         <template #[`item.id`]="{ item }">
@@ -113,11 +112,9 @@ const props = withDefaults(
     mapsList: IOsuMap[];
     isLoading: boolean;
     defaultSort?: { key: string; order?: "asc" | "desc" }[];
-    isFixedHeight?: boolean;
   }>(),
   {
     defaultSort: () => [{ key: "starRate", order: "asc" }],
-    isFixedHeight: false,
   }
 );
 
@@ -263,17 +260,8 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
     vertical-align: middle;
   }
   &__content {
-    height: calc(100dvh - 344px);
+    height: 600px;
     cursor: pointer;
-    @media (max-width: $tablet-l) {
-      height: calc(100dvh - 334px);
-    }
-    @media (max-width: $phone-l) {
-      height: calc(100dvh - 329px);
-    }
-    &_fixed-height {
-      height: 600px;
-    }
   }
   &__id-label {
     cursor: pointer;

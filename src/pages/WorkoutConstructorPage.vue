@@ -88,7 +88,6 @@
         v-if="isMapsSectionVisible"
         :mapsList="suggestedMapsList"
         :isLoading="isPreparingMaps"
-        isFixedHeight
       />
     </div>
   </div>

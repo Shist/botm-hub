@@ -214,11 +214,7 @@
               ({{ clubMaps.length }})
             </span>
           </h3>
-          <SkillsetsMapsTable
-            :mapsList="clubMaps"
-            :isLoading="isMapsLoading"
-            isFixedHeight
-          />
+          <SkillsetsMapsTable :mapsList="clubMaps" :isLoading="isMapsLoading" />
         </div>
       </div>
       <div v-else-if="!isValidClub" class="club-profile-page__not-found">
