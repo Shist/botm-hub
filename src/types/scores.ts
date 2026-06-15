@@ -151,6 +151,7 @@ export interface IScoreTableRow {
   combo: number;
   basePoints: number;
   points: number;
+  percentage: number;
 }
 
 export interface IParsedOsr {

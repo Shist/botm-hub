@@ -8,7 +8,10 @@ import {
 import { useMetaStore } from "@/stores/meta";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
-import { calculateFinalCategoryPoints } from "@/utils/scores-calcs";
+import {
+  getMaxScoreForMods,
+  calculateFinalCategoryPoints,
+} from "@/utils/scores-calcs";
 import {
   MAPS_CATEGORIES,
   CLUB_SETTINGS,
@@ -213,10 +216,14 @@ export const useScoresStore = defineStore("scores", () => {
 
         for (const [modKey, scoreData] of Object.entries(modsRecord)) {
           const basePoints = scoreData.points;
+          const scoreNum = scoreData.score;
           const modsArray =
             modKey === "nm"
               ? ["NM"]
               : (modKey.toUpperCase().match(/.{1,2}/g) ?? []);
+
+          const maxScore = getMaxScoreForMods(modsArray);
+          const percentage = (scoreNum / maxScore) * 100;
 
           let maxFinalPoints = basePoints;
           let hasValidCategory = false;
@@ -254,6 +261,7 @@ export const useScoresStore = defineStore("scores", () => {
             combo: scoreData.combo,
             basePoints: basePoints,
             points: maxFinalPoints,
+            percentage: percentage,
           });
         }
       }

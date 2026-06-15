@@ -187,25 +187,28 @@
         </template>
         <template #[`item.score`]="{ item }">
           <div class="scores-table__score-wrapper">
-            <span class="scores-table__score">
-              {{ item.score.toLocaleString("ru-RU") }}
-            </span>
-            <v-tooltip
-              v-if="item.modsArray.includes('EZ')"
-              text="Скор с учётом множителя x1.8 для EZ"
-              location="top"
-            >
+            <v-tooltip location="top" content-class="scores-table__tooltip-bg">
               <template #activator="{ props }">
-                <v-icon
+                <span
                   v-bind="props"
-                  size="16"
-                  color="var(--color-text-gray)"
-                  class="scores-table__sr-info-icon"
-                  @click.stop
+                  class="scores-table__score scores-table__score-hoverable"
                 >
-                  mdi-information-outline
-                </v-icon>
+                  {{ item.score.toLocaleString("ru-RU") }}
+                </span>
               </template>
+              <div class="scores-table__sr-tooltip">
+                <div class="scores-table__sr-tooltip-row">
+                  <span>
+                    <b>{{ item.percentage.toFixed(2) }}%</b> от максимума
+                  </span>
+                </div>
+                <span
+                  v-if="item.modsArray.includes('EZ')"
+                  class="scores-table__sr-tooltip-ez"
+                >
+                  (с учётом баффа x1.8 для EZ)
+                </span>
+              </div>
             </v-tooltip>
           </div>
         </template>
@@ -764,16 +767,24 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
     display: flex;
     align-items: center;
     gap: 5px;
-    font-weight: bold;
+    b {
+      font-weight: bold;
+    }
   }
   &__sr-tooltip-sr-wrapper {
     display: flex;
     align-items: center;
+    font-weight: bold;
   }
   &__sr-tooltip-nm {
     margin-bottom: 1px;
     font-size: 11px;
-    opacity: 0.7;
+    opacity: 0.9;
+    font-weight: normal;
+  }
+  &__sr-tooltip-ez {
+    font-size: 12px;
+    opacity: 0.9;
     font-weight: normal;
   }
   &__tooltip-bg {
@@ -809,6 +820,14 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
   }
   &__score {
     font-weight: bold;
+  }
+  &__score-hoverable {
+    cursor: help;
+    border-bottom: 1px dashed var(--color-hoverable-bottom-border);
+    transition: opacity 0.2s;
+    &:hover {
+      opacity: 0.8;
+    }
   }
   &__points {
     color: var(--color-points);
