@@ -11,7 +11,7 @@ export const getFmTbModMultiplier = (mods: string[]): number => {
 };
 
 export const getAdjustedScore = (rawScore: number, mods: string[]): number => {
-  return mods.includes("EZ") ? rawScore * 1.8 : rawScore;
+  return mods.includes("EZ") ? Math.round(rawScore * 1.8) : rawScore;
 };
 
 export const getMaxScoreForMods = (mods: string[]): number => {

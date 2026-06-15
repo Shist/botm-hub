@@ -26,6 +26,7 @@ export const useOsumapsStore = defineStore("osumaps", () => {
       osumaps[key as OsuMapCategory] = [];
     }
     maps.forEach((map) => {
+      map.starRate = Math.round(map.starRate * 100) / 100;
       osumaps[map.category].push(map);
     });
   };

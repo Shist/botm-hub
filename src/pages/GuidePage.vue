@@ -265,7 +265,8 @@ const calcResults = computed(() => {
   const percentage = (adjustedScore / maxScore) * 100;
   const isFail = percentage < 60;
 
-  const basePoints = calculateBasePoints(percentage, sr);
+  const basePoints =
+    Math.round(calculateBasePoints(percentage, sr) * 100) / 100;
   const finalPoints = calculateFinalCategoryPoints(
     basePoints,
     category,
@@ -278,6 +279,7 @@ const calcResults = computed(() => {
   const catUpper = category.toUpperCase();
   if (catUpper.startsWith("FM") || catUpper === "TB") {
     fmTbMultiplier = getFmTbModMultiplier(modsArray);
+    fmTbMultiplier = Math.round(fmTbMultiplier * 1000) / 1000;
   }
 
   return {

@@ -3,7 +3,7 @@ import MainPage from "@/pages/MainPage.vue";
 import SignInPage from "@/pages/auth/SignInPage.vue";
 import SignUpPage from "@/pages/auth/SignUpPage.vue";
 import PersonalAccountPage from "@/pages/PersonalAccountPage.vue";
-import GuidePage from "@/pages/guide/GuidePage.vue";
+import GuidePage from "@/pages/GuidePage.vue";
 import PlayersPage from "@/pages/players/PlayersPage.vue";
 import PlayerProfilePage from "@/pages/players/PlayerProfilePage.vue";
 import SkillsetsMapsPage from "@/pages/skillsets-maps/SkillsetsMapsPage.vue";

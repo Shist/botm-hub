@@ -439,6 +439,7 @@ const groupAndFormatScores = (
     let calculatedPoints = 0;
     if (!isInsufficient && adjustedScore > 0) {
       calculatedPoints = calculateBasePoints(percentage, stars);
+      calculatedPoints = Math.round(calculatedPoints * 100) / 100;
     }
 
     groupsMap.get(groupKey)!.scores.push({
