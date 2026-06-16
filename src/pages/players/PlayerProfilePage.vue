@@ -141,17 +141,20 @@
           </div>
         </div>
         <v-divider class="player-profile-page__divider border-opacity-100" />
-        <h2 class="player-profile-page__scores-headline">
-          Скоры Игрока
-          <span class="player-profile-page__count">
-            ({{ playerScoresList.length }})
-          </span>
-        </h2>
-        <ScoresTable
-          :scoresList="playerScoresList"
-          :isLoading="isLoading"
-          :hiddenColumns="['user']"
-        />
+        <div class="player-profile-page__section-wrapper">
+          <h2 class="player-profile-page__scores-headline">
+            Скоры Игрока
+            <span class="player-profile-page__count">
+              ({{ filteredPlayerScoresCount }})
+            </span>
+          </h2>
+          <ScoresTable
+            :scoresList="playerScoresList"
+            :isLoading="isLoading"
+            :hiddenColumns="['user']"
+            @update:filteredCount="filteredPlayerScoresCount = $event"
+          />
+        </div>
       </div>
       <div v-else class="player-profile-page__user-not-found-wrapper">
         <h2 class="player-profile-page__user-not-found-headline">
@@ -210,6 +213,7 @@ const clubsStore = useClubsStore();
 const { setErrorToast } = useToast();
 
 const isLoading = ref(false);
+const filteredPlayerScoresCount = ref(0);
 
 const playerNick = computed<string>(() => `${route.params.nick}`);
 const playerInfo = computed<IAllUsersListItem | null>(
@@ -581,6 +585,9 @@ onMounted(async () => {
     text-align: center;
     opacity: 0.8;
   }
+  &__section-wrapper {
+    @extend %section-wrapper;
+  }
   &__scores-headline {
     @include default-headline(36px, 36px, var(--color-text));
     display: flex;
@@ -668,6 +675,7 @@ onMounted(async () => {
   }
 }
 
+:deep(.v-field--variant-filled),
 :deep(.v-field--variant-solo),
 :deep(.v-field--variant-solo-filled) {
   background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));

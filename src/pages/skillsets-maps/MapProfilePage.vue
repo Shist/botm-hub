@@ -2,82 +2,89 @@
   <div class="map-profile-page">
     <v-skeleton-loader type="image, paragraph, table" :loading="isLoading">
       <div v-if="routeCategory && mapInfo" class="map-profile-page__content">
-        <div class="map-profile-page__banner-wrapper">
-          <v-img
-            v-if="mapInfo.mapsetId"
-            :src="`https://assets.ppy.sh/beatmaps/${mapInfo.mapsetId}/covers/cover@2x.jpg`"
-            class="map-profile-page__banner"
-            cover
-          >
-            <template #placeholder>
-              <div class="map-profile-page__banner-loader">
-                <v-progress-circular
-                  indeterminate
-                  size="40"
-                  width="4"
-                  color="var(--color-vuetify-progress)"
-                />
-              </div>
-            </template>
-            <template #error>
-              <div class="map-profile-page__banner-error">
-                <span>NO BG</span>
-              </div>
-            </template>
-          </v-img>
-        </div>
-        <h2 class="map-profile-page__headline">{{ mapInfo.name }}</h2>
-        <div class="map-profile-page__info-wrapper">
-          <span>Категория:</span>
-          <div class="map-profile-page__align-left">
-            <CategoryBadge :category="mapInfo.category" />
-          </div>
-          <span>Маппер:</span>
-          <span>{{ mapInfo.mapper }}</span>
-          <span>Сложность:</span>
-          <span>{{ mapInfo.starRate }} ⭐</span>
-          <span>Длительность:</span>
-          <span>{{ mapInfo.duration }}</span>
-          <span>BPM:</span>
-          <span>{{ mapInfo.bpm }}</span>
-          <span class="map-profile-page__map-stats-label"
-            >CS / AR / OD / HP:</span
-          >
-          <span
-            >{{ mapInfo.cs }} / {{ mapInfo.ar }} / {{ mapInfo.od }} /
-            {{ mapInfo.hp }}</span
-          >
-          <span>Комментарий:</span>
-          <span>
-            {{ mapInfo.comment || "(нет комментария)" }}
-          </span>
-          <span>Ссылка:</span>
-          <div class="map-profile-page__align-left">
-            <v-tooltip text="Перейти на страницу osu!-сайта" location="top">
-              <template #activator="{ props }">
-                <v-btn
-                  v-bind="props"
-                  :href="mapInfo.link"
-                  target="_blank"
-                  icon="mdi-open-in-new"
-                  size="small"
-                  variant="text"
-                  color="var(--color-text)"
-                />
+        <div class="map-profile-page__section-wrapper">
+          <div class="map-profile-page__banner-wrapper">
+            <v-img
+              v-if="mapInfo.mapsetId"
+              :src="`https://assets.ppy.sh/beatmaps/${mapInfo.mapsetId}/covers/cover@2x.jpg`"
+              class="map-profile-page__banner"
+              cover
+            >
+              <template #placeholder>
+                <div class="map-profile-page__banner-loader">
+                  <v-progress-circular
+                    indeterminate
+                    size="40"
+                    width="4"
+                    color="var(--color-vuetify-progress)"
+                  />
+                </div>
               </template>
-            </v-tooltip>
+              <template #error>
+                <div class="map-profile-page__banner-error">
+                  <span>NO BG</span>
+                </div>
+              </template>
+            </v-img>
+          </div>
+          <h2 class="map-profile-page__headline">{{ mapInfo.name }}</h2>
+          <div class="map-profile-page__info-wrapper">
+            <span>Категория:</span>
+            <div class="map-profile-page__align-left">
+              <CategoryBadge :category="mapInfo.category" />
+            </div>
+            <span>Маппер:</span>
+            <span>{{ mapInfo.mapper }}</span>
+            <span>Сложность:</span>
+            <span>{{ mapInfo.starRate }} ⭐</span>
+            <span>Длительность:</span>
+            <span>{{ mapInfo.duration }}</span>
+            <span>BPM:</span>
+            <span>{{ mapInfo.bpm }}</span>
+            <span class="map-profile-page__map-stats-label"
+              >CS / AR / OD / HP:</span
+            >
+            <span
+              >{{ mapInfo.cs }} / {{ mapInfo.ar }} / {{ mapInfo.od }} /
+              {{ mapInfo.hp }}</span
+            >
+            <span>Комментарий:</span>
+            <span>
+              {{ mapInfo.comment || "(нет комментария)" }}
+            </span>
+            <span>Ссылка:</span>
+            <div class="map-profile-page__align-left">
+              <v-tooltip text="Перейти на страницу osu!-сайта" location="top">
+                <template #activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    :href="mapInfo.link"
+                    target="_blank"
+                    icon="mdi-open-in-new"
+                    size="small"
+                    variant="text"
+                    color="var(--color-text)"
+                  />
+                </template>
+              </v-tooltip>
+            </div>
           </div>
         </div>
         <v-divider class="map-profile-page__divider border-opacity-100" />
-        <h2 class="map-profile-page__headline">
-          BOTM Скоры Карты ({{ mapScoresList.length }})
-        </h2>
-        <ScoresTable
-          :scoresList="mapScoresList"
-          :isLoading="isLoading"
-          :targetCategory="routeCategory"
-          :hiddenColumns="['mapId', 'cover', 'mapName', 'link', 'maxSr']"
-        />
+        <div class="map-profile-page__section-wrapper">
+          <h2 class="map-profile-page__headline">
+            BOTM Скоры Карты ({{ mapScoresCount }})
+          </h2>
+          <ScoresTable
+            :scoresList="mapScoresList"
+            :isLoading="isLoading"
+            :targetCategory="routeCategory"
+            :hiddenColumns="['mapId', 'cover', 'mapName', 'link', 'maxSr']"
+            :themeColor="categoryColor"
+            showDigitFilters
+            @update:filteredCount="mapScoresCount = $event"
+          />
+        </div>
       </div>
       <div
         v-else-if="routeCategory && !mapInfo"
@@ -119,6 +126,7 @@ import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import { isValidModCombinationForCategory } from "@/utils/index";
+import { CATEGORIES_COLORS } from "@/constants";
 import {
   type IOsuMap,
   OsuMapCategory,
@@ -134,12 +142,19 @@ const scoresStore = useScoresStore();
 const { setErrorToast } = useToast();
 
 const isLoading = ref(false);
+const mapScoresCount = ref(0);
 
 const routeMapId = computed(() => Number(route.params.mapId));
 
 const routeCategory = computed<OsuMapCategory | null>(() => {
   const category = String(route.params.category).toLowerCase();
   return isOsuMapCategory(category) ? category : null;
+});
+
+const categoryColor = computed(() => {
+  return routeCategory.value
+    ? CATEGORIES_COLORS[routeCategory.value]
+    : "var(--global-bg-base)";
 });
 
 const mapInfo = computed<IOsuMap | null>(() => {
@@ -189,6 +204,10 @@ onMounted(async () => {
     flex-direction: column;
     align-items: center;
     row-gap: 20px;
+  }
+  &__section-wrapper {
+    @extend %section-wrapper;
+    align-items: center;
   }
   &__banner-wrapper {
     width: 100%;

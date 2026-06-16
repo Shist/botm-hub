@@ -468,7 +468,7 @@ const onCloseDeleteRosterModalAfterDeleting = () => {
 .tournaments-page {
   display: flex;
   flex-direction: column;
-  row-gap: 20px;
+  row-gap: 15px;
   &__headline {
     @include default-headline(36px, 36px, var(--color-text));
     text-align: center;
@@ -482,7 +482,7 @@ const onCloseDeleteRosterModalAfterDeleting = () => {
     }
   }
   &__search-wrapper {
-    margin-bottom: -15px;
+    margin-bottom: -10px;
   }
   &__tabs-wrapper {
     color: var(--color-text);

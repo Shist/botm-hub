@@ -40,6 +40,17 @@ export interface IOsuMap {
   comment: string;
 }
 
+export interface MapsTableHeader {
+  key: string;
+  title: string;
+  minWidth?: string;
+  align?: "start" | "center" | "end";
+  sortable?: boolean;
+  sort?:
+    | ((a: OsuMapCategory, b: OsuMapCategory) => number)
+    | ((a: string, b: string) => number);
+}
+
 export function isOsuMapCategory(value: string): value is OsuMapCategory {
   return Object.values(OsuMapCategory).includes(value as OsuMapCategory);
 }

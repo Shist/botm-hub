@@ -135,6 +135,19 @@ export interface IMpModalGroup {
   scores: IMpModalScore[];
 }
 
+export interface ScoresTableHeader {
+  key: string;
+  title: string;
+  minWidth?: string;
+  align?: "start" | "center" | "end";
+  sortable?: boolean;
+  sort?:
+    | ((a: number, b: number) => number)
+    | ((a: string, b: string) => number)
+    | ((a: Date, b: Date) => number)
+    | ((a: { nick: string }, b: { nick: string }) => number);
+}
+
 export interface IScoreTableRow {
   uidWithMapIdAndMods: string;
   uid: string;
@@ -152,6 +165,33 @@ export interface IScoreTableRow {
   basePoints: number;
   points: number;
   percentage: number;
+}
+
+export interface ILeaderboardTableRow {
+  uid: string;
+  user: IAllUsersListItem;
+  searchString: string;
+  rank?: number | string;
+  totalPoints?: number;
+  overallStats?: IStatBucket;
+  aim?: number;
+  aimStats?: IStatBucket;
+  speed?: number;
+  speedStats?: IStatBucket;
+  tech?: number;
+  techStats?: IStatBucket;
+  reading?: number;
+  readingStats?: IStatBucket;
+  hidden?: number;
+  hiddenStats?: IStatBucket;
+  hardrock?: number;
+  hardrockStats?: IStatBucket;
+  points?: number;
+  totalScores?: number;
+  avgScore?: number;
+  avgAcc?: number;
+  avgCombo?: number;
+  joinedTimestamp?: number;
 }
 
 export interface IParsedOsr {

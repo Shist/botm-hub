@@ -1,26 +1,33 @@
 <template>
   <div class="skillsets-maps-table">
-    <v-text-field
-      v-model="searchQuery"
-      variant="solo-filled"
-      prepend-inner-icon="mdi-magnify"
-      label="Найти карты по любому полю"
-      placeholder="Введи любое ключевое слово любого поля"
-      clearable
-      hide-details
-    />
+    <div class="skillsets-maps-table__controls">
+      <v-text-field
+        v-model="searchQuery"
+        variant="filled"
+        prepend-inner-icon="mdi-magnify"
+        label="Найти карты по любому полю"
+        placeholder="Введи любое ключевое слово..."
+        density="compact"
+        clearable
+        hide-details
+        class="skillsets-maps-table__search"
+      />
+    </div>
     <v-skeleton-loader type="table" :loading="isLoading">
       <v-data-table-virtual
         :headers="headers"
-        :items="itemsForTable"
+        :items="filteredItemsForTable"
         :item-value="'idWithCategory'"
         :sort-by="defaultSortBy"
-        :search="searchQuery"
         :mobile-breakpoint="769"
         :fixed-header="true"
         hover
         hide-details
         class="skillsets-maps-table__content"
+        :class="{
+          'skillsets-maps-table__content_empty':
+            filteredItemsForTable.length === 0,
+        }"
         @click:row="onRowClick"
       >
         <template #[`item.id`]="{ item }">
@@ -87,23 +94,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 import { useRouter } from "vue-router";
-import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import useToast from "@/composables/useToast";
-import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
+import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
-
-type DataTableHeader = {
-  key: string;
-  title: string;
-  minWidth?: string;
-  align?: "start" | "center" | "end";
-  sortable?: boolean;
-  sort?:
-    | ((a: OsuMapCategory, b: OsuMapCategory) => number)
-    | ((a: string, b: string) => number);
-};
+import {
+  OsuMapCategory,
+  type IOsuMap,
+  type MapsTableHeader,
+} from "@/types/osumaps";
 
 const router = useRouter();
 
@@ -118,17 +118,16 @@ const props = withDefaults(
   }
 );
 
+const emit = defineEmits<{
+  (e: "update:filteredCount", count: number): void;
+}>();
+
 const { setSuccessToast, setErrorToast } = useToast();
 
 const searchQuery = ref("");
 
-const headers = reactive<DataTableHeader[]>([
-  {
-    key: "id",
-    title: "ID",
-    minWidth: "104px",
-    align: "center",
-  },
+const headers = reactive<MapsTableHeader[]>([
+  { key: "id", title: "ID", minWidth: "104px", align: "center" },
   {
     key: "link",
     title: "Ссылка",
@@ -151,21 +150,9 @@ const headers = reactive<DataTableHeader[]>([
     sort: (a: OsuMapCategory, b: OsuMapCategory) =>
       CATEGORIES_SORT_PRIORITIES[a] - CATEGORIES_SORT_PRIORITIES[b],
   },
-  {
-    key: "name",
-    title: "Название",
-    minWidth: "335px",
-  },
-  {
-    key: "mapper",
-    title: "Мапер",
-    minWidth: "181px",
-  },
-  {
-    key: "starRate",
-    title: "Сложность",
-    minWidth: "140px",
-  },
+  { key: "name", title: "Название", minWidth: "335px" },
+  { key: "mapper", title: "Мапер", minWidth: "181px" },
+  { key: "starRate", title: "Сложность", minWidth: "140px" },
   {
     key: "duration",
     title: "Длительность",
@@ -180,45 +167,49 @@ const headers = reactive<DataTableHeader[]>([
       return aSeconds - bSeconds;
     },
   },
-  {
-    key: "bpm",
-    title: "BPM",
-    minWidth: "91px",
-  },
-  {
-    key: "cs",
-    title: "CS",
-    minWidth: "76px",
-  },
-  {
-    key: "ar",
-    title: "AR",
-    minWidth: "77px",
-  },
-  {
-    key: "od",
-    title: "OD",
-    minWidth: "78px",
-  },
-  {
-    key: "hp",
-    title: "HP",
-    minWidth: "78px",
-  },
-  {
-    key: "comment",
-    title: "Комментарий",
-    minWidth: "190px",
-  },
+  { key: "bpm", title: "BPM", minWidth: "91px" },
+  { key: "cs", title: "CS", minWidth: "76px" },
+  { key: "ar", title: "AR", minWidth: "77px" },
+  { key: "od", title: "OD", minWidth: "78px" },
+  { key: "hp", title: "HP", minWidth: "78px" },
+  { key: "comment", title: "Комментарий", minWidth: "190px" },
 ]);
 
 const defaultSortBy = computed(() => props.defaultSort);
 
-const itemsForTable = computed(() =>
-  props.mapsList.map((item) => ({
+const filteredItemsForTable = computed(() => {
+  let list = props.mapsList.map((item) => ({
     idWithCategory: `${item.id}-${item.category}`,
     ...item,
-  }))
+  }));
+
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase();
+    list = list.filter((item) => {
+      return (
+        String(item.id).includes(q) ||
+        item.category.toLowerCase().includes(q) ||
+        item.name.toLowerCase().includes(q) ||
+        item.mapper.toLowerCase().includes(q) ||
+        String(item.starRate).includes(q) ||
+        item.duration.includes(q) ||
+        String(item.bpm).includes(q) ||
+        String(item.cs).includes(q) ||
+        String(item.ar).includes(q) ||
+        String(item.od).includes(q) ||
+        String(item.hp).includes(q) ||
+        (item.comment && item.comment.toLowerCase().includes(q))
+      );
+    });
+  }
+
+  return list;
+});
+
+watch(
+  () => filteredItemsForTable.value.length,
+  (newCount) => emit("update:filteredCount", newCount),
+  { immediate: true }
 );
 
 const copyToClipboard = async (mapId: number) => {
@@ -253,15 +244,27 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
   width: 100%;
   border: 4px solid var(--color-vuetify-table-borders);
   border-radius: 4px;
-  & :deep(th) {
-    vertical-align: middle;
+  &__controls {
+    display: flex;
+    align-items: center;
+    background-color: var(--color-vuetify-table-borders);
   }
-  & :deep(td) {
-    vertical-align: middle;
+  &__search {
+    flex-grow: 1;
   }
   &__content {
     height: 600px;
     cursor: pointer;
+    &_empty {
+      cursor: default;
+    }
+    & :deep(th) {
+      vertical-align: middle;
+      font-weight: bold;
+    }
+    & :deep(td) {
+      vertical-align: middle;
+    }
   }
   &__id-label {
     cursor: pointer;

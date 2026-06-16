@@ -4,208 +4,219 @@
     :class="{ 'personal-account-page__colored-skeleton': !!chosenThemeColor }"
   >
     <v-skeleton-loader type="image, article, table" :loading="isPageLoading">
-      <div v-if="chosenBannerUrl" class="personal-account-page__banner">
-        <AppImage
-          :imgPath="chosenBannerUrl"
-          imgAlt="Баннер профиля"
-          class="personal-account-page__banner-img"
-        />
-        <div class="personal-account-page__banner-overlay"></div>
-      </div>
-      <div class="personal-account-page__header-wrapper">
-        <h2 class="personal-account-page__headline">Личный Кабинет</h2>
-        <v-btn
-          v-if="currentNick"
-          :to="`/players/${encodeURIComponent(currentNick)}`"
-          variant="outlined"
-          color="var(--color-text)"
-          prepend-icon="mdi-account-eye"
-          class="personal-account-page__public-link-btn"
-        >
-          Публичный профиль
-        </v-btn>
-      </div>
-      <div class="personal-account-page__avatar-inputs-wrapper">
-        <v-tooltip
-          :disabled="currentOsuId !== null"
-          text="Для подгрузки аватара требуется osu! ID"
-          location="top"
-        >
-          <template #activator="{ props }">
-            <AppImage
-              v-bind="props"
-              :imgPath="avatarSrc"
-              imgAlt="Аватар"
-              class="personal-account-page__avatar"
-            />
-          </template>
-        </v-tooltip>
-        <v-form
-          v-model="isFormValid"
-          class="personal-account-page__inputs-wrapper"
-        >
-          <div class="personal-account-page__input-row">
-            <v-number-input
-              v-model="chosenOsuId"
-              :min="1"
-              :max="1000000000000"
-              :counter="13"
-              :rules="[rules.min(1), rules.max(13)]"
-              variant="solo"
-              control-variant="hidden"
-              prepend-inner-icon="mdi-identifier"
-              label="osu! ID"
-              placeholder="Введи свой osu! ID"
-              clearable
-              persistent-counter
-            />
-            <v-text-field
-              v-model="chosenNick"
-              :counter="15"
-              :rules="[
-                rules.min(3),
-                rules.max(15),
-                rules.notOnlySpaces,
-                rules.noEdgeSpaces,
-                rules.noMultipleSpaces,
-                rules.noMultipleUnderscores,
-              ]"
-              autocomplete="username"
-              variant="solo"
-              prepend-inner-icon="mdi-account"
-              label="osu! Ник"
-              placeholder="Введи свой osu! ник"
-              persistent-counter
-              clearable
-            />
-          </div>
-          <div class="personal-account-page__input-row">
-            <v-select
-              v-model="chosenDigit"
-              :items="digitOptions"
-              variant="solo"
-              prepend-inner-icon="mdi-star-half-full"
-              label="Digit-категория"
-              placeholder="Выбери Digit-категорию"
-              clearable
-              hide-details
-            />
-            <v-menu
-              :close-on-content-click="false"
-              content-class="vuetify-color-picker-wrapper"
-              location="bottom"
-            >
-              <template #activator="{ props }">
-                <v-text-field
-                  v-model="chosenThemeColor"
-                  v-bind="props"
-                  variant="solo"
-                  label="Цвет Профиля"
-                  placeholder="Выбери цвет через палитру"
-                  clearable
-                  readonly
-                  hide-details
-                >
-                  <template #prepend-inner>
-                    <v-icon :color="chosenThemeColor || 'var(--color-text)'">
-                      mdi-palette
-                    </v-icon>
-                  </template>
-                </v-text-field>
-              </template>
-              <v-color-picker
-                v-model="chosenThemeColor"
-                mode="hex"
-                elevation="5"
+      <div class="personal-account-page__section-wrapper">
+        <div v-if="chosenBannerUrl" class="personal-account-page__banner">
+          <AppImage
+            :imgPath="chosenBannerUrl"
+            imgAlt="Баннер профиля"
+            class="personal-account-page__banner-img"
+          />
+          <div class="personal-account-page__banner-overlay"></div>
+        </div>
+        <div class="personal-account-page__header-wrapper">
+          <h2 class="personal-account-page__headline">Личный Кабинет</h2>
+          <v-btn
+            v-if="currentNick"
+            :to="`/players/${encodeURIComponent(currentNick)}`"
+            variant="outlined"
+            color="var(--color-text)"
+            prepend-icon="mdi-account-eye"
+            class="personal-account-page__public-link-btn"
+          >
+            Публичный профиль
+          </v-btn>
+        </div>
+        <div class="personal-account-page__avatar-inputs-wrapper">
+          <v-tooltip
+            :disabled="currentOsuId !== null"
+            text="Для подгрузки аватара требуется osu! ID"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <AppImage
+                v-bind="props"
+                :imgPath="avatarSrc"
+                imgAlt="Аватар"
+                class="personal-account-page__avatar"
               />
-            </v-menu>
-          </div>
-          <v-text-field
-            v-model="chosenBannerUrl"
-            :counter="300"
-            :rules="[rules.max(300), rules.isOptionalUrl]"
-            variant="solo"
-            prepend-inner-icon="mdi-image-area"
-            label="URL Баннера"
-            placeholder="Вставь прямую ссылку на картинку (imgur, imgbb и т.д.)"
-            persistent-counter
-            clearable
-          />
-          <SkillsetsSelect v-model="chosenCategories" isMultiple />
-          <v-textarea
-            v-model="chosenDescription"
-            :counter="300"
-            :rules="[rules.max(300)]"
-            variant="solo"
-            prepend-inner-icon="mdi-text-box-outline"
-            label="О себе"
-            placeholder="Здесь ты можешь написать пару слов о себе..."
-            persistent-counter
-            clearable
-            auto-grow
-            rows="3"
-            max-rows="3"
-          />
-        </v-form>
-      </div>
-      <v-btn
-        :disabled="!isFormValid || !isSomeInfoChanged"
-        :loading="isUpdating"
-        height="50"
-        class="personal-account-page__confirm-btn"
-        @click="onUpdate"
-      >
-        Обновить информацию
-      </v-btn>
-      <v-divider class="border-opacity-100" />
-      <h2 class="personal-account-page__scores-headline">
-        Мои Скоры
-        <span class="personal-account-page__count">
-          ({{ myScoresList.length }})
-        </span>
-      </h2>
-      <div class="personal-account-page__scores-actions">
-        <v-tooltip
-          :disabled="currentOsuId !== null"
-          text="Для загрузки скоров через MP линк сперва необходимо указать osu! ID"
-          location="top"
-        >
-          <template #activator="{ props }">
-            <div v-bind="props" class="personal-account-page__tooltip-wrapper">
-              <v-btn
-                :disabled="currentOsuId === null"
-                height="50"
-                prepend-icon="mdi-link-variant"
-                class="personal-account-page__action-btn personal-account-page__action-btn_mp"
-                @click="isMpModalOpened = true"
-              >
-                Загрузить по MP линку
-              </v-btn>
+            </template>
+          </v-tooltip>
+          <v-form
+            v-model="isFormValid"
+            class="personal-account-page__inputs-wrapper"
+          >
+            <div class="personal-account-page__input-row">
+              <v-number-input
+                v-model="chosenOsuId"
+                :min="1"
+                :max="1000000000000"
+                :counter="13"
+                :rules="[rules.min(1), rules.max(13)]"
+                variant="solo"
+                control-variant="hidden"
+                prepend-inner-icon="mdi-identifier"
+                label="osu! ID"
+                placeholder="Введи свой osu! ID"
+                clearable
+                persistent-counter
+              />
+              <v-text-field
+                v-model="chosenNick"
+                :counter="15"
+                :rules="[
+                  rules.min(3),
+                  rules.max(15),
+                  rules.notOnlySpaces,
+                  rules.noEdgeSpaces,
+                  rules.noMultipleSpaces,
+                  rules.noMultipleUnderscores,
+                ]"
+                autocomplete="username"
+                variant="solo"
+                prepend-inner-icon="mdi-account"
+                label="osu! Ник"
+                placeholder="Введи свой osu! ник"
+                persistent-counter
+                clearable
+              />
             </div>
-          </template>
-        </v-tooltip>
+            <div class="personal-account-page__input-row">
+              <v-select
+                v-model="chosenDigit"
+                :items="digitOptions"
+                variant="solo"
+                prepend-inner-icon="mdi-star-half-full"
+                label="Digit-категория"
+                placeholder="Выбери Digit-категорию"
+                clearable
+                hide-details
+              />
+              <v-menu
+                :close-on-content-click="false"
+                content-class="vuetify-color-picker-wrapper"
+                location="bottom"
+              >
+                <template #activator="{ props }">
+                  <v-text-field
+                    v-model="chosenThemeColor"
+                    v-bind="props"
+                    variant="solo"
+                    label="Цвет Профиля"
+                    placeholder="Выбери цвет через палитру"
+                    clearable
+                    readonly
+                    hide-details
+                  >
+                    <template #prepend-inner>
+                      <v-icon :color="chosenThemeColor || 'var(--color-text)'">
+                        mdi-palette
+                      </v-icon>
+                    </template>
+                  </v-text-field>
+                </template>
+                <v-color-picker
+                  v-model="chosenThemeColor"
+                  mode="hex"
+                  elevation="5"
+                />
+              </v-menu>
+            </div>
+            <v-text-field
+              v-model="chosenBannerUrl"
+              :counter="300"
+              :rules="[rules.max(300), rules.isOptionalUrl]"
+              variant="solo"
+              prepend-inner-icon="mdi-image-area"
+              label="URL Баннера"
+              placeholder="Вставь прямую ссылку на картинку (imgur, imgbb и т.д.)"
+              persistent-counter
+              clearable
+            />
+            <SkillsetsSelect v-model="chosenCategories" isMultiple />
+            <v-textarea
+              v-model="chosenDescription"
+              :counter="300"
+              :rules="[rules.max(300)]"
+              variant="solo"
+              prepend-inner-icon="mdi-text-box-outline"
+              label="О себе"
+              placeholder="Здесь ты можешь написать пару слов о себе..."
+              persistent-counter
+              clearable
+              auto-grow
+              rows="3"
+              max-rows="3"
+            />
+          </v-form>
+        </div>
         <v-btn
+          :disabled="!isFormValid || !isSomeInfoChanged"
+          :loading="isUpdating"
           height="50"
-          prepend-icon="mdi-file-document"
-          class="personal-account-page__action-btn personal-account-page__action-btn_osr"
-          @click="isOsrModalOpened = true"
+          class="personal-account-page__confirm-btn"
+          @click="onUpdate"
         >
-          Загрузить .osr файл(ы)
+          Обновить информацию
         </v-btn>
       </div>
-      <ScoresTable
-        :scoresList="myScoresList"
-        :isLoading="isPageLoading"
-        :hiddenColumns="['user']"
-      />
       <v-divider class="border-opacity-100" />
-      <h3 class="personal-account-page__small-headline">
-        Здесь уже много, что есть, но я всё равно оставил здесь коллаб с eh-ами
-      </h3>
-      <AppImage
-        :imgPath="ehCollabImagePath"
-        imgAlt="Коллаб белых котов eh-ов"
-      />
+      <div class="personal-account-page__section-wrapper">
+        <h2 class="personal-account-page__scores-headline">
+          Мои Скоры
+          <span class="personal-account-page__count">
+            ({{ filteredScoresCount }})
+          </span>
+        </h2>
+        <div class="personal-account-page__scores-actions">
+          <v-tooltip
+            :disabled="currentOsuId !== null"
+            text="Для загрузки скоров через MP линк сперва необходимо указать osu! ID"
+            location="top"
+          >
+            <template #activator="{ props }">
+              <div
+                v-bind="props"
+                class="personal-account-page__tooltip-wrapper"
+              >
+                <v-btn
+                  :disabled="currentOsuId === null"
+                  height="50"
+                  prepend-icon="mdi-link-variant"
+                  class="personal-account-page__action-btn personal-account-page__action-btn_mp"
+                  @click="isMpModalOpened = true"
+                >
+                  Загрузить по MP линку
+                </v-btn>
+              </div>
+            </template>
+          </v-tooltip>
+          <v-btn
+            height="50"
+            prepend-icon="mdi-file-document"
+            class="personal-account-page__action-btn personal-account-page__action-btn_osr"
+            @click="isOsrModalOpened = true"
+          >
+            Загрузить .osr файл(ы)
+          </v-btn>
+        </div>
+        <ScoresTable
+          :scoresList="myScoresList"
+          :isLoading="isPageLoading"
+          :hiddenColumns="['user']"
+          @update:filteredCount="filteredScoresCount = $event"
+        />
+      </div>
+      <v-divider class="border-opacity-100" />
+      <div class="personal-account-page__section-wrapper">
+        <h3 class="personal-account-page__small-headline">
+          Здесь уже много, что есть, но я всё равно оставил здесь коллаб с
+          eh-ами
+        </h3>
+        <AppImage
+          :imgPath="ehCollabImagePath"
+          imgAlt="Коллаб белых котов eh-ов"
+        />
+      </div>
     </v-skeleton-loader>
     <MpLinkModal
       :isOpened="isMpModalOpened"
@@ -255,6 +266,7 @@ const ehCollabImagePath = ref(ehCollabImage);
 const isMpModalOpened = ref(false);
 const isOsrModalOpened = ref(false);
 const isDependenciesLoading = ref(false);
+const filteredScoresCount = ref(0);
 
 useProfileTheme(() => chosenThemeColor.value);
 
@@ -390,16 +402,19 @@ const onUpdate = async () => {
   display: flex;
   flex-direction: column;
   row-gap: 20px;
+  &__section-wrapper {
+    @extend %section-wrapper;
+  }
   &__banner {
     width: 100%;
     height: 250px;
     border-radius: 12px;
-    margin-bottom: -40px;
+    margin-bottom: -35px;
     position: relative;
     overflow: hidden;
     @media (max-width: $tablet-l) {
       height: 180px;
-      margin-bottom: -20px;
+      margin-bottom: -15px;
     }
   }
   &__banner-img {
@@ -578,6 +593,7 @@ const onUpdate = async () => {
   }
 }
 
+:deep(.v-field--variant-filled),
 :deep(.v-field--variant-solo),
 :deep(.v-field--variant-solo-filled) {
   background-color: var(--color-table-solid-bg, rgb(var(--v-theme-surface)));

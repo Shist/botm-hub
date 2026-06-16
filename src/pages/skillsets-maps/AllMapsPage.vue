@@ -3,7 +3,7 @@
     <h2 class="skillset-maps-page__headline">
       Все BOTM Мапы
       <span v-if="!isLoading" class="skillset-maps-page__count">
-        ({{ allMapsList.length }})
+        ({{ filteredMapsCount }})
       </span>
       <v-progress-circular
         v-else
@@ -13,18 +13,24 @@
         color="currentColor"
       />
     </h2>
-    <SkillsetsMapsTable :mapsList="allMapsList" :isLoading="isLoading" />
+    <SkillsetsMapsTable
+      :mapsList="allMapsList"
+      :isLoading="isLoading"
+      @update:filteredCount="filteredMapsCount = $event"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useOsumapsStore } from "@/stores/osumaps";
 import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import useToast from "@/composables/useToast";
 
 const mapsStore = useOsumapsStore();
 const { setErrorToast } = useToast();
+
+const filteredMapsCount = ref(0);
 
 const allMapsList = computed(() => {
   return Object.values(mapsStore.osumaps).flat();

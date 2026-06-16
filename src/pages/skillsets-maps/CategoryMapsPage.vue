@@ -4,7 +4,7 @@
       <h2 class="skillset-maps-page__headline">
         Мапы {{ categoryTitle }}
         <span v-if="!isLoading" class="skillset-maps-page__count">
-          ({{ categoryMapsList.length }})
+          ({{ filteredMapsCount }})
         </span>
         <v-progress-circular
           v-else
@@ -14,7 +14,11 @@
           color="currentColor"
         />
       </h2>
-      <SkillsetsMapsTable :mapsList="categoryMapsList" :isLoading="isLoading" />
+      <SkillsetsMapsTable
+        :mapsList="categoryMapsList"
+        :isLoading="isLoading"
+        @update:filteredCount="filteredMapsCount = $event"
+      />
     </template>
     <div v-else class="skillset-maps-page__not-found-wrapper">
       <h2 class="skillset-maps-page__not-found-headline">
@@ -31,11 +35,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useOsumapsStore } from "@/stores/osumaps";
-import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import useToast from "@/composables/useToast";
+import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import { MAPS_CATEGORIES } from "@/constants";
 import { OsuMapCategory } from "@/types/osumaps";
 
@@ -44,6 +48,8 @@ const route = useRoute();
 const mapsStore = useOsumapsStore();
 
 const { setErrorToast } = useToast();
+
+const filteredMapsCount = ref(0);
 
 const currentCategory = computed<OsuMapCategory | null>(() => {
   const paramCategory = String(route.params.category).toLowerCase();

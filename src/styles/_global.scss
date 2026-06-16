@@ -280,6 +280,7 @@
 
 .v-overlay__content,
 .modal__window-wrapper {
+  .v-field.v-field--variant-filled,
   .v-field.v-field--variant-solo,
   .v-field.v-field--variant-solo-filled {
     background-color: var(

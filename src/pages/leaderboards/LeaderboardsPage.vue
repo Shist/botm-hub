@@ -45,12 +45,13 @@ import { MAPS_CATEGORIES } from "@/constants";
     }
   }
   &__nav-wrapper {
-    padding: 30px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 20px;
     @media (max-width: $tablet-l) {
       padding: 15px;
+      gap: 15px;
     }
   }
   &__links-list {
@@ -61,6 +62,7 @@ import { MAPS_CATEGORIES } from "@/constants";
     @media (max-width: $tablet-l) {
       grid-template-columns: repeat(1, 1fr);
       grid-template-rows: repeat(21, 1fr);
+      gap: 15px;
     }
   }
   &__btn {

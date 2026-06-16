@@ -1,26 +1,50 @@
 <template>
   <div class="scores-table">
-    <v-text-field
-      v-model="searchQuery"
-      variant="solo-filled"
-      prepend-inner-icon="mdi-magnify"
-      label="Найти скоры по любому полю"
-      placeholder="Введи любое ключевое слово любого поля"
-      clearable
-      hide-details
-    />
+    <div class="scores-table__controls">
+      <v-btn-toggle
+        v-if="showDigitFilters"
+        v-model="selectedDigitFilter"
+        :color="themeColor"
+        density="compact"
+        mandatory
+        class="scores-table__digit-toggle"
+      >
+        <v-btn value="all">Все</v-btn>
+        <v-btn :value="DigitCategory.FOUR_DIGIT">
+          4<span class="scores-table__digit-text">&nbsp;Дигиты</span>
+        </v-btn>
+        <v-btn :value="DigitCategory.FIVE_DIGIT">
+          5<span class="scores-table__digit-text">&nbsp;Дигиты</span>
+        </v-btn>
+        <v-btn :value="DigitCategory.SIX_DIGIT">
+          6<span class="scores-table__digit-text">&nbsp;Дигиты</span>
+        </v-btn>
+      </v-btn-toggle>
+      <v-text-field
+        v-model="searchQuery"
+        variant="filled"
+        prepend-inner-icon="mdi-magnify"
+        label="Найти скоры по любому полю"
+        placeholder="Введи любое ключевое слово..."
+        density="compact"
+        clearable
+        hide-details
+        class="scores-table__search"
+      />
+    </div>
     <v-skeleton-loader type="table" :loading="isLoading">
       <v-data-table-virtual
         :headers="visibleHeaders"
-        :items="enrichedScoresList"
+        :items="filteredScoresList"
         :item-value="'uidWithMapIdAndMods'"
-        :search="searchQuery"
-        :custom-filter="customFilter"
         :mobile-breakpoint="769"
         :fixed-header="true"
         hover
         hide-details
         class="scores-table__content"
+        :class="{
+          'scores-table__content_empty': filteredScoresList.length === 0,
+        }"
         :sort-by="defaultSortBy"
         @click:row="onRowClick"
       >
@@ -192,6 +216,7 @@
                 <span
                   v-bind="props"
                   class="scores-table__score scores-table__score-hoverable"
+                  @click.stop
                 >
                   {{ item.score.toLocaleString("ru-RU") }}
                 </span>
@@ -312,7 +337,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { ref, reactive, computed, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useOsumapsStore } from "@/stores/osumaps";
 import useToast from "@/composables/useToast";
@@ -320,21 +345,9 @@ import UserCard from "@/components/users/UserCard.vue";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { formatMapRank, isValidModCombinationForCategory } from "@/utils";
 import { calculateFinalCategoryPoints } from "@/utils/scores-calcs";
+import { DigitCategory } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
-import { type IScoreTableRow } from "@/types/scores";
-
-type DataTableHeader = {
-  key: string;
-  title: string;
-  minWidth?: string;
-  align?: "start" | "center" | "end";
-  sortable?: boolean;
-  sort?:
-    | ((a: number, b: number) => number)
-    | ((a: string, b: string) => number)
-    | ((a: Date, b: Date) => number)
-    | ((a: { nick: string }, b: { nick: string }) => number);
-};
+import { type ScoresTableHeader, type IScoreTableRow } from "@/types/scores";
 
 const router = useRouter();
 const mapsStore = useOsumapsStore();
@@ -345,14 +358,22 @@ const props = withDefaults(
     isLoading: boolean;
     targetCategory?: OsuMapCategory | null;
     hiddenColumns?: string[];
+    themeColor?: string;
     defaultSort?: { key: string; order?: "asc" | "desc" }[];
+    showDigitFilters?: boolean;
   }>(),
   {
     targetCategory: null,
     hiddenColumns: () => [],
+    themeColor: "var(--global-bg-base)",
     defaultSort: () => [{ key: "points", order: "desc" }],
+    showDigitFilters: false,
   }
 );
+
+const emit = defineEmits<{
+  (e: "update:filteredCount", count: number): void;
+}>();
 
 const { setSuccessToast, setErrorToast } = useToast();
 
@@ -362,7 +383,9 @@ const selectedMapCategories = ref<OsuMapCategory[]>([]);
 const pendingMapId = ref<number | null>(null);
 const isPendingNewTab = ref(false);
 
-const allHeaders = reactive<DataTableHeader[]>([
+const selectedDigitFilter = ref<"all" | DigitCategory>("all");
+
+const allHeaders = reactive<ScoresTableHeader[]>([
   {
     key: "user",
     title: "Игрок",
@@ -526,44 +549,44 @@ const enrichedScoresList = computed(() => {
   });
 });
 
-const customFilter = (
-  _: unknown,
-  query: string,
-  item?: {
-    raw: IScoreTableRow & {
-      validSrInfo?: { category: string; sr: number; finalPoints: number }[];
-      maxSr?: number;
-      modsArray?: string[];
-    };
+const filteredScoresList = computed(() => {
+  let list = enrichedScoresList.value;
+
+  if (props.showDigitFilters && selectedDigitFilter.value !== "all") {
+    list = list.filter(
+      (score) => score.user.digitCategory === selectedDigitFilter.value
+    );
   }
-) => {
-  if (!query || !item) return true;
 
-  const q = query.toLowerCase();
-  const row = item.raw;
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase();
+    list = list.filter((row) => {
+      const matchesCategoryOrSrOrPoints = row.validSrInfo?.some(
+        (info) =>
+          info.category.toLowerCase().includes(q) ||
+          info.sr.toFixed(2).includes(q) ||
+          info.finalPoints.toFixed(2).includes(q)
+      );
 
-  const matchesCategoryOrSrOrPoints = row.validSrInfo?.some(
-    (info) =>
-      info.category.toLowerCase().includes(q) ||
-      info.sr.toFixed(2).includes(q) ||
-      info.finalPoints.toFixed(2).includes(q)
-  );
+      return (
+        matchesCategoryOrSrOrPoints ||
+        row.user.nick.toLowerCase().includes(q) ||
+        row.mapName.toLowerCase().includes(q) ||
+        row.mods.toLowerCase().includes(q) ||
+        row.rank.toLowerCase().includes(q) ||
+        String(row.mapId).includes(q) ||
+        String(row.combo).includes(q) ||
+        row.points.toFixed(2).includes(q) ||
+        row.accuracy.toFixed(2).includes(q) ||
+        `${row.score}`.includes(q) ||
+        formatDate(row.date).includes(q) ||
+        formatTime(row.date).includes(q)
+      );
+    });
+  }
 
-  return (
-    matchesCategoryOrSrOrPoints ||
-    row.user.nick.toLowerCase().includes(q) ||
-    row.mapName.toLowerCase().includes(q) ||
-    row.mods.toLowerCase().includes(q) ||
-    row.rank.toLowerCase().includes(q) ||
-    String(row.mapId).includes(q) ||
-    String(row.combo).includes(q) ||
-    row.points.toFixed(2).includes(q) ||
-    row.accuracy.toFixed(2).includes(q) ||
-    `${row.score}`.includes(q) ||
-    formatDate(row.date).includes(q) ||
-    formatTime(row.date).includes(q)
-  );
-};
+  return list;
+});
 
 const formatDate = (date: Date) => {
   return date.toLocaleDateString("ru-RU", {
@@ -649,6 +672,12 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
     navigateToMapProfile(category, pendingMapId.value, isNewTab);
   }
 };
+
+watch(
+  () => filteredScoresList.value.length,
+  (newCount) => emit("update:filteredCount", newCount),
+  { immediate: true }
+);
 </script>
 
 <style lang="scss" scoped>
@@ -656,15 +685,49 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
   width: 100%;
   border: 4px solid var(--color-vuetify-table-borders);
   border-radius: 4px;
-  & :deep(th) {
-    vertical-align: middle;
-  }
-  & :deep(td) {
-    vertical-align: middle;
-  }
   &__content {
     height: 600px;
     cursor: pointer;
+    &_empty {
+      cursor: default;
+    }
+    & :deep(th) {
+      vertical-align: middle;
+      font-weight: bold;
+    }
+    & :deep(td) {
+      vertical-align: middle;
+    }
+  }
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background-color: var(--color-vuetify-table-borders);
+    @media (max-width: $tablet-l) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+  &__digit-toggle {
+    padding-inline: 2px;
+    @media (max-width: $tablet-l) {
+      padding-inline: 0;
+      width: 100%;
+    }
+    & :deep(.v-btn) {
+      @media (max-width: $tablet-l) {
+        flex: 1 1 auto;
+      }
+    }
+  }
+  &__digit-text {
+    @media (max-width: $phone-l) {
+      display: none;
+    }
+  }
+  &__search {
+    flex-grow: 1;
   }
   &__id-label {
     cursor: pointer;
@@ -673,7 +736,7 @@ const onCategorySelected = (event: MouseEvent, category: OsuMapCategory) => {
     }
   }
   &__user-card-wrapper {
-    padding: 8px 0;
+    padding-block: 4px;
   }
   &__cover-wrapper {
     width: 162px;

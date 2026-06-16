@@ -2,219 +2,188 @@
   <div class="club-profile-page">
     <v-skeleton-loader type="image, article, table" :loading="isLoading">
       <div v-if="isValidClub && clubData" class="club-profile-page__content">
-        <h2
-          class="club-profile-page__headline"
-          :style="{ color: `var(--color-club-${normalizedClubId})` }"
-        >
-          {{ clubTitle }}
-        </h2>
-        <div class="club-profile-page__header-section">
-          <div class="club-profile-page__join-wrapper">
-            <h3 class="club-profile-page__sub-headline">Статус</h3>
-            <div class="club-profile-page__status-info">
-              <template v-if="isActiveMember">
-                <v-tooltip
-                  :text="`Дата вступления: ${formattedJoinedDate}`"
-                  location="bottom"
-                >
-                  <template #activator="{ props }">
-                    <span v-bind="props" class="club-profile-page__status-text">
-                      Ты состоишь в клубе вот уже:<br />
-                      <b>{{ membershipDuration }}</b>
-                    </span>
-                  </template>
-                </v-tooltip>
-              </template>
-              <span
-                v-else
-                class="club-profile-page__status-text club-profile-page__status-text_out"
-              >
-                Ты ещё не в клубе
-              </span>
-            </div>
-            <v-tooltip
-              :disabled="!joinBtnTooltipText"
-              :text="joinBtnTooltipText"
-              location="bottom"
-            >
-              <template #activator="{ props }">
-                <div
-                  v-bind="props"
-                  class="w-100 club-profile-page__join-btn-wrapper"
-                >
-                  <v-btn
-                    :disabled="isJoinBtnDisabled"
-                    :loading="isUpdatingMembership"
-                    height="50"
-                    class="club-profile-page__join-btn"
-                    :class="{
-                      'club-profile-page__join-btn_exit': isActiveMember,
-                    }"
-                    @click="onMembershipBtnClick"
+        <div class="club-profile-page__section-wrapper">
+          <h2
+            class="club-profile-page__headline"
+            :style="{ color: `var(--color-club-${normalizedClubId})` }"
+          >
+            {{ clubTitle }}
+          </h2>
+          <div class="club-profile-page__header-section">
+            <div class="club-profile-page__join-wrapper">
+              <h3 class="club-profile-page__sub-headline">Статус</h3>
+              <div class="club-profile-page__status-info">
+                <template v-if="isActiveMember">
+                  <v-tooltip
+                    :text="`Дата вступления: ${formattedJoinedDate}`"
+                    location="bottom"
                   >
-                    {{ isActiveMember ? "Покинуть клуб" : "Вступить в клуб" }}
-                  </v-btn>
-                </div>
-              </template>
-            </v-tooltip>
-          </div>
-          <v-divider
-            vertical
-            class="club-profile-page__divider-desktop border-opacity-100"
-          />
-          <v-divider
-            class="club-profile-page__divider-mobile club-profile-page__divider-mobile_bottom border-opacity-100"
-          />
-          <div class="club-profile-page__skillsets-section">
-            <h3 class="club-profile-page__sub-headline">Специализация Клуба</h3>
-            <div class="club-profile-page__skillsets-wrapper">
+                    <template #activator="{ props }">
+                      <span
+                        v-bind="props"
+                        class="club-profile-page__status-text"
+                      >
+                        Ты состоишь в клубе вот уже:<br />
+                        <b>{{ membershipDuration }}</b>
+                      </span>
+                    </template>
+                  </v-tooltip>
+                </template>
+                <span
+                  v-else
+                  class="club-profile-page__status-text club-profile-page__status-text_out"
+                >
+                  Ты ещё не в клубе
+                </span>
+              </div>
               <v-tooltip
-                v-for="skillset in clubSkillsets"
-                :key="skillset.category"
-                :text="`Профильные моды: ${formatModsList(skillset.allowedMods)}`"
-                location="top"
+                :disabled="!joinBtnTooltipText"
+                :text="joinBtnTooltipText"
+                location="bottom"
               >
                 <template #activator="{ props }">
-                  <div v-bind="props" class="club-profile-page__skillset-item">
-                    <CategoryBadge :category="skillset.category" />
+                  <div
+                    v-bind="props"
+                    class="w-100 club-profile-page__join-btn-wrapper"
+                  >
+                    <v-btn
+                      :disabled="isJoinBtnDisabled"
+                      :loading="isUpdatingMembership"
+                      height="50"
+                      class="club-profile-page__join-btn"
+                      :class="{
+                        'club-profile-page__join-btn_exit': isActiveMember,
+                      }"
+                      @click="onMembershipBtnClick"
+                    >
+                      {{ isActiveMember ? "Покинуть клуб" : "Вступить в клуб" }}
+                    </v-btn>
                   </div>
                 </template>
               </v-tooltip>
             </div>
-          </div>
-          <v-divider
-            vertical
-            class="club-profile-page__divider-desktop border-opacity-100"
-          />
-          <v-divider
-            class="club-profile-page__divider-mobile club-profile-page__divider-mobile_top border-opacity-100"
-          />
-          <div class="club-profile-page__leader-wrapper">
-            <h3 class="club-profile-page__sub-headline">Лидер клуба</h3>
-            <div class="club-profile-page__leader-card-and-bubble">
-              <div class="club-profile-page__leader-side">
-                <div class="club-profile-page__leader-card-wrapper">
-                  <UserCard v-if="clubLeader" :user="clubLeader" />
-                  <div v-else class="club-profile-page__no-leader-wrapper">
-                    <span class="club-profile-page__no-leader">
-                      Лидер пока не назначен
-                    </span>
+            <v-divider
+              vertical
+              class="club-profile-page__divider-desktop border-opacity-100"
+            />
+            <v-divider
+              class="club-profile-page__divider-mobile club-profile-page__divider-mobile_bottom border-opacity-100"
+            />
+            <div class="club-profile-page__skillsets-section">
+              <h3 class="club-profile-page__sub-headline">
+                Специализация Клуба
+              </h3>
+              <div class="club-profile-page__skillsets-wrapper">
+                <v-tooltip
+                  v-for="skillset in clubSkillsets"
+                  :key="skillset.category"
+                  :text="`Профильные моды: ${formatModsList(skillset.allowedMods)}`"
+                  location="top"
+                >
+                  <template #activator="{ props }">
+                    <div
+                      v-bind="props"
+                      class="club-profile-page__skillset-item"
+                    >
+                      <CategoryBadge :category="skillset.category" />
+                    </div>
+                  </template>
+                </v-tooltip>
+              </div>
+            </div>
+            <v-divider
+              vertical
+              class="club-profile-page__divider-desktop border-opacity-100"
+            />
+            <v-divider
+              class="club-profile-page__divider-mobile club-profile-page__divider-mobile_top border-opacity-100"
+            />
+            <div class="club-profile-page__leader-wrapper">
+              <h3 class="club-profile-page__sub-headline">Лидер клуба</h3>
+              <div class="club-profile-page__leader-card-and-bubble">
+                <div class="club-profile-page__leader-side">
+                  <div class="club-profile-page__leader-card-wrapper">
+                    <UserCard v-if="clubLeader" :user="clubLeader" />
+                    <div v-else class="club-profile-page__no-leader-wrapper">
+                      <span class="club-profile-page__no-leader">
+                        Лидер пока не назначен
+                      </span>
+                    </div>
                   </div>
                 </div>
+                <div class="club-profile-page__speech-bubble">
+                  <p class="club-profile-page__leader-message">
+                    {{
+                      clubData.leaderMessage || "(Лидер пока ничего не написал)"
+                    }}
+                  </p>
+                </div>
+                <v-btn
+                  v-if="isLeaderOfThisClub"
+                  height="40"
+                  class="club-profile-page__edit-msg-btn"
+                  @click="isEditMessageModalOpened = true"
+                >
+                  Изменить послание
+                </v-btn>
               </div>
-              <div class="club-profile-page__speech-bubble">
-                <p class="club-profile-page__leader-message">
-                  {{
-                    clubData.leaderMessage || "(Лидер пока ничего не написал)"
-                  }}
-                </p>
-              </div>
-              <v-btn
-                v-if="isLeaderOfThisClub"
-                height="40"
-                class="club-profile-page__edit-msg-btn"
-                @click="isEditMessageModalOpened = true"
-              >
-                Изменить послание
-              </v-btn>
             </div>
           </div>
         </div>
         <v-divider class="club-profile-page__divider border-opacity-100" />
-        <div class="club-profile-page__table-section">
-          <div class="club-profile-page__table-header">
-            <h3 class="club-profile-page__sub-headline">
-              Участники клуба
-              <span class="club-profile-page__count">
-                ({{ tableItems.length }})
-              </span>
-            </h3>
-            <v-text-field
-              v-model="searchQuery"
-              variant="solo"
-              prepend-inner-icon="mdi-magnify"
-              label="Поиск по нику"
-              placeholder="Введи ник игрока..."
-              clearable
-              hide-details
-              density="compact"
-              class="club-profile-page__search"
-            />
-          </div>
-          <v-data-table-virtual
-            :headers="tableHeaders"
-            :items="tableItems"
-            :search="searchQuery"
-            :mobile-breakpoint="769"
-            :custom-filter="
-              (_, query, item) =>
-                item?.raw.searchString.includes(query.toLowerCase())
-            "
-            item-value="rawMember.uid"
-            class="club-profile-page__table"
-            hover
-            :sort-by="[{ key: 'points', order: 'desc' }]"
-          >
-            <template #[`item.userNick`]="{ item }">
-              <div class="club-profile-page__table-user-wrapper">
-                <UserCard :user="item.fullUser" />
-              </div>
-            </template>
-            <template #[`item.joinedTimestamp`]="{ item }">
-              <span>{{ formatDateTimeForTable(item.rawMember.joinedAt) }}</span>
-            </template>
-            <template #[`item.points`]="{ item }">
-              <span class="club-profile-page__points">
-                {{ item.points.toFixed(2) }}
-              </span>
-            </template>
-            <template #[`item.totalScores`]="{ item }">
-              <span>{{ item.totalScores }}</span>
-            </template>
-            <template #[`item.avgScore`]="{ item }">
-              <span class="club-profile-page__score">
-                {{
-                  item.avgScore > 0
-                    ? item.avgScore.toLocaleString("ru-RU")
-                    : "0"
-                }}
-              </span>
-            </template>
-            <template #[`item.avgAcc`]="{ item }">
-              <span>{{ item.avgAcc.toFixed(2) }}%</span>
-            </template>
-            <template #[`item.avgCombo`]="{ item }">
-              <span>{{ item.avgCombo }}x</span>
-            </template>
-            <template #no-data>
-              <div class="club-profile-page__no-data">
-                Нет данных об участниках
-              </div>
-            </template>
-          </v-data-table-virtual>
+        <div class="club-profile-page__section-wrapper">
+          <h3 class="club-profile-page__sub-headline">
+            Участники клуба
+            <span class="club-profile-page__count">
+              ({{ clubMembersCount }})
+            </span>
+          </h3>
+          <LeaderboardTable
+            :itemsList="allTableItems"
+            :hiddenColumns="[
+              'totalPoints',
+              'aim',
+              'speed',
+              'tech',
+              'reading',
+              'hidden',
+              'hardrock',
+            ]"
+            :themeColor="`var(--color-club-${normalizedClubId})`"
+            showDigitFilters
+            :defaultSortBy="[{ key: 'points', order: 'desc' }]"
+            @update:filteredCount="clubMembersCount = $event"
+          />
         </div>
         <v-divider class="club-profile-page__divider border-opacity-100" />
-        <div class="club-profile-page__scores-section">
+        <div class="club-profile-page__section-wrapper">
           <h3 class="club-profile-page__sub-headline">
-            Профильные Скоры Участников Клуба
+            Профильные Скоры Участников
             <span class="club-profile-page__count">
-              ({{ clubScoresList.length }})
+              ({{ clubScoresCount }})
             </span>
           </h3>
           <ScoresTable
             :scoresList="clubScoresList"
             :isLoading="isLoading || isMapsLoading"
+            :themeColor="`var(--color-club-${normalizedClubId})`"
+            showDigitFilters
+            @update:filteredCount="clubScoresCount = $event"
           />
         </div>
         <v-divider class="club-profile-page__divider border-opacity-100" />
-        <div class="club-profile-page__maps-section">
+        <div class="club-profile-page__section-wrapper">
           <h3 class="club-profile-page__sub-headline">
             Профильные Мапы Клуба
             <span class="club-profile-page__count">
-              ({{ clubMaps.length }})
+              ({{ clubMapsCount }})
             </span>
           </h3>
-          <SkillsetsMapsTable :mapsList="clubMaps" :isLoading="isMapsLoading" />
+          <SkillsetsMapsTable
+            :mapsList="clubMaps"
+            :isLoading="isMapsLoading"
+            @update:filteredCount="clubMapsCount = $event"
+          />
         </div>
       </div>
       <div v-else-if="!isValidClub" class="club-profile-page__not-found">
@@ -255,16 +224,17 @@ import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
-import { isBotmClub, BotmClub } from "@/types/clubs";
+import useToast from "@/composables/useToast";
 import UserCard from "@/components/users/UserCard.vue";
+import LeaderboardTable from "@/components/leaderboards/LeaderboardTable.vue";
 import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
 import LeaveClubModal from "@/components/clubs/LeaveClubModal.vue";
 import EditLeaderMsgModal from "@/components/clubs/EditLeaderMsgModal.vue";
-import useToast from "@/composables/useToast";
-import { getMembershipDurationLabel, formatModsList } from "@/utils";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
+import { getMembershipDurationLabel, formatModsList } from "@/utils";
 import { CLUB_SETTINGS } from "@/constants";
+import { isBotmClub, BotmClub } from "@/types/clubs";
 
 const route = useRoute();
 
@@ -279,6 +249,10 @@ const { setErrorToast, setSuccessToast } = useToast();
 const isLoading = ref(false);
 const isUpdatingMembership = ref(false);
 const isMapsLoading = ref(false);
+
+const clubMembersCount = ref(0);
+const clubScoresCount = ref(0);
+const clubMapsCount = ref(0);
 
 const isLeaveModalOpened = ref(false);
 const isEditMessageModalOpened = ref(false);
@@ -370,48 +344,7 @@ const clubScoresList = computed(() => {
   });
 });
 
-const searchQuery = ref("");
-
-const tableHeaders = [
-  { title: "Игрок", key: "userNick", minWidth: "300px" },
-  {
-    title: "Дата вступления",
-    key: "joinedTimestamp",
-    minWidth: "165px",
-  },
-  {
-    title: "Очки",
-    key: "points",
-    align: "center" as const,
-    minWidth: "120px",
-  },
-  {
-    title: "Скоров",
-    key: "totalScores",
-    align: "center" as const,
-    minWidth: "102px",
-  },
-  {
-    title: "Средний Скор",
-    key: "avgScore",
-    align: "center" as const,
-    minWidth: "146px",
-  },
-  {
-    title: "Средняя Акка",
-    key: "avgAcc",
-    align: "center" as const,
-    minWidth: "145px",
-  },
-  {
-    title: "Среднее Комбо",
-    key: "avgCombo",
-    align: "center" as const,
-    minWidth: "156px",
-  },
-];
-
-const tableItems = computed(() => {
+const allTableItems = computed(() => {
   if (!clubData.value?.members) return [];
 
   const items = [];
@@ -441,9 +374,9 @@ const tableItems = computed(() => {
     }
 
     items.push({
+      uid: member.uid,
       rawMember: member,
-      fullUser: fullUser,
-      userNick: fullUser.nick,
+      user: fullUser,
       searchString: fullUser.nick.toLowerCase(),
       joinedTimestamp: member.joinedAt ? member.joinedAt.getTime() : 0,
       totalScores,
@@ -456,20 +389,6 @@ const tableItems = computed(() => {
 
   return items;
 });
-
-const formatDateTimeForTable = (date: Date | null) => {
-  if (!date) return "—";
-  const dateStr = date.toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-  const timeStr = date.toLocaleTimeString("ru-RU", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  return `${dateStr} ${timeStr}`;
-};
 
 const onMembershipBtnClick = async () => {
   if (!currentUserUid.value || !isValidClub.value) return;
@@ -520,8 +439,11 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    row-gap: 30px;
+    row-gap: 20px;
     width: 100%;
+  }
+  &__section-wrapper {
+    @extend %section-wrapper;
   }
   &__headline {
     @include default-headline(44px, 44px, var(--color-text));
@@ -554,7 +476,7 @@ onMounted(async () => {
   &__header-section {
     display: flex;
     width: 100%;
-    gap: 30px;
+    gap: 20px;
     justify-content: center;
     @media (max-width: $laptop-l) {
       flex-direction: column;
@@ -747,73 +669,6 @@ onMounted(async () => {
     &_exit:disabled {
       background-color: var(--color-club-exit);
     }
-  }
-  &__table-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-  }
-  &__table-header {
-    padding-inline: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-    @media (max-width: $tablet-m) {
-      flex-direction: column;
-      align-items: stretch;
-    }
-  }
-  &__search {
-    max-width: 400px;
-    @media (max-width: $tablet-m) {
-      max-width: 100%;
-    }
-  }
-  &__table {
-    border: 4px solid var(--color-vuetify-table-borders);
-    border-radius: 4px;
-    height: 600px;
-    & :deep(th) {
-      vertical-align: middle;
-      font-weight: bold;
-    }
-    & :deep(td) {
-      vertical-align: middle;
-    }
-  }
-  &__table-user-wrapper {
-    padding: 8px 0;
-  }
-  &__status-chip {
-    font-weight: bold;
-    letter-spacing: 0.5px;
-  }
-  &__points {
-    color: var(--color-points);
-    font-weight: bold;
-  }
-  &__score {
-    font-weight: bold;
-  }
-  &__no-data {
-    padding: 40px;
-    text-align: center;
-    @include default-text(18px, 18px, var(--color-text));
-    opacity: 0.7;
-  }
-  &__scores-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  &__maps-section {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
   }
   &__not-found {
     display: flex;
