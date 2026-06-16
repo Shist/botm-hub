@@ -150,6 +150,15 @@ export const ALL_FM_TB_MODS: OsuScoreMod[] = [
   "ezflhd",
 ];
 
+export const CLUB_TITLES_MAP: Record<BotmClub, string> = {
+  [BotmClub.AIM]: "Аимер",
+  [BotmClub.SPEED]: "Жимер",
+  [BotmClub.TECH]: "Технарь",
+  [BotmClub.READING]: "Читалкер",
+  [BotmClub.HIDDEN]: "HD-Керри",
+  [BotmClub.HARDROCK]: "HR-Керри",
+};
+
 export const VALID_MODS_FOR_CATEGORY: Record<OsuMapCategory, OsuScoreMod[]> = {
   [OsuMapCategory.NM1]: MODS_ONLY_NM,
   [OsuMapCategory.NM2]: MODS_ONLY_NM,

@@ -115,8 +115,32 @@
           <div class="player-profile-page__chart-container">
             <h3 class="player-profile-page__sub-headline">Абсолютный Скилл</h3>
             <p class="player-profile-page__chart-desc">
-              Относительно других участников BOTM
+              {{ absoluteChartDesc }}
             </p>
+            <v-btn-toggle
+              v-model="selectedAbsoluteDigitFilter"
+              :color="playerThemeColor ?? undefined"
+              density="compact"
+              mandatory
+              class="player-profile-page__digit-toggle"
+            >
+              <v-btn value="all">Все</v-btn>
+              <v-btn :value="DigitCategory.FOUR_DIGIT">
+                4<span class="player-profile-page__digit-text">
+                  &nbsp;Дигиты
+                </span>
+              </v-btn>
+              <v-btn :value="DigitCategory.FIVE_DIGIT">
+                5<span class="player-profile-page__digit-text">
+                  &nbsp;Дигиты
+                </span>
+              </v-btn>
+              <v-btn :value="DigitCategory.SIX_DIGIT">
+                6<span class="player-profile-page__digit-text">
+                  &nbsp;Дигиты
+                </span>
+              </v-btn>
+            </v-btn-toggle>
             <SkillsetsRadarChart
               :points="playerClubPoints"
               labelName="Очков"
@@ -132,6 +156,21 @@
             <p class="player-profile-page__chart-desc">
               На основе внутреннего баланса скиллсетов
             </p>
+            <div
+              v-if="topPlayerTitles.length"
+              class="player-profile-page__titles-wrapper"
+            >
+              <span
+                v-for="(titleObj, index) in topPlayerTitles"
+                :key="titleObj.name"
+                class="player-profile-page__title-badge"
+              >
+                <span :style="{ color: `var(--color-club-${titleObj.key})` }">
+                  {{ titleObj.title }}
+                </span>
+                <template v-if="index < topPlayerTitles.length - 1">,</template>
+              </span>
+            </div>
             <SkillsetsRadarChart
               :points="playerClubPoints"
               labelName="Очков"
@@ -178,6 +217,9 @@ import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import { useClubsStore } from "@/stores/clubs";
+import useUserTags from "@/composables/useUserTags";
+import useToast from "@/composables/useToast";
+import useProfileTheme from "@/composables/useProfileTheme";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import ScoresTable from "@/components/scores/ScoresTable.vue";
 import SkillsetsRadarChart from "@/components/users/SkillsetsRadarChart.vue";
@@ -196,12 +238,10 @@ import IconTechMember from "@/components/users/user-icons/clubs/members/IconTech
 import IconReadingMember from "@/components/users/user-icons/clubs/members/IconReadingMember.vue";
 import IconHiddenMember from "@/components/users/user-icons/clubs/members/IconHiddenMember.vue";
 import IconHardrockMember from "@/components/users/user-icons/clubs/members/IconHardrockMember.vue";
-import useUserTags from "@/composables/useUserTags";
-import useToast from "@/composables/useToast";
-import useProfileTheme from "@/composables/useProfileTheme";
-import { type IAllUsersListItem } from "@/types/users";
+import { CLUB_TITLES_MAP } from "@/constants";
+import { DigitCategory, type IAllUsersListItem } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
-import { BotmClub } from "@/types/clubs";
+import { BotmClub, isBotmClub } from "@/types/clubs";
 
 const route = useRoute();
 
@@ -214,6 +254,7 @@ const { setErrorToast } = useToast();
 
 const isLoading = ref(false);
 const filteredPlayerScoresCount = ref(0);
+const selectedAbsoluteDigitFilter = ref<"all" | DigitCategory>("all");
 
 const playerNick = computed<string>(() => `${route.params.nick}`);
 const playerInfo = computed<IAllUsersListItem | null>(
@@ -275,6 +316,13 @@ const hubMaxInfo = computed(() => {
   ];
 
   scoresStore.leaderboardsData.forEach((stat) => {
+    if (
+      selectedAbsoluteDigitFilter.value !== "all" &&
+      stat.user.digitCategory !== selectedAbsoluteDigitFilter.value
+    ) {
+      return;
+    }
+
     const clubs = stat.clubs;
     const currentPoints = [
       clubs[BotmClub.AIM].points,
@@ -299,21 +347,46 @@ const hubMaxInfo = computed(() => {
 const absoluteNormalizedPoints = computed(() => {
   return playerClubPoints.value.map((pts, index) => {
     if (!hubMaxInfo.value[index]) return 0;
-    const maxPts =
-      hubMaxInfo.value[index].points > 0 ? hubMaxInfo.value[index].points : 10;
+    const cohortMax = hubMaxInfo.value[index].points;
+    const maxPts = Math.max(cohortMax, pts, 10);
     return (pts / maxPts) * 100;
   });
 });
 
 const absoluteTopTooltips = computed(() => {
-  return hubMaxInfo.value.map((info) => {
+  return hubMaxInfo.value.map((info, index) => {
+    const playerPts = playerClubPoints.value[index] ?? 0;
+    if (info.points === 0 && playerPts === 0) return "";
+
+    let prefix = "Лучший в BOTM";
+    if (selectedAbsoluteDigitFilter.value === DigitCategory.FOUR_DIGIT)
+      prefix = "Лучший среди 4 дигитов";
+    if (selectedAbsoluteDigitFilter.value === DigitCategory.FIVE_DIGIT)
+      prefix = "Лучший среди 5 дигитов";
+    if (selectedAbsoluteDigitFilter.value === DigitCategory.SIX_DIGIT)
+      prefix = "Лучший среди 6 дигитов";
+
+    if (playerPts > info.points) {
+      return [
+        `${prefix}: ${info.points.toFixed(2)} (${info.nick || "—"})`,
+        `(Твой показатель выше максимума группы)`,
+      ];
+    }
+
     return info.nick
-      ? [
-          `Лучший показатель BOTM:`,
-          `${info.points.toFixed(2)} очков (${info.nick})`,
-        ]
+      ? [`${prefix}:`, `${info.points.toFixed(2)} очков (${info.nick})`]
       : "";
   });
+});
+
+const absoluteChartDesc = computed(() => {
+  if (selectedAbsoluteDigitFilter.value === DigitCategory.FOUR_DIGIT)
+    return "Относительно 4 дигитов BOTM";
+  if (selectedAbsoluteDigitFilter.value === DigitCategory.FIVE_DIGIT)
+    return "Относительно 5 дигитов BOTM";
+  if (selectedAbsoluteDigitFilter.value === DigitCategory.SIX_DIGIT)
+    return "Относительно 6 дигитов BOTM";
+  return "Относительно всех участников BOTM";
 });
 
 const balanceTooltips = computed(() => {
@@ -337,6 +410,35 @@ const balanceTooltips = computed(() => {
 const playerMaxClubPoints = computed(() => {
   const max = Math.max(...playerClubPoints.value);
   return max > 0 ? Math.ceil(max) : 10;
+});
+
+const topPlayerTitles = computed(() => {
+  const points = playerClubPoints.value;
+  if (Math.max(...points) <= 0) return [];
+
+  const clubKeys = [
+    BotmClub.AIM,
+    BotmClub.HIDDEN,
+    BotmClub.READING,
+    BotmClub.TECH,
+    BotmClub.SPEED,
+    BotmClub.HARDROCK,
+  ];
+
+  const stats = points.map((pts, index) => {
+    const clubName = clubKeys[index] ?? "";
+    return {
+      pts,
+      name: clubName,
+      key: clubName,
+      title: isBotmClub(clubName) && CLUB_TITLES_MAP[clubName],
+    };
+  });
+
+  return stats
+    .sort((a, b) => b.pts - a.pts)
+    .filter((s) => s.pts > 0)
+    .slice(0, 3);
 });
 
 const {
@@ -567,11 +669,12 @@ onMounted(async () => {
     align-items: center;
     background-color: var(--color-tabs-bg);
     border-radius: 12px;
-    padding: 20px;
+    padding: 15px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
   &__sub-headline {
     @include default-headline(28px, 28px, var(--color-text));
+    margin-bottom: 5px;
     text-align: center;
     @media (max-width: $tablet-l) {
       font-size: 24px;
@@ -580,10 +683,51 @@ onMounted(async () => {
   }
   &__chart-desc {
     @include default-text(16px, 16px, var(--color-text-gray));
-    margin-top: 5px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     text-align: center;
     opacity: 0.8;
+  }
+  &__digit-toggle {
+    margin-bottom: 15px;
+  }
+  &__digit-text {
+    @media (max-width: $laptop-m) {
+      display: none;
+    }
+    @media (max-width: $tablet-l) {
+      display: inline;
+    }
+    @media (max-width: $phone-l) {
+      display: none;
+    }
+  }
+  &__titles-wrapper {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    @media (max-width: $tablet-l) {
+      margin-bottom: 15px;
+    }
+  }
+  &__title-badge {
+    @include default-headline(26px, 26px, var(--color-text));
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    @media (max-width: $laptop-m) {
+      font-size: 22px;
+      line-height: 22px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    }
+    @media (max-width: $laptop-s) {
+      font-size: 20px;
+      line-height: 20px;
+    }
+    @media (max-width: $tablet-l) {
+      font-size: 16px;
+      line-height: 16px;
+    }
   }
   &__section-wrapper {
     @extend %section-wrapper;
