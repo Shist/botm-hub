@@ -111,6 +111,80 @@
           </div>
         </div>
         <v-divider class="player-profile-page__divider border-opacity-100" />
+        <div
+          v-if="playerRanks"
+          class="player-profile-page__section-wrapper player-profile-page__ranks-section"
+        >
+          <h2 class="player-profile-page__sub-headline">
+            Позиции в Лидербордах
+          </h2>
+          <div class="player-profile-page__ranks-container">
+            <div class="player-profile-page__ranks-grid">
+              <v-tooltip
+                text="Общие Очки"
+                location="top"
+                content-class="player-profile-page__tooltip-bg"
+              >
+                <template #activator="{ props }">
+                  <div
+                    v-bind="props"
+                    class="player-profile-page__rank-cell player-profile-page__rank-cell_global"
+                  >
+                    <span class="player-profile-page__rank-label">Global</span>
+                    <span class="player-profile-page__rank-value">
+                      {{ playerRanks.globalRank }}
+                    </span>
+                  </div>
+                </template>
+              </v-tooltip>
+              <v-tooltip
+                v-for="club in Object.values(BotmClub)"
+                :key="`rank-club-tooltip-${club}`"
+                :text="`Очки ${CLUB_SETTINGS[club].title.replace(' Клуб', '')} Скиллсетов`"
+                location="top"
+                content-class="player-profile-page__tooltip-bg"
+              >
+                <template #activator="{ props }">
+                  <div
+                    v-bind="props"
+                    class="player-profile-page__rank-cell"
+                    :style="{ color: `var(--color-club-${club})` }"
+                  >
+                    <span class="player-profile-page__rank-label">
+                      {{ CLUB_SETTINGS[club].title.replace(" Клуб", "") }}
+                    </span>
+                    <span class="player-profile-page__rank-value">
+                      {{ playerRanks.clubRanks[club] }}
+                    </span>
+                  </div>
+                </template>
+              </v-tooltip>
+              <v-tooltip
+                v-for="category in Object.values(OsuMapCategory)"
+                :key="`rank-category-tooltip-${category}`"
+                :text="`Очки ${MAPS_CATEGORIES[category]}`"
+                location="top"
+                content-class="player-profile-page__tooltip-bg"
+              >
+                <template #activator="{ props }">
+                  <div
+                    v-bind="props"
+                    class="player-profile-page__rank-cell"
+                    :style="{ color: `var(--color-btn-bg-${category})` }"
+                  >
+                    <span class="player-profile-page__rank-label">
+                      {{ category.toUpperCase() }}
+                    </span>
+                    <span class="player-profile-page__rank-value">
+                      {{ playerRanks.catRanks[category] }}
+                    </span>
+                  </div>
+                </template>
+              </v-tooltip>
+            </div>
+          </div>
+        </div>
+        <v-divider class="player-profile-page__divider border-opacity-100" />
         <div class="player-profile-page__charts-section">
           <div class="player-profile-page__chart-container">
             <h3 class="player-profile-page__sub-headline">Абсолютный Скилл</h3>
@@ -238,10 +312,11 @@ import IconTechMember from "@/components/users/user-icons/clubs/members/IconTech
 import IconReadingMember from "@/components/users/user-icons/clubs/members/IconReadingMember.vue";
 import IconHiddenMember from "@/components/users/user-icons/clubs/members/IconHiddenMember.vue";
 import IconHardrockMember from "@/components/users/user-icons/clubs/members/IconHardrockMember.vue";
-import { CLUB_TITLES_MAP } from "@/constants";
+import { CLUB_TITLES_MAP, CLUB_SETTINGS, MAPS_CATEGORIES } from "@/constants";
 import { DigitCategory, type IAllUsersListItem } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
 import { BotmClub, isBotmClub } from "@/types/clubs";
+import { type IPlayerLeaderboardStats } from "@/types/scores";
 
 const route = useRoute();
 
@@ -439,6 +514,36 @@ const topPlayerTitles = computed(() => {
     .sort((a, b) => b.pts - a.pts)
     .filter((s) => s.pts > 0)
     .slice(0, 3);
+});
+
+const playerRanks = computed(() => {
+  const uid = playerInfo.value?.uid;
+  if (!uid) return null;
+
+  const allStats = scoresStore.leaderboardsData;
+
+  const getRank = (getValue: (s: IPlayerLeaderboardStats) => number) => {
+    const sorted = [...allStats].sort((a, b) => getValue(b) - getValue(a));
+    const index = sorted.findIndex((s) => s.uid === uid);
+    const stat = sorted[index];
+    if (index === -1 || !stat) return "—";
+    const val = getValue(stat);
+    return val > 0 ? `#${index + 1}` : "—";
+  };
+
+  const globalRank = getRank((s) => s.overall.points);
+
+  const clubRanks = {} as Record<BotmClub, string | number>;
+  Object.values(BotmClub).forEach((club) => {
+    clubRanks[club] = getRank((s) => s.clubs[club].points);
+  });
+
+  const categoryRanks = {} as Record<OsuMapCategory, string | number>;
+  Object.values(OsuMapCategory).forEach((category) => {
+    categoryRanks[category] = getRank((s) => s.skillsets[category].points);
+  });
+
+  return { globalRank, clubRanks, catRanks: categoryRanks };
 });
 
 const {
@@ -651,6 +756,71 @@ onMounted(async () => {
   }
   &__divider {
     width: 100%;
+  }
+  &__ranks-section {
+    align-items: center;
+  }
+  &__ranks-container {
+    width: 100%;
+  }
+  &__ranks-grid {
+    padding: 15px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+    background-color: var(--color-tabs-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    @media (max-width: $tablet-l) {
+      padding: 10px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: $phone-m) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  &__rank-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 5px;
+    background-color: rgba(128, 128, 128, 0.1);
+    border-radius: 8px;
+    text-align: center;
+    transition: background-color 0.2s;
+    cursor: help;
+    &:hover {
+      background-color: rgba(128, 128, 128, 0.2);
+    }
+    &_global {
+      color: var(--color-btn-bg-skillsets-maps);
+    }
+  }
+  &__rank-label {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    opacity: 0.9;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    @media (max-width: $phone-l) {
+      font-size: 12px;
+    }
+  }
+  &__tooltip-bg {
+    background-color: var(--color-modal-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-vuetify-table-borders);
+  }
+  &__rank-value {
+    font-size: 24px;
+    font-weight: bold;
+    margin-top: 4px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    @media (max-width: $phone-l) {
+      font-size: 20px;
+    }
   }
   &__charts-section {
     display: flex;
