@@ -866,7 +866,6 @@ watch(
   &__date {
     color: var(--color-text);
     font-size: 14px;
-    font-weight: 500;
   }
   &__time {
     color: var(--color-text-gray);

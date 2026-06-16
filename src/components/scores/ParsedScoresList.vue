@@ -2,7 +2,7 @@
   <div class="parsed-scores-list">
     <div class="parsed-scores-list__groups-list">
       <div
-        v-for="group in groupedScores"
+        v-for="group in enrichedGroupedScores"
         :key="group.id"
         class="parsed-scores-list__group-card"
       >
@@ -49,7 +49,9 @@
                 'parsed-scores-list__score-row_db': score.isDbScore,
                 'parsed-scores-list__score-row_selected': score.isSelected,
               }"
-              @click="$emit('toggleScore', group, score)"
+              @click="
+                $emit('toggleScore', group.originalGroup, score.originalScore)
+              "
             >
               <div class="parsed-scores-list__score-content">
                 <div class="parsed-scores-list__score-left">
@@ -87,8 +89,7 @@
                       v-if="score.isInsufficient"
                       class="parsed-scores-list__score-subtext-error"
                     >
-                      ({{ !score.passed ? "Скор зафейлен" : "<60% скора" }}, 0
-                      очков)
+                      ({{ !score.passed ? "Скор зафейлен" : "<60% скора" }})
                     </span>
                     <span
                       v-else
@@ -98,9 +99,60 @@
                           score.isDbScore,
                       }"
                     >
-                      ({{ score.percentage.toFixed(2) }}% скора,
-                      {{ score.points.toFixed(2) }} очков)
+                      ({{ score.percentage.toFixed(2) }}% от максимума)
                     </span>
+                  </div>
+                  <div
+                    class="parsed-scores-list__categories-wrapper"
+                    v-if="!score.isInsufficient"
+                  >
+                    <div
+                      v-if="score.validSrInfo.length === 1"
+                      class="parsed-scores-list__cat-single"
+                    >
+                      <CategoryBadge
+                        v-if="score.validSrInfo[0]"
+                        :category="score.validSrInfo[0].category"
+                      />
+                      <span class="parsed-scores-list__cat-points">
+                        {{ score.validSrInfo[0]?.finalPoints.toFixed(2) }}
+                      </span>
+                    </div>
+                    <div v-else-if="score.validSrInfo.length > 1">
+                      <v-tooltip location="top">
+                        <template #activator="{ props }">
+                          <div
+                            v-bind="props"
+                            class="parsed-scores-list__cat-mixed"
+                            @click.stop
+                          >
+                            <v-icon size="20" color="var(--color-points)">
+                              mdi-bullseye-arrow
+                            </v-icon>
+                            <span class="parsed-scores-list__cat-points">
+                              {{ score.validSrInfo[0]?.finalPoints.toFixed(2) }}
+                            </span>
+                          </div>
+                        </template>
+                        <div class="parsed-scores-list__cat-tooltip">
+                          <span class="parsed-scores-list__cat-tooltip-title">
+                            Очки по категориям:
+                          </span>
+                          <div
+                            v-for="info in score.validSrInfo"
+                            :key="info.category"
+                            class="parsed-scores-list__cat-tooltip-row"
+                          >
+                            <CategoryBadge :category="info.category" />
+                            <span
+                              class="parsed-scores-list__cat-points parsed-scores-list__cat-points_outlined"
+                            >
+                              {{ info.finalPoints.toFixed(2) }}
+                            </span>
+                          </div>
+                        </div>
+                      </v-tooltip>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -113,16 +165,26 @@
 </template>
 
 <script lang="ts" setup>
-import { formatMapRank } from "@/utils";
+import { computed } from "vue";
+import { useOsumapsStore } from "@/stores/osumaps";
+import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
+import { formatMapRank, isValidModCombinationForCategory } from "@/utils";
+import {
+  calculateFinalCategoryPoints,
+  calculateBasePoints,
+} from "@/utils/scores-calcs";
+import { OsuMapCategory } from "@/types/osumaps";
 import type { IMpModalGroup, IMpModalScore } from "@/types/scores";
 
-defineProps<{
+const props = defineProps<{
   groupedScores: IMpModalGroup[];
 }>();
 
 defineEmits<{
   (e: "toggleScore", group: IMpModalGroup, score: IMpModalScore): void;
 }>();
+
+const mapsStore = useOsumapsStore();
 
 const getModsChipColor = (mods: string[]): string => {
   if (mods.includes("DT")) return "var(--color-mod-combination-dt)";
@@ -132,6 +194,64 @@ const getModsChipColor = (mods: string[]): string => {
   if (mods.includes("EZ")) return "var(--color-mod-combination-ez)";
   return "var(--color-mod-combination-nm)";
 };
+
+const enrichedGroupedScores = computed(() => {
+  const allMaps = mapsStore.getMapsOfGivenCategories(
+    Object.values(OsuMapCategory)
+  );
+
+  return props.groupedScores.map((group) => {
+    const enrichedScores = group.scores.map((score) => {
+      const actualMods = score.mods ?? group.mods;
+      const actualMapId = score.mapId ?? group.mapId;
+
+      const rawModKey = (
+        actualMods && actualMods.length ? actualMods.join("") : "nm"
+      ).toLowerCase();
+      const modsArray =
+        rawModKey === "nm"
+          ? ["NM"]
+          : (rawModKey.toUpperCase().match(/.{1,2}/g) ?? []);
+
+      const validDbMaps = allMaps.filter(
+        (m) =>
+          m.id === actualMapId &&
+          isValidModCombinationForCategory(modsArray, m.category)
+      );
+
+      const basePts =
+        score.percentage >= 60
+          ? calculateBasePoints(score.percentage, group.stars)
+          : 0;
+
+      const validSrInfo = validDbMaps
+        .map((m) => {
+          const finalPts = calculateFinalCategoryPoints(
+            basePts,
+            m.category,
+            modsArray
+          );
+          return {
+            category: m.category,
+            finalPoints: finalPts,
+          };
+        })
+        .sort((a, b) => b.finalPoints - a.finalPoints);
+
+      return {
+        ...score,
+        originalScore: score,
+        validSrInfo,
+      };
+    });
+
+    return {
+      ...group,
+      originalGroup: group,
+      scores: enrichedScores,
+    };
+  });
+});
 </script>
 
 <style lang="scss" scoped>
@@ -242,7 +362,7 @@ const getModsChipColor = (mods: string[]): string => {
     background-color: var(--color-score-row-bg);
     border-radius: 8px;
     border: 2px solid transparent;
-    transition: 0.2s ease-in-out;
+    transition: 0.3s ease-in-out;
     cursor: pointer;
     &:hover:not(&_disabled):not(&_db) {
       background-color: var(--color-score-hover);
@@ -278,11 +398,15 @@ const getModsChipColor = (mods: string[]): string => {
     gap: 8px;
   }
   &__score-stats-text {
-    @include default-text(16px, 16px, var(--color-text-gray));
-    font-weight: 600;
+    @include default-text(24px, 24px, var(--color-text-gray));
+    font-weight: bold;
     @media (max-width: $phone-l) {
-      font-size: 13px;
-      line-height: 13px;
+      font-size: 16px;
+      line-height: 16px;
+    }
+    @media (max-width: $phone-m) {
+      font-size: 14px;
+      line-height: 14px;
     }
   }
   &__score-right {
@@ -290,6 +414,7 @@ const getModsChipColor = (mods: string[]): string => {
     flex-direction: column;
     align-items: flex-end;
     text-align: right;
+    gap: 2px;
     flex-shrink: 0;
   }
   &__score-db-label {
@@ -298,7 +423,6 @@ const getModsChipColor = (mods: string[]): string => {
     line-height: 10px;
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: 2px;
     letter-spacing: 0.5px;
   }
   &__score-value {
@@ -317,7 +441,6 @@ const getModsChipColor = (mods: string[]): string => {
   }
   &__score-subtext {
     @include default-text(12px, 14px, var(--color-text-gray));
-    margin-top: 2px;
     text-align: right;
     @media (max-width: $phone-l) {
       font-size: 10px;
@@ -329,15 +452,15 @@ const getModsChipColor = (mods: string[]): string => {
     font-weight: bold;
   }
   &__score-subtext-points {
-    color: var(--color-points);
+    color: var(--color-text-gray);
     font-weight: bold;
     &_db {
       color: var(--color-db-score-label);
     }
   }
   &__score-rank {
-    @include default-text(18px, 18px, var(--color-text-white));
-    font-weight: 900;
+    @include default-text(36px, 36px, var(--color-text-white));
+    font-weight: bold;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
     &.rank-X,
     &.rank-SS,
@@ -365,9 +488,58 @@ const getModsChipColor = (mods: string[]): string => {
       color: var(--color-rank-f);
     }
     @media (max-width: $phone-l) {
-      font-size: 16px;
-      line-height: 16px;
+      font-size: 24px;
+      line-height: 24px;
     }
+  }
+  &__categories-wrapper {
+    display: flex;
+    justify-content: flex-end;
+  }
+  &__cat-single {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  &__cat-mixed {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: help;
+    padding: 2px 6px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    transition: background-color 0.3s;
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+  &__cat-points {
+    color: var(--color-points);
+    font-weight: bold;
+    font-size: 14px;
+    &_outlined {
+      text-shadow:
+        1px 1px 0 #000,
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000;
+    }
+  }
+  &__cat-tooltip {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 4px;
+  }
+  &__cat-tooltip-title {
+    @include default-text(14px, 14px, inherit);
+  }
+  &__cat-tooltip-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
   }
 }
 </style>

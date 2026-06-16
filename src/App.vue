@@ -248,22 +248,6 @@ onMounted(async () => {
   top: -9999px;
 }
 
-.skillset-maps-page {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  row-gap: 10px;
-  &__headline {
-    @include default-headline(28px, 28px, var(--color-text));
-    width: 100%;
-    text-align: center;
-    @media (max-width: $phone-l) {
-      font-size: 20px;
-      line-height: 20px;
-    }
-  }
-}
-
 .vuetify-date-time-picker-wrapper {
   @media (max-width: $phone-m) {
     left: calc(50dvw - 160px) !important;
