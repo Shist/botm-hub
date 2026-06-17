@@ -1,6 +1,7 @@
 import { reactive, ref } from "vue";
 import { defineStore } from "pinia";
 import { loadAllMapsFromFirebase } from "@/services/firebase/osumaps";
+import { idbGet, idbSet } from "@/services/idb";
 import { useMetaStore } from "@/stores/meta";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 
@@ -42,23 +43,25 @@ export const useOsumapsStore = defineStore("osumaps", () => {
 
       const serverTimestamp = metaStore.metaConfig?.mapsUpdatedAt?.toString();
       const localTimestamp = localStorage.getItem("mapsUpdatedAt");
-      const localMaps = localStorage.getItem("botmMaps");
 
-      if (serverTimestamp && localTimestamp === serverTimestamp && localMaps) {
+      localStorage.removeItem("botmMaps"); // TODO remove this instruction in future patches
+
+      if (serverTimestamp && localTimestamp === serverTimestamp) {
         try {
-          const parsedMaps: IOsuMap[] = JSON.parse(localMaps);
-          if (parsedMaps.length > 0) {
-            populateStore(parsedMaps);
+          const cachedMaps = await idbGet<IOsuMap[]>("botmMaps");
+
+          if (cachedMaps && cachedMaps.length > 0) {
+            populateStore(cachedMaps);
             isLoading.value = false;
             isLoaded.value = true;
             return;
           } else {
             console.warn(
-              "В localStorage обнаружен пустой массив карт. Принудительная загрузка с сервера..."
+              "В IndexedDB пусто или данные повреждены. Принудительная загрузка с сервера..."
             );
           }
         } catch (e) {
-          console.error("Ошибка парсинга карт из localStorage:", e);
+          console.error("Ошибка чтения карт из IndexedDB:", e);
         }
       }
 
@@ -66,10 +69,12 @@ export const useOsumapsStore = defineStore("osumaps", () => {
         const fetchedMaps = await loadAllMapsFromFirebase();
         populateStore(fetchedMaps);
 
-        localStorage.setItem("botmMaps", JSON.stringify(fetchedMaps));
+        await idbSet("botmMaps", fetchedMaps);
+
         if (serverTimestamp) {
           localStorage.setItem("mapsUpdatedAt", serverTimestamp);
         }
+
         isLoaded.value = true;
       } catch (error) {
         throw error;
