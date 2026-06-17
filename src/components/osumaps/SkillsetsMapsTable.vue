@@ -55,29 +55,82 @@
           </v-tooltip>
         </template>
         <template #[`item.cover`]="{ item }">
-          <div class="skillsets-maps-table__cover-wrapper">
-            <v-img
-              :src="`https://assets.ppy.sh/beatmaps/${item.mapsetId}/covers/cover.jpg`"
-              cover
-              height="100%"
+          <v-tooltip location="top">
+            <template #activator="{ props }">
+              <div
+                v-bind="props"
+                class="skillsets-maps-table__cover-wrapper"
+                :class="{
+                  [`skillsets-maps-table__cover-wrapper_rank-${item.bestScoreInfo?.rank}`]:
+                    item.bestScoreInfo,
+                }"
+                @click.stop
+              >
+                <v-img
+                  :src="`https://assets.ppy.sh/beatmaps/${item.mapsetId}/covers/cover.jpg`"
+                  cover
+                  height="100%"
+                >
+                  <template #placeholder>
+                    <div class="skillsets-maps-table__cover-loader">
+                      <v-progress-circular
+                        indeterminate
+                        size="16"
+                        width="2"
+                        color="var(--color-vuetify-progress)"
+                      />
+                    </div>
+                  </template>
+                  <template #error>
+                    <div class="skillsets-maps-table__cover-error">
+                      <span>NO BG</span>
+                    </div>
+                  </template>
+                </v-img>
+              </div>
+            </template>
+            <div
+              v-if="item.mapUserScores?.length"
+              class="skillsets-maps-table__scores-tooltip"
             >
-              <template #placeholder>
-                <div class="skillsets-maps-table__cover-loader">
-                  <v-progress-circular
-                    indeterminate
-                    size="16"
-                    width="2"
-                    color="var(--color-vuetify-progress)"
-                  />
-                </div>
-              </template>
-              <template #error>
-                <div class="skillsets-maps-table__cover-error">
-                  <span>NO BG</span>
-                </div>
-              </template>
-            </v-img>
-          </div>
+              <span class="skillsets-maps-table__tooltip-title">
+                Имеющиеся личные скоры:
+              </span>
+              <div
+                v-for="score in item.mapUserScores"
+                :key="score.mods"
+                class="skillsets-maps-table__tooltip-row"
+              >
+                <span
+                  class="skillsets-maps-table__tooltip-rank"
+                  :class="`rank-${score.rank}`"
+                >
+                  {{ formatMapRank(score.rank) }}
+                </span>
+                <span class="skillsets-maps-table__tooltip-mods">{{
+                  score.mods
+                }}</span>
+                <span class="skillsets-maps-table__tooltip-score">
+                  {{ score.score.toLocaleString("ru-RU") }}
+                </span>
+                <span class="skillsets-maps-table__tooltip-stats">
+                  {{ score.accuracy.toFixed(2) }}% | {{ score.combo }}x
+                </span>
+                <span class="skillsets-maps-table__tooltip-points">
+                  <v-icon size="14" color="var(--color-points)">
+                    mdi-bullseye-arrow
+                  </v-icon>
+                  {{ score.points.toFixed(2) }}
+                </span>
+              </div>
+            </div>
+            <div
+              v-else
+              class="skillsets-maps-table__scores-tooltip skillsets-maps-table__scores-tooltip_empty"
+            >
+              <span>Пока нет личных скоров</span>
+            </div>
+          </v-tooltip>
         </template>
         <template #[`item.category`]="{ item }">
           <CategoryBadge
@@ -96,9 +149,13 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import { useScoresStore } from "@/stores/scores";
 import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
+import { formatMapRank } from "@/utils";
+import { calculateFinalCategoryPoints } from "@/utils/scores-calcs";
 import {
   OsuMapCategory,
   type IOsuMap,
@@ -106,6 +163,9 @@ import {
 } from "@/types/osumaps";
 
 const router = useRouter();
+
+const authStore = useAuthStore();
+const scoresStore = useScoresStore();
 
 const props = withDefaults(
   defineProps<{
@@ -137,7 +197,7 @@ const headers = reactive<MapsTableHeader[]>([
   },
   {
     key: "cover",
-    title: "Фон",
+    title: "Фон / Скоры",
     minWidth: "176px",
     sortable: false,
     align: "center",
@@ -178,10 +238,48 @@ const headers = reactive<MapsTableHeader[]>([
 const defaultSortBy = computed(() => props.defaultSort);
 
 const filteredItemsForTable = computed(() => {
-  let list = props.mapsList.map((item) => ({
-    idWithCategory: `${item.id}-${item.category}`,
-    ...item,
-  }));
+  const uid = authStore.user?.uid;
+  const userScores = uid ? scoresStore.allScores[uid] : null;
+
+  let list = props.mapsList.map((item) => {
+    const mapUserScores = [];
+
+    if (userScores && userScores[item.id]) {
+      const mapScores = userScores[item.id] ?? {};
+
+      for (const [modKey, scoreData] of Object.entries(mapScores)) {
+        const rawModKey = modKey.toLowerCase();
+        const modsArray =
+          rawModKey === "nm"
+            ? ["NM"]
+            : (rawModKey.toUpperCase().match(/.{1,2}/g) ?? []);
+
+        const finalPts = calculateFinalCategoryPoints(
+          scoreData.points,
+          item.category,
+          modsArray
+        );
+
+        mapUserScores.push({
+          mods: modKey.toUpperCase() === "NM" ? "NM" : modKey.toUpperCase(),
+          rank: scoreData.rank,
+          score: scoreData.score,
+          accuracy: scoreData.accuracy,
+          combo: scoreData.combo,
+          points: finalPts,
+        });
+      }
+
+      mapUserScores.sort((a, b) => b.points - a.points);
+    }
+
+    return {
+      idWithCategory: `${item.id}-${item.category}`,
+      mapUserScores,
+      bestScoreInfo: mapUserScores[0] ?? null,
+      ...item,
+    };
+  });
 
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase();
@@ -273,13 +371,44 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
     }
   }
   &__cover-wrapper {
-    width: 144px;
-    height: 40px;
-    border-radius: 4px;
+    width: 152px;
+    height: 48px;
+    border: 4px solid transparent;
+    border-radius: 6px;
     overflow: hidden;
     margin: 0 auto;
+    transition: border-color 0.3s ease-in-out;
+    cursor: help;
     @media (max-width: $tablet-l) {
       margin: 0 0 0 auto;
+    }
+    &_rank-X,
+    &_rank-SS,
+    &_rank-S {
+      border-color: var(--color-rank-s-or-ss);
+    }
+    &_rank-XH,
+    &_rank-SSH,
+    &_rank-SH {
+      border-color: var(--color-rank-silver-s-or-ss);
+    }
+    &_rank-A {
+      border-color: var(--color-rank-a);
+    }
+    &_rank-B {
+      border-color: var(--color-rank-b);
+    }
+    &_rank-C {
+      border-color: var(--color-rank-c);
+    }
+    &_rank-D {
+      border-color: var(--color-rank-d);
+    }
+    &_rank-F {
+      border-color: var(--color-rank-f);
+    }
+    .v-img {
+      border-radius: 2px;
     }
   }
   &__cover-loader {
@@ -312,6 +441,122 @@ const onRowClick = (event: MouseEvent, { item }: { item: IOsuMap }) => {
     text-align: center;
     @include default-text(18px, 18px, var(--color-text));
     opacity: 0.7;
+  }
+  &__scores-tooltip {
+    padding-block: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    &_empty {
+      span {
+        @include default-text(14px, 14px, inherit);
+      }
+    }
+  }
+  &__tooltip-title {
+    @include default-text(14px, 14px, inherit);
+  }
+  &__tooltip-row {
+    padding: 2px 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: var(--color-score-tooltip-row-bg);
+    font-weight: bold;
+    text-align: center;
+    border-radius: 6px;
+    @media (max-width: $phone-l) {
+      width: 250px;
+      display: grid;
+      grid-template-columns: min-content auto 1fr;
+      grid-template-areas:
+        "rank mods score"
+        "rank stats points";
+      row-gap: 4px;
+      column-gap: 12px;
+      padding: 8px 10px;
+    }
+  }
+  &__tooltip-rank {
+    font-size: 18px;
+    width: 23px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+    &.rank-X,
+    &.rank-SS,
+    &.rank-S {
+      color: var(--color-rank-s-or-ss);
+    }
+    &.rank-XH,
+    &.rank-SSH,
+    &.rank-SH {
+      color: var(--color-rank-silver-s-or-ss);
+    }
+    &.rank-A {
+      color: var(--color-rank-a);
+    }
+    &.rank-B {
+      color: var(--color-rank-b);
+    }
+    &.rank-C {
+      color: var(--color-rank-c);
+    }
+    &.rank-D {
+      color: var(--color-rank-d);
+    }
+    &.rank-F {
+      color: var(--color-rank-f);
+    }
+    @media (max-width: $phone-l) {
+      grid-area: rank;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  &__tooltip-mods {
+    width: 50px;
+    @media (max-width: $phone-l) {
+      grid-area: mods;
+      width: auto;
+      text-align: left;
+    }
+  }
+  &__tooltip-score {
+    width: 75px;
+    @media (max-width: $phone-l) {
+      grid-area: score;
+      width: auto;
+      text-align: right;
+    }
+  }
+  &__tooltip-stats {
+    width: 110px;
+    @media (max-width: $phone-l) {
+      grid-area: stats;
+      width: auto;
+      text-align: left;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+  }
+  &__tooltip-points {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 80px;
+    color: var(--color-points);
+    text-shadow:
+      1px 1px 0 #000,
+      -1px -1px 0 #000,
+      1px -1px 0 #000,
+      -1px 1px 0 #000;
+    @media (max-width: $phone-l) {
+      grid-area: points;
+      justify-content: flex-end;
+      width: auto;
+    }
   }
 }
 </style>

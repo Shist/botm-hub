@@ -94,17 +94,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from "vue";
-import { useOsumapsStore } from "@/stores/osumaps";
+import { ref, reactive, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { useOsumapsStore } from "@/stores/osumaps";
+import { useScoresStore } from "@/stores/scores";
 import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import SkillsetsSelect from "@/components/osumaps/SkillsetsSelect.vue";
 import useToast from "@/composables/useToast";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import { fromDurationToSeconds, fromTotalSecondsToLabel } from "@/utils";
 
-const mapsStore = useOsumapsStore();
 const authStore = useAuthStore();
+const mapsStore = useOsumapsStore();
+const scoresStore = useScoresStore();
 
 const { setErrorToast, setSuccessToast } = useToast();
 
@@ -221,6 +223,15 @@ const onConfirm = async () => {
 
   setSuccessToast("Карты для тренировки успешно подготовлены!");
 };
+
+onMounted(async () => {
+  try {
+    await Promise.all([mapsStore.loadAllMaps(), scoresStore.loadAllScores()]);
+  } catch (error) {
+    const msg = error instanceof Error ? error?.message : error;
+    setErrorToast(`Не удалось загрузить данные карт или скоров: ${msg}`);
+  }
+});
 </script>
 
 <style lang="scss" scoped>

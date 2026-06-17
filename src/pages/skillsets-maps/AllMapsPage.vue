@@ -24,10 +24,13 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import { useOsumapsStore } from "@/stores/osumaps";
+import { useScoresStore } from "@/stores/scores";
 import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import useToast from "@/composables/useToast";
 
 const mapsStore = useOsumapsStore();
+const scoresStore = useScoresStore();
+
 const { setErrorToast } = useToast();
 
 const filteredMapsCount = ref(0);
@@ -40,10 +43,10 @@ const isLoading = computed(() => mapsStore.isLoading);
 
 onMounted(async () => {
   try {
-    await mapsStore.loadAllMaps();
+    await Promise.all([mapsStore.loadAllMaps(), scoresStore.loadAllScores()]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить карты: ${msg}`);
+    setErrorToast(`Не удалось загрузить данные карт или скоров: ${msg}`);
   }
 });
 </script>

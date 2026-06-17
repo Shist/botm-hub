@@ -38,6 +38,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { useOsumapsStore } from "@/stores/osumaps";
+import { useScoresStore } from "@/stores/scores";
 import useToast from "@/composables/useToast";
 import SkillsetsMapsTable from "@/components/osumaps/SkillsetsMapsTable.vue";
 import { MAPS_CATEGORIES } from "@/constants";
@@ -46,6 +47,7 @@ import { OsuMapCategory } from "@/types/osumaps";
 const route = useRoute();
 
 const mapsStore = useOsumapsStore();
+const scoresStore = useScoresStore();
 
 const { setErrorToast } = useToast();
 
@@ -74,10 +76,10 @@ const isLoading = computed(() => mapsStore.isLoading);
 
 onMounted(async () => {
   try {
-    await mapsStore.loadAllMaps();
+    await Promise.all([mapsStore.loadAllMaps(), scoresStore.loadAllScores()]);
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось загрузить карты для пула: ${msg}`);
+    setErrorToast(`Не удалось загрузить данные карт или скоров: ${msg}`);
   }
 });
 </script>
