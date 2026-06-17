@@ -231,6 +231,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch, onMounted } from "vue";
+import { verifyOsuPlayer } from "@/services/botm-hub-api";
 import { useAuthStore } from "@/stores/auth";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
@@ -251,7 +252,7 @@ const usersStore = useUsersStore();
 const osumapsStore = useOsumapsStore();
 const scoresStore = useScoresStore();
 
-const { setErrorToast, setSuccessToast } = useToast();
+const { setLoadingToast, setErrorToast, setSuccessToast } = useToast();
 const { isFormValid, rules } = useFormValidation();
 
 const chosenOsuId = ref<number | null>(null);
@@ -376,21 +377,52 @@ onMounted(async () => {
 const onUpdate = async () => {
   try {
     isUpdating.value = true;
+    const newOsuId = chosenOsuId.value === null ? null : `${chosenOsuId.value}`;
+    const newNick = chosenNick.value?.trim() ?? "";
 
+    const isIdChanged = newOsuId !== currentOsuId.value;
+    const isNickChanged = newNick !== currentNick.value;
+
+    setLoadingToast("Проверка данных...");
+
+    if (newOsuId && isIdChanged) {
+      const idVerification = await verifyOsuPlayer(newOsuId, "id");
+      if (!idVerification.isValid) {
+        if (idVerification.reason === "NOT_FOUND")
+          throw new Error("Указанный osu! ID не существует!");
+        if (idVerification.reason === "NOT_BY")
+          throw new Error(
+            "Указанный osu! ID не принадлежит игроку из Беларуси!"
+          );
+      }
+    }
+
+    if (newNick && isNickChanged) {
+      const nickVerification = await verifyOsuPlayer(newNick, "username");
+      if (!nickVerification.isValid) {
+        if (nickVerification.reason === "NOT_FOUND")
+          throw new Error(`Игрок "${newNick}" не найден!`);
+        if (nickVerification.reason === "NOT_BY")
+          throw new Error(`Игрок "${newNick}" не из Беларуси!`);
+      }
+    }
+
+    setLoadingToast("Сохранение...");
     await authStore.updateUserAdditionalInfo({
-      osuId: chosenOsuId.value === null ? null : `${chosenOsuId.value}`,
-      nick: chosenNick.value?.trim() ?? "",
+      osuId: newOsuId,
+      nick: newNick,
       digitCategory: chosenDigit.value,
       profileThemeColor: chosenThemeColor.value || null,
       profileBannerUrl: chosenBannerUrl.value?.trim() || null,
       skillsets: JSON.stringify(chosenCategories.value),
       profileDescription: chosenDescription.value?.trim() || null,
     });
+
     await usersStore.loadAllUsers();
     setSuccessToast("🥳🥳🥳 Информация успешно обновлена!!! 🥳🥳🥳");
   } catch (error) {
     const msg = error instanceof Error ? error?.message : error;
-    setErrorToast(`Не удалось обновить информацию: ${msg}`);
+    setErrorToast(`Не удалось обновить: ${msg}`);
   } finally {
     isUpdating.value = false;
   }

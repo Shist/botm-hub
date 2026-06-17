@@ -94,6 +94,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { verifyOsuPlayer } from "@/services/botm-hub-api";
 import { useAuthStore } from "@/stores/auth";
 import useToast from "@/composables/useToast";
 import useFormValidation from "@/composables/useFormValidation";
@@ -115,10 +116,26 @@ const isLoading = ref(false);
 
 const onConfirmBtnClicked = async () => {
   isLoading.value = true;
-  setLoadingToast("Регистрация...");
+  setLoadingToast("Проверка osu! аккаунта...");
 
   try {
-    const partialInfo = { nick: nick.value.trim(), email: email.value };
+    const rawNick = nick.value.trim();
+
+    const verification = await verifyOsuPlayer(rawNick, "username");
+
+    if (!verification.isValid) {
+      if (verification.reason === "NOT_FOUND") {
+        throw new Error(`Игрок с ником "${rawNick}" не найден в osu!`);
+      } else if (verification.reason === "NOT_BY") {
+        throw new Error("For now this app is only for players from Belarus...");
+      } else {
+        throw new Error("Ошибка верификации аккаунта!");
+      }
+    }
+    const verifiedNick = verification.nick ?? rawNick;
+
+    setLoadingToast("Регистрация в Firebase...");
+    const partialInfo = { nick: verifiedNick, email: email.value };
     await authStore.signUpUser(email.value, password.value, partialInfo);
 
     email.value = "";
@@ -130,7 +147,7 @@ const onConfirmBtnClicked = async () => {
     router.replace({ name: "main" });
   } catch (error: unknown) {
     if (error instanceof Error) {
-      const errorMsg = getFirebaseErrorMsg(error);
+      const errorMsg = getFirebaseErrorMsg(error) ?? error.message;
       setErrorToast(errorMsg);
     }
   } finally {

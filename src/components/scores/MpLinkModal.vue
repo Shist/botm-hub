@@ -85,6 +85,7 @@
 
 <script lang="ts" setup>
 import { ref, computed, watch } from "vue";
+import { fetchOsuMatch } from "@/services/botm-hub-api";
 import ParsedScoresList from "@/components/scores/ParsedScoresList.vue";
 import useToast from "@/composables/useToast";
 import { useAuthStore } from "@/stores/auth";
@@ -180,28 +181,7 @@ const fetchAndProcessLobby = async () => {
   isFetching.value = true;
 
   try {
-    const response = await fetch(
-      `https://botm-hub-api.vercel.app/api/match?id=${chosenMpLinkId.value}`
-    );
-
-    if (!response.ok) {
-      let errorText = `Ошибка сервера: ${response.status}`;
-      try {
-        const errorData = await response.json();
-        if (errorData.error) errorText = errorData.error;
-      } catch (error) {
-        console.error("For some reason both-hub-api returned not JSON:", error);
-      }
-      if (response.status === 404 || errorText.includes("404")) {
-        throw new Error("Лобби с таким ID не существует!");
-      }
-      if (response.status === 401 || errorText.includes("401")) {
-        throw new Error("Это приватное лобби! API osu! не даёт к нему доступ!");
-      }
-      throw new Error(errorText);
-    }
-
-    const data = await response.json();
+    const data = await fetchOsuMatch(chosenMpLinkId.value);
 
     await loadDependencies();
 
