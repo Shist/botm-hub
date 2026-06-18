@@ -7,7 +7,7 @@ export const SHIST_UID = "mjFMxVxnVrdAuYf0wYHY7Zb3KRl2";
 export const MAX_ROSTERS_COUNT = 32;
 
 export const CHUNKS_LIMITS = {
-  SCORES: 5000,
+  SCORES: 10000,
   USERS: 500,
   TRAININGS: 500,
   TOURNAMENTS: 30,
