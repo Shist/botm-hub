@@ -27,21 +27,13 @@ export interface IScore {
   score: number;
   accuracy: number;
   combo: number;
-  points: number;
 }
 
 export type IMapScores = Partial<Record<OsuScoreMod, IScore>>;
 
 export type IAllScores = Record<string, Record<string, IMapScores>>;
 
-export type IFirebaseScoreRecord = [
-  Timestamp,
-  string,
-  string,
-  string,
-  string,
-  string,
-];
+export type IFirebaseScoreRecord = [Timestamp, string, string, string, string];
 
 export type IAllScoresFirebase = Record<
   string,
@@ -117,12 +109,15 @@ export interface IMpModalScore {
   passed: boolean;
   percentage: number;
   isInsufficient: boolean;
-  points: number;
   isSelected: boolean;
   isDbScore: boolean;
-  mapId?: number;
-  mods?: string[];
   date: Date;
+}
+
+export interface IScoreUploadPayload {
+  mapId: number;
+  mods: string[];
+  score: IMpModalScore;
 }
 
 export interface IMpModalGroup {
@@ -131,7 +126,6 @@ export interface IMpModalGroup {
   mods: string[];
   mapInfo: IOsuApiMapInfo | null;
   dbMapInfo: IOsuMap;
-  stars: number;
   scores: IMpModalScore[];
 }
 
