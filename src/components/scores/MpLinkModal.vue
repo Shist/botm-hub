@@ -92,16 +92,13 @@ import { useAuthStore } from "@/stores/auth";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import { isValidModCombinationForCategory } from "@/utils";
-import {
-  getAdjustedScore,
-  getMaxScoreForMods,
-  calculateBasePoints,
-} from "@/utils/scores-calcs";
+import { getAdjustedScore, getMaxScoreForMods } from "@/utils/scores-calcs";
 import { OsuMapCategory } from "@/types/osumaps";
 import {
   type IOsuApiEvent,
   type IOsuApiScore,
   type IMpModalScore,
+  type IScoreUploadPayload,
   type IMpModalGroup,
   isOsuScoreMod,
 } from "@/types/scores";
@@ -262,14 +259,15 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
   );
 
   rawScores.forEach((score) => {
-    const dbMap = allMaps.find(
+    const validDbMaps = allMaps.filter(
       (m) =>
         m.id === score.mapId &&
         isValidModCombinationForCategory(score.mods, m.category)
     );
-    if (!dbMap) return;
 
-    const stars = dbMap.starRate;
+    const baseDbMap = validDbMaps[0];
+    if (validDbMaps.length === 0 || !baseDbMap) return;
+
     const groupKey = `${score.mapId}_${score.mods.join("")}`;
 
     if (!groupsMap.has(groupKey)) {
@@ -278,22 +276,15 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
         mapId: score.mapId,
         mods: score.mods,
         mapInfo: score.mapInfo,
-        dbMapInfo: dbMap,
-        stars: stars,
+        dbMapInfo: baseDbMap,
         scores: [],
       });
     }
 
     const adjustedScore = getAdjustedScore(score.score, score.mods);
     const maxScore = getMaxScoreForMods(score.mods);
-    const percentage = (adjustedScore / maxScore) * 100;
+    const percentage = maxScore > 0 ? (adjustedScore / maxScore) * 100 : 0;
     const isInsufficient = percentage < 60;
-
-    let calculatedPoints = 0;
-    if (!isInsufficient && adjustedScore > 0) {
-      calculatedPoints = calculateBasePoints(percentage, stars);
-      calculatedPoints = Math.round(calculatedPoints * 100) / 100;
-    }
 
     groupsMap.get(groupKey)!.scores.push({
       gameId: score.gameId,
@@ -304,11 +295,8 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
       passed: score.passed,
       percentage,
       isInsufficient,
-      points: calculatedPoints,
       isSelected: false,
       isDbScore: false,
-      mapId: score.mapId,
-      mods: score.mods,
       date: score.date,
     });
   });
@@ -329,7 +317,8 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
 
         if (dbScore) {
           const maxScore = getMaxScoreForMods(group.mods);
-          const percentage = (dbScore.score / maxScore) * 100;
+          const percentage =
+            maxScore > 0 ? (dbScore.score / maxScore) * 100 : 0;
 
           group.scores.push({
             gameId: `db_${group.mapId}_${rawModKey}`,
@@ -340,7 +329,6 @@ const groupAndFormatScores = (rawScores: IOsuApiScore[]): IMpModalGroup[] => {
             passed: true,
             percentage,
             isInsufficient: false,
-            points: dbScore.points,
             isSelected: false,
             isDbScore: true,
             date: dbScore.date,
@@ -391,9 +379,12 @@ const toggleScoreSelection = (
 const confirmAndUpload = async () => {
   if (!currentUserUid.value) return;
 
-  const selectedToUpload: IMpModalScore[] = [];
+  const selectedToUpload: IScoreUploadPayload[] = [];
+
   groupedScores.value.forEach((group) => {
-    const selected = group.scores.filter((s) => s.isSelected);
+    const selected = group.scores
+      .filter((s) => s.isSelected)
+      .map((s) => ({ mapId: group.mapId, mods: group.mods, score: s }));
     selectedToUpload.push(...selected);
   });
 

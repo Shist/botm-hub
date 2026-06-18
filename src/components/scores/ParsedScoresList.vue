@@ -27,7 +27,7 @@
                 }}
               </span>
               <span class="parsed-scores-list__map-star-rate">
-                ({{ group.stars.toFixed(2) }}★)
+                ({{ group.dbMapInfo.starRate.toFixed(2) }}★)
               </span>
             </div>
             <v-chip
@@ -202,8 +202,8 @@ const enrichedGroupedScores = computed(() => {
 
   return props.groupedScores.map((group) => {
     const enrichedScores = group.scores.map((score) => {
-      const actualMods = score.mods ?? group.mods;
-      const actualMapId = score.mapId ?? group.mapId;
+      const actualMods = group.mods;
+      const actualMapId = group.mapId;
 
       const rawModKey = (
         actualMods && actualMods.length ? actualMods.join("") : "nm"
@@ -219,18 +219,19 @@ const enrichedGroupedScores = computed(() => {
           isValidModCombinationForCategory(modsArray, m.category)
       );
 
-      const basePts =
-        score.percentage >= 60
-          ? calculateBasePoints(score.percentage, group.stars)
-          : 0;
-
       const validSrInfo = validDbMaps
         .map((m) => {
+          const currentBasePts =
+            score.percentage >= 60
+              ? calculateBasePoints(score.percentage, m.starRate)
+              : 0;
+
           const finalPts = calculateFinalCategoryPoints(
-            basePts,
+            currentBasePts,
             m.category,
             modsArray
           );
+
           return {
             category: m.category,
             finalPoints: finalPts,

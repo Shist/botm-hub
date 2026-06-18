@@ -10,6 +10,7 @@ import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import {
   getMaxScoreForMods,
+  calculateBasePoints,
   calculateFinalCategoryPoints,
 } from "@/utils/scores-calcs";
 import {
@@ -21,7 +22,7 @@ import { OsuMapCategory, isOsuMapCategory } from "@/types/osumaps";
 import {
   type IAllScores,
   type IFirebaseScoreRecord,
-  type IMpModalScore,
+  type IScoreUploadPayload,
   type IScoreTableRow,
   type OsuScoreMod,
   type IStatBucket,
@@ -47,7 +48,6 @@ export const useScoresStore = defineStore("scores", () => {
   const usersStore = useUsersStore();
 
   const allScores = ref<IAllScores>({});
-
   const isLoaded = ref(false);
   let loadPromise: Promise<void> | null = null;
 
@@ -77,11 +77,13 @@ export const useScoresStore = defineStore("scores", () => {
     });
 
     const allMapsList = Object.values(osumapsStore.osumaps).flat();
-    const mapsDataMap = new Map<number, OsuMapCategory[]>();
+
+    const mapsDataMap = new Map<number, Record<OsuMapCategory, number>>();
     allMapsList.forEach((m) => {
-      if (!mapsDataMap.has(m.id)) mapsDataMap.set(m.id, []);
-      const categories = mapsDataMap.get(m.id)!;
-      if (!categories.includes(m.category)) categories.push(m.category);
+      if (!mapsDataMap.has(m.id)) {
+        mapsDataMap.set(m.id, {} as Record<OsuMapCategory, number>);
+      }
+      mapsDataMap.get(m.id)![m.category] = m.starRate ?? 0;
     });
 
     for (const [uid, mapsRecord] of Object.entries(allScores.value)) {
@@ -90,16 +92,18 @@ export const useScoresStore = defineStore("scores", () => {
 
       for (const [mapIdStr, modsRecord] of Object.entries(mapsRecord)) {
         const mapIdNum = Number(mapIdStr);
-        const mapCategories = mapsDataMap.get(mapIdNum);
-        if (!mapCategories) continue;
+        const mapCategoriesInfo = mapsDataMap.get(mapIdNum);
+        if (!mapCategoriesInfo) continue;
 
         for (const [modKey, scoreData] of Object.entries(modsRecord)) {
-          const basePoints = scoreData.points;
-
           const modsArray =
             modKey === "nm"
               ? ["NM"]
               : (modKey.toUpperCase().match(/.{1,2}/g) ?? []);
+
+          const maxScore = getMaxScoreForMods(modsArray);
+          const percentage =
+            maxScore > 0 ? (scoreData.score / maxScore) * 100 : 0;
 
           let maxOverallPoints = 0;
           const clubMaxPoints = new Map<BotmClub, number>();
@@ -112,11 +116,14 @@ export const useScoresStore = defineStore("scores", () => {
             bucket.sumCombo += scoreData.combo;
           };
 
-          mapCategories.forEach((category) => {
+          Object.entries(mapCategoriesInfo).forEach(([catStr, stars]) => {
+            const category = catStr as OsuMapCategory;
             const allowedMods = VALID_MODS_FOR_CATEGORY[category];
+
             if (isOsuScoreMod(modKey) && allowedMods.includes(modKey)) {
+              const currentBasePoints = calculateBasePoints(percentage, stars);
               const finalCategoryPoints = calculateFinalCategoryPoints(
-                basePoints,
+                currentBasePoints,
                 category,
                 modsArray
               );
@@ -184,7 +191,11 @@ export const useScoresStore = defineStore("scores", () => {
     const allMapsList = Object.values(osumapsStore.osumaps).flat();
     const mapsDataMap = new Map<
       number,
-      { mapsetId: number; name: string; categories: OsuMapCategory[] }
+      {
+        mapsetId: number;
+        name: string;
+        categories: { category: OsuMapCategory; stars: number }[];
+      }
     >();
 
     allMapsList.forEach((m) => {
@@ -196,8 +207,8 @@ export const useScoresStore = defineStore("scores", () => {
         });
       }
       const data = mapsDataMap.get(m.id)!;
-      if (!data.categories.includes(m.category)) {
-        data.categories.push(m.category);
+      if (!data.categories.find((c) => c.category === m.category)) {
+        data.categories.push({ category: m.category, stars: m.starRate ?? 0 });
       }
     });
 
@@ -215,7 +226,6 @@ export const useScoresStore = defineStore("scores", () => {
         if (!mapData) continue;
 
         for (const [modKey, scoreData] of Object.entries(modsRecord)) {
-          const basePoints = scoreData.points;
           const scoreNum = scoreData.score;
           const modsArray =
             modKey === "nm"
@@ -223,26 +233,31 @@ export const useScoresStore = defineStore("scores", () => {
               : (modKey.toUpperCase().match(/.{1,2}/g) ?? []);
 
           const maxScore = getMaxScoreForMods(modsArray);
-          const percentage = (scoreNum / maxScore) * 100;
+          const percentage = maxScore > 0 ? (scoreNum / maxScore) * 100 : 0;
 
-          let maxFinalPoints = basePoints;
-          let hasValidCategory = false;
+          let maxFinalPoints = 0;
+          let bestBasePoints = 0;
 
           if (mapData.categories.length > 0) {
-            let maxCalculated = 0;
-            mapData.categories.forEach((category) => {
-              const allowedMods = VALID_MODS_FOR_CATEGORY[category];
+            mapData.categories.forEach((catInfo) => {
+              const allowedMods = VALID_MODS_FOR_CATEGORY[catInfo.category];
               if (isOsuScoreMod(modKey) && allowedMods.includes(modKey)) {
-                hasValidCategory = true;
+                const currentBasePts = calculateBasePoints(
+                  percentage,
+                  catInfo.stars
+                );
                 const finalPts = calculateFinalCategoryPoints(
-                  basePoints,
-                  category,
+                  currentBasePts,
+                  catInfo.category,
                   modsArray
                 );
-                if (finalPts > maxCalculated) maxCalculated = finalPts;
+
+                if (finalPts > maxFinalPoints) {
+                  maxFinalPoints = finalPts;
+                  bestBasePoints = currentBasePts;
+                }
               }
             });
-            if (hasValidCategory) maxFinalPoints = maxCalculated;
           }
 
           flatScores.push({
@@ -251,7 +266,7 @@ export const useScoresStore = defineStore("scores", () => {
             user: userInfo,
             mapId: mapIdNum,
             mapsetId: mapData.mapsetId,
-            mapCategories: mapData.categories,
+            mapCategories: mapData.categories.map((c) => c.category),
             mapName: mapData.name,
             mods: modKey as OsuScoreMod,
             date: scoreData.date,
@@ -259,7 +274,7 @@ export const useScoresStore = defineStore("scores", () => {
             score: scoreData.score,
             accuracy: scoreData.accuracy,
             combo: scoreData.combo,
-            basePoints: basePoints,
+            basePoints: bestBasePoints,
             points: maxFinalPoints,
             percentage: percentage,
           });
@@ -299,7 +314,6 @@ export const useScoresStore = defineStore("scores", () => {
                   score: Number(scoreArr[2]),
                   accuracy: Number(scoreArr[3]),
                   combo: Number(scoreArr[4]),
-                  points: Number(scoreArr[5]),
                 };
               }
             }
@@ -316,7 +330,10 @@ export const useScoresStore = defineStore("scores", () => {
     isLoaded.value = true;
   };
 
-  const uploadScores = async (uid: string, newScores: IMpModalScore[]) => {
+  const uploadScores = async (
+    uid: string,
+    newScores: IScoreUploadPayload[]
+  ) => {
     if (!uid || newScores.length === 0) return;
 
     const formattedForFirebase: Record<
@@ -324,18 +341,18 @@ export const useScoresStore = defineStore("scores", () => {
       Record<string, IFirebaseScoreRecord>
     > = {};
 
-    newScores.forEach((score) => {
-      if (!score.mapId) return;
-
-      const mapIdStr = String(score.mapId);
+    newScores.forEach(({ mapId, mods, score }) => {
+      const mapIdStr = String(mapId);
       const rawModKey = (
-        score.mods && score.mods.length ? score.mods.join("") : "nm"
+        mods && mods.length ? mods.join("") : "nm"
       ).toLowerCase();
 
       if (isOsuScoreMod(rawModKey)) {
         formattedForFirebase[mapIdStr] ??= {};
 
-        const scoreTimestamp = Timestamp.fromDate(score.date);
+        const scoreDate =
+          score.date instanceof Date ? score.date : new Date(score.date);
+        const scoreTimestamp = Timestamp.fromDate(scoreDate);
         const accToSave = Math.round(score.accuracy * 10000) / 100;
 
         formattedForFirebase[mapIdStr][rawModKey] = [
@@ -344,7 +361,6 @@ export const useScoresStore = defineStore("scores", () => {
           String(score.score),
           String(accToSave),
           String(score.combo),
-          score.points.toFixed(2),
         ];
       }
     });
@@ -359,32 +375,26 @@ export const useScoresStore = defineStore("scores", () => {
       metaStore.metaConfig.chunks.scores = newChunksCount;
     }
 
-    newScores.forEach((score) => {
-      if (!score.mapId) return;
-
-      const mapIdStr = String(score.mapId);
+    newScores.forEach(({ mapId, mods, score }) => {
+      const mapIdStr = String(mapId);
       const rawModKey = (
-        score.mods && score.mods.length ? score.mods.join("") : "nm"
+        mods && mods.length ? mods.join("") : "nm"
       ).toLowerCase();
 
       if (isOsuScoreMod(rawModKey)) {
         allScores.value[uid] ??= {};
-
         const userScores = allScores.value[uid];
-
         userScores[mapIdStr] ??= {};
-
         const mapScores = userScores[mapIdStr];
 
         const accToSave = Math.round(score.accuracy * 10000) / 100;
 
         mapScores[rawModKey] = {
-          date: score.date,
+          date: score.date instanceof Date ? score.date : new Date(score.date),
           rank: score.rank,
           score: score.score,
           accuracy: accToSave,
           combo: score.combo,
-          points: Number(score.points.toFixed(2)),
         };
       }
     });

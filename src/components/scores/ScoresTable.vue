@@ -344,7 +344,10 @@ import useToast from "@/composables/useToast";
 import UserCard from "@/components/users/UserCard.vue";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { formatMapRank, isValidModCombinationForCategory } from "@/utils";
-import { calculateFinalCategoryPoints } from "@/utils/scores-calcs";
+import {
+  calculateBasePoints,
+  calculateFinalCategoryPoints,
+} from "@/utils/scores-calcs";
 import { DigitCategory } from "@/types/users";
 import { OsuMapCategory } from "@/types/osumaps";
 import { type ScoresTableHeader, type IScoreTableRow } from "@/types/scores";
@@ -519,8 +522,14 @@ const enrichedScoresList = computed(() => {
     const validSrInfo = validDbMaps
       .map((m) => {
         const categoryUpper = m.category.toUpperCase();
-        const basePts = calculateFinalCategoryPoints(
-          score.basePoints,
+
+        const currentBasePts =
+          score.percentage >= 60
+            ? calculateBasePoints(score.percentage, m.starRate)
+            : 0;
+
+        const finalPts = calculateFinalCategoryPoints(
+          currentBasePts,
           m.category,
           modsArray
         );
@@ -529,7 +538,7 @@ const enrichedScoresList = computed(() => {
           category: m.category,
           sr: m.starRate,
           isFmTb: categoryUpper.startsWith("FM") || categoryUpper === "TB",
-          finalPoints: basePts,
+          finalPoints: finalPts,
         };
       })
       .sort((a, b) => b.finalPoints - a.finalPoints);

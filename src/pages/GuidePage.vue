@@ -265,8 +265,7 @@ const calcResults = computed(() => {
   const percentage = (adjustedScore / maxScore) * 100;
   const isFail = percentage < 60;
 
-  const basePoints =
-    Math.round(calculateBasePoints(percentage, sr) * 100) / 100;
+  const basePoints = calculateBasePoints(percentage, sr);
   const finalPoints = calculateFinalCategoryPoints(
     basePoints,
     category,

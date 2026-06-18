@@ -155,7 +155,11 @@ import useToast from "@/composables/useToast";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 import { formatMapRank } from "@/utils";
-import { calculateFinalCategoryPoints } from "@/utils/scores-calcs";
+import {
+  calculateBasePoints,
+  getMaxScoreForMods,
+  calculateFinalCategoryPoints,
+} from "@/utils/scores-calcs";
 import {
   OsuMapCategory,
   type IOsuMap,
@@ -254,8 +258,13 @@ const filteredItemsForTable = computed(() => {
             ? ["NM"]
             : (rawModKey.toUpperCase().match(/.{1,2}/g) ?? []);
 
+        const maxScore = getMaxScoreForMods(modsArray);
+        const percentage =
+          maxScore > 0 ? (scoreData.score / maxScore) * 100 : 0;
+        const basePoints = calculateBasePoints(percentage, item.starRate);
+
         const finalPts = calculateFinalCategoryPoints(
-          scoreData.points,
+          basePoints,
           item.category,
           modsArray
         );

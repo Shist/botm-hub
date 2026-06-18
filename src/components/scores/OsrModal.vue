@@ -138,16 +138,13 @@ import { useAuthStore } from "@/stores/auth";
 import { useOsumapsStore } from "@/stores/osumaps";
 import { useScoresStore } from "@/stores/scores";
 import { isValidModCombinationForCategory } from "@/utils";
-import {
-  getAdjustedScore,
-  getMaxScoreForMods,
-  calculateBasePoints,
-} from "@/utils/scores-calcs";
+import { getAdjustedScore, getMaxScoreForMods } from "@/utils/scores-calcs";
 import { OsrParser } from "@/utils/osr-parser";
 import { VALID_MODS_FOR_CATEGORY } from "@/constants";
 import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
 import {
   type IMpModalScore,
+  type IScoreUploadPayload,
   type IMpModalGroup,
   isOsuScoreMod,
   type IParsedOsr,
@@ -407,7 +404,6 @@ const groupAndFormatScores = (
 
   rawScores.forEach((parsed) => {
     const dbMap = parsed.dbMap;
-    const stars = dbMap.starRate;
     const groupKey = `${dbMap.id}_${parsed.parsedMods.join("")}`;
 
     if (!groupsMap.has(groupKey)) {
@@ -420,10 +416,9 @@ const groupAndFormatScores = (
           version: "",
           coverUrl: `https://assets.ppy.sh/beatmaps/${dbMap.mapsetId}/covers/cover.jpg`,
           fullName: dbMap.name,
-          stars: stars,
+          stars: dbMap.starRate,
         },
         dbMapInfo: dbMap,
-        stars: stars,
         scores: [],
       });
     }
@@ -436,12 +431,6 @@ const groupAndFormatScores = (
     const percentage = (adjustedScore / maxScore) * 100;
     const isInsufficient = percentage < 60;
 
-    let calculatedPoints = 0;
-    if (!isInsufficient && adjustedScore > 0) {
-      calculatedPoints = calculateBasePoints(percentage, stars);
-      calculatedPoints = Math.round(calculatedPoints * 100) / 100;
-    }
-
     groupsMap.get(groupKey)!.scores.push({
       gameId: parsed.replayMD5 || crypto.randomUUID(),
       score: adjustedScore,
@@ -451,11 +440,8 @@ const groupAndFormatScores = (
       passed: parsed.totalScore > 0,
       percentage,
       isInsufficient,
-      points: calculatedPoints,
       isSelected: false,
       isDbScore: false,
-      mapId: dbMap.id,
-      mods: parsed.parsedMods,
       date: parsed.date,
     });
   });
@@ -484,7 +470,6 @@ const groupAndFormatScores = (
             passed: true,
             percentage,
             isInsufficient: false,
-            points: dbScore.points,
             isSelected: false,
             isDbScore: true,
             date: dbScore.date,
@@ -535,9 +520,12 @@ const toggleScoreSelection = (
 const confirmAndUpload = async () => {
   if (!currentUserUid.value) return;
 
-  const selectedToUpload: IMpModalScore[] = [];
+  const selectedToUpload: IScoreUploadPayload[] = [];
+
   groupedScores.value.forEach((group) => {
-    const selected = group.scores.filter((s) => s.isSelected);
+    const selected = group.scores
+      .filter((s) => s.isSelected)
+      .map((s) => ({ mapId: group.mapId, mods: group.mods, score: s }));
     selectedToUpload.push(...selected);
   });
 
