@@ -329,7 +329,7 @@ const processFiles = async (files: FileList) => {
         if (matchingMaps.length === 0) {
           errorsList.value.push({
             id: crypto.randomUUID(),
-            text: `${file.name}: Карта не найдена в пулах BOTM`,
+            text: `${file.name}: Карта либо не найдена в пулах BOTM, либо маппер обновил её, после чего MD5-хеш карты в базе устарел (в этом случае нужно передать админу актуальный хеш: ${parsedData.beatmapMD5})`,
           });
           continue;
         }
