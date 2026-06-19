@@ -170,8 +170,9 @@ import { useOsumapsStore } from "@/stores/osumaps";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { formatMapRank, isValidModCombinationForCategory } from "@/utils";
 import {
-  calculateFinalCategoryPoints,
+  getAdjustedStarRate,
   calculateBasePoints,
+  calculateFinalCategoryPoints,
 } from "@/utils/scores-calcs";
 import { OsuMapCategory } from "@/types/osumaps";
 import type { IMpModalGroup, IMpModalScore } from "@/types/scores";
@@ -223,13 +224,15 @@ const enrichedGroupedScores = computed(() => {
         .map((m) => {
           const currentBasePts =
             score.percentage >= 60
-              ? calculateBasePoints(score.percentage, m.starRate)
+              ? calculateBasePoints(
+                  score.percentage,
+                  getAdjustedStarRate(m.starRate, m.category, modsArray)
+                )
               : 0;
 
           const finalPts = calculateFinalCategoryPoints(
             currentBasePts,
-            m.category,
-            modsArray
+            m.category
           );
 
           return {

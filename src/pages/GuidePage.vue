@@ -48,6 +48,51 @@
           <div v-if="isValidForCalculation" class="guide-page__results">
             <h4 class="guide-page__results-title">Результат:</h4>
             <div class="guide-page__result-row">
+              <span>
+                Старрейт Карты (<span class="math-var math-var_map-sr"
+                  >MapStarRate</span
+                >):
+              </span>
+              <b class="math-var math-var_map-sr">
+                {{ Number(starRate).toFixed(2) }}★
+              </b>
+            </div>
+            <div class="guide-page__result-row">
+              <span>
+                Бонусный Старрейт (<span class="math-var math-var_fm-bonus"
+                  >FreeModBonus</span
+                >):
+              </span>
+              <b class="math-var math-var_fm-bonus">
+                +{{
+                  (
+                    (calcResults?.adjustedStarRate ?? 0) - Number(starRate)
+                  ).toFixed(2)
+                }}★
+              </b>
+            </div>
+            <div class="guide-page__result-row">
+              <span>
+                Фактический Старрейт (<span class="math-var math-var_actual-sr"
+                  >ActualStarRate</span
+                >):
+              </span>
+              <b class="math-var math-var_actual-sr">
+                {{ calcResults?.adjustedStarRate.toFixed(2) }}★
+              </b>
+            </div>
+            <div class="guide-page__result-row">
+              <span>
+                Куб Старрейта (<span class="math-var math-var_actual-sr"
+                  >ActualStarRate</span
+                ><sup>3</sup>):
+              </span>
+              <b class="math-var math-var_actual-sr">
+                {{ calcResults?.cubedSr.toFixed(2) }}
+              </b>
+            </div>
+            <v-divider class="border-opacity-100" />
+            <div class="guide-page__result-row">
               <span>Скор{{ calcResults?.hasEZ ? " (с учётом EZ)" : "" }}:</span>
               <b>{{ calcResults?.adjustedScore.toLocaleString("ru-RU") }}</b>
             </div>
@@ -56,8 +101,16 @@
               <b>{{ calcResults?.maxScore.toLocaleString("ru-RU") }}</b>
             </div>
             <div class="guide-page__result-row">
-              <span>Процент выполнения (Percent):</span>
-              <b :class="{ 'guide-page__text-error': calcResults?.isFail }">
+              <span>
+                Процент выполнения (<span
+                  class="math-var math-var_score-percent"
+                  >ScorePercent</span
+                >):
+              </span>
+              <b
+                class="math-var math-var_score-percent"
+                :class="{ 'guide-page__text-error': calcResults?.isFail }"
+              >
                 {{ calcResults?.percentage.toFixed(2) }}%
               </b>
             </div>
@@ -66,16 +119,25 @@
             </div>
             <template v-else>
               <div class="guide-page__result-row">
-                <span>Базовые очки (BasePoints):</span>
-                <b>{{ calcResults?.basePoints.toFixed(2) }}</b>
+                <span>
+                  Множитель Скора (<span class="math-var math-var_score-mult"
+                    >ScoreMultiplier</span
+                  >):
+                </span>
+                <b class="math-var math-var_score-mult">
+                  x{{ calcResults?.scoreMultiplier.toFixed(3) }}
+                </b>
               </div>
+              <v-divider class="border-opacity-100" />
               <div class="guide-page__result-row">
-                <span>Множитель скиллсета:</span>
-                <b>x{{ calcResults?.categoryMultiplier.toFixed(2) }}</b>
-              </div>
-              <div class="guide-page__result-row">
-                <span>Бонус за мод (для FM/TB):</span>
-                <b>x{{ calcResults?.fmTbMultiplier.toFixed(2) }}</b>
+                <span>
+                  Множитель Скиллсета (<span class="math-var math-var_cat"
+                    >CategoryMultiplier</span
+                  >):
+                </span>
+                <b class="math-var math-var_cat">
+                  x{{ calcResults?.categoryMultiplier.toFixed(2) }}
+                </b>
               </div>
               <v-divider class="border-opacity-100" />
               <div class="guide-page__result-final">
@@ -96,55 +158,129 @@
         <div class="guide-page__rule-block guide-page__rule-block_formula">
           <h4>Формула расчёта</h4>
           <div class="guide-page__math-box">
-            <div class="guide-page__math-line">
-              <span class="math-var math-var_final">FinalPoints</span> =
-              <span class="math-var math-var_base">BasePoints</span> &times;
-              <span class="math-var math-var_cat">CategoryMultiplier</span>
-              &times;
-              <span class="math-var math-var_fm">ModBonusMultiplier</span>
-            </div>
-            <v-divider class="border-opacity-100" />
-            <div class="guide-page__math-line">
-              <span class="math-var math-var_base">BasePoints</span>
-              = SR
-              <sup>3</sup>
-              &times;
-              <span class="math-bracket">(</span>
-              1 +
-              <span class="math-bracket">(</span>
-              <div class="math-fraction">
-                <span class="math-num">Percent &minus; 60</span>
-                <span class="math-den">40</span>
+            <div class="guide-page__math-box-inner">
+              <div class="guide-page__math-line">
+                <span class="math-var math-var_final">FinalPoints</span> =
+                <span class="math-var math-var_actual-sr">ActualStarRate</span
+                ><sup>3</sup> &times;
+                <span class="math-var math-var_score-mult">
+                  ScoreMultiplier
+                </span>
+                &times;
+                <span class="math-var math-var_cat">CategoryMultiplier</span>
               </div>
-              <span class="math-bracket">)</span>
-              <sup>2</sup>
-              <span class="math-bracket">)</span>
+              <v-divider class="border-opacity-100" />
+              <div class="guide-page__math-line">
+                <span class="math-var math-var_actual-sr">ActualStarRate</span>
+                = <span class="math-var math-var_map-sr">MapStarRate</span> +
+                <span class="math-var math-var_fm-bonus">FreeModBonus</span>
+              </div>
+              <v-divider class="border-opacity-100" />
+              <div class="guide-page__math-line">
+                <span class="math-var math-var_score-mult">
+                  ScoreMultiplier
+                </span>
+                = 1 +
+                <span class="math-bracket">(</span>
+                <div class="math-fraction">
+                  <span class="math-num">
+                    <span class="math-var math-var_score-percent"
+                      >ScorePercent</span
+                    >
+                    &minus; 60
+                  </span>
+                  <span class="math-den">40</span>
+                </div>
+                <span class="math-bracket">)</span>
+                <sup>2</sup>
+              </div>
             </div>
           </div>
         </div>
         <div class="guide-page__rule-block">
-          <h4>1. BasePoints (SR и Percent)</h4>
+          <h4>
+            1. Фактический Старрейт (<span class="math-var math-var_actual-sr"
+              >ActualStarRate</span
+            >)
+          </h4>
           <p>
-            Основа скора — куб старрейта карты (SR<sup>3</sup>). Переменная
-            <b>Percent</b> — это процент вашего набранного скора от максимально
-            возможного капа. Скоры ниже <b>60%</b> не приносят очков. Каждый мод
-            меняет максимальный кап скора (например, для DT он равен 1,200,000).
-            При этом спиннеры могут дать больше этого капа, тогда будет получено
-            больше очков. Если модов несколько, их множители максимума
-            <b>перемножаются</b>. У мода <b>Easy (EZ)</b> есть особое турнирное
-            правило: он повышает как ваш набранный скор (умножая его на 1.8),
-            так и максимальный кап карты (он становится равен 900,000 вместо
-            500,000). Только после всех этих корректировок высчитывается
-            итоговый <b>Percent</b>.
+            Основой любой калькуляции является изначальная сложность карты —
+            <span class="math-var math-var_map-sr">MapStarRate</span>.
+          </p>
+          <p>
+            В пулах <b class="cat-fm1">FM1</b>, <b class="cat-fm2">FM2</b>,
+            <b class="cat-fm3">FM3</b> и <b class="cat-tb">TB</b> игроки могут
+            выбирать усложняющие моды. Поскольку реальный Star Rating при
+            наложении модов пересчитать на лету невозможно, мы добавляем к
+            базовому старрейту карты "виртуальные" бонусные звезды (<span
+              class="math-var math-var_fm-bonus"
+              >FreeModBonus</span
+            >) <b>до</b> возведения его в куб: <b class="mod-hd">HD</b>
+            <b
+              >(<span class="math-var math-var_fm-bonus"
+                >+{{ MOD_SR_BONUSES.HD.toFixed(2) }}★</span
+              >)</b
+            >, <b class="mod-hr">HR</b>
+            <b
+              >(<span class="math-var math-var_fm-bonus"
+                >+{{ MOD_SR_BONUSES.HR.toFixed(2) }}★</span
+              >)</b
+            >, <b class="mod-ez">EZ</b>
+            <b
+              >(<span class="math-var math-var_fm-bonus"
+                >+{{ MOD_SR_BONUSES.EZ.toFixed(2) }}★</span
+              >)</b
+            >, <b class="mod-fl">FL</b>
+            <b
+              >(<span class="math-var math-var_fm-bonus"
+                >+{{ MOD_SR_BONUSES.FL.toFixed(2) }}★</span
+              >)</b
+            >.
+          </p>
+          <p>
+            При комбинации модов (например, <b class="mod-hd">HD</b
+            ><b class="mod-hr">HR</b>) звёзды суммируются. В остальных пулах
+            (например, <b class="mod-nm">NM</b> или <b class="mod-dt">DT</b>)
+            <span class="math-var math-var_fm-bonus">FreeModBonus</span> всегда
+            равен нулю, а
+            <span class="math-var math-var_actual-sr">ActualStarRate</span>
+            равен изначальному
+            <span class="math-var math-var_map-sr">MapStarRate</span>.
           </p>
         </div>
         <div class="guide-page__rule-block">
-          <h4>2. CategoryMultiplier (Множители Скиллсетов)</h4>
+          <h4>
+            2. Множитель Скора (<span class="math-var math-var_score-mult"
+              >ScoreMultiplier</span
+            >)
+          </h4>
+          <p>
+            Переменная
+            <span class="math-var math-var_score-percent">ScorePercent</span> —
+            это процент вашего набранного скора от максимально возможного капа
+            карты. Скоры ниже <b>60%</b> не приносят очков. Каждый мод меняет
+            максимальный кап скора (например, для <b class="mod-dt">DT</b> он
+            равен <b class="mod-dt">1,200,000</b>, а для
+            <b class="mod-ez">EZ</b> — <b class="mod-ez">900,000</b>). Спиннеры
+            могут дать скор выше капа, принося дополнительные очки.
+          </p>
+          <p>
+            У мода <b class="mod-ez">Easy (EZ)</b> ваш набранный скор
+            предварительно умножается на 1.8, после чего рассчитывается итоговый
+            <span class="math-var math-var_score-percent">ScorePercent</span>,
+            который подставляется в формулу для получения итогового множителя.
+          </p>
+        </div>
+        <div class="guide-page__rule-block">
+          <h4>
+            3. Множители Скиллсетов (<span class="math-var math-var_cat"
+              >CategoryMultiplier</span
+            >)
+          </h4>
           <p>
             У каждого из 21 скиллсета есть свой уникальный балансный коэффициент
-            (от x1.00 до x1.95). Эти цифры не взяты из головы — они отражают
-            мнение нашего комьюнити и результаты глобального опроса игроков
-            BOTM:
+            (от x1.00 до x1.95). Эти цифры отражают среднее мнение нашего
+            комьюнити и результаты глобального опроса игроков BOTM:
           </p>
           <div class="guide-page__multipliers-grid">
             <v-tooltip
@@ -165,19 +301,6 @@
             </v-tooltip>
           </div>
         </div>
-        <div class="guide-page__rule-block">
-          <h4>3. ModBonusMultiplier (Бонусы FM и TB)</h4>
-          <p>
-            Мы не можем динамически пересчитывать StarRate карты с учётом
-            наложенных модов прямо в браузере. Поэтому для пулов
-            <b>FM1, FM2, FM3</b> и <b>TB</b>
-            в формулу всегда подставляется базовый (NM) старрейт. Чтобы это было
-            честно, игрокам, берущим усложняющие моды, выдаются бонусные
-            множители к итоговым очкам:
-            <b>HD (x1.06)</b>, <b>HR (x1.1)</b>, <b>EZ (x1.2)</b>,
-            <b>FL (x1.5)</b>.
-          </p>
-        </div>
       </div>
     </div>
   </div>
@@ -190,14 +313,14 @@ import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import {
   getAdjustedScore,
   getMaxScoreForMods,
-  calculateBasePoints,
   calculateFinalCategoryPoints,
-  getFmTbModMultiplier,
+  getAdjustedStarRate,
 } from "@/utils/scores-calcs";
 import {
   MAPS_CATEGORIES,
   VALID_MODS_FOR_CATEGORY,
   CATEGORY_MULTIPLIERS,
+  MOD_SR_BONUSES,
 } from "@/constants";
 import { OsuMapCategory } from "@/types/osumaps";
 import { isOsuScoreMod } from "@/types/scores";
@@ -265,21 +388,15 @@ const calcResults = computed(() => {
   const percentage = (adjustedScore / maxScore) * 100;
   const isFail = percentage < 60;
 
-  const basePoints = calculateBasePoints(percentage, sr);
-  const finalPoints = calculateFinalCategoryPoints(
-    basePoints,
-    category,
-    modsArray
-  );
+  const adjustedStarRate = getAdjustedStarRate(sr, category, modsArray);
+  const cubedSr = Math.pow(adjustedStarRate, 3);
+
+  const scoreMultiplier = isFail ? 0 : 1 + Math.pow((percentage - 60) / 40, 2);
+  const basePoints = cubedSr * scoreMultiplier;
+
+  const finalPoints = calculateFinalCategoryPoints(basePoints, category);
 
   const categoryMultiplier = CATEGORY_MULTIPLIERS[category];
-
-  let fmTbMultiplier = 1;
-  const catUpper = category.toUpperCase();
-  if (catUpper.startsWith("FM") || catUpper === "TB") {
-    fmTbMultiplier = getFmTbModMultiplier(modsArray);
-    fmTbMultiplier = Math.round(fmTbMultiplier * 1000) / 1000;
-  }
 
   return {
     hasEZ,
@@ -287,9 +404,10 @@ const calcResults = computed(() => {
     maxScore,
     percentage,
     isFail,
-    basePoints,
+    adjustedStarRate,
+    cubedSr,
+    scoreMultiplier,
     categoryMultiplier,
-    fmTbMultiplier,
     finalPoints,
   };
 });
@@ -473,24 +591,17 @@ watch(dynamicMaxScore, () => {
       @include default-text(16px, 24px, var(--color-text));
       margin-bottom: 10px;
       opacity: 0.9;
-      b {
-        color: var(--color-points);
-      }
     }
     &_formula {
       border-left-color: var(--color-points);
     }
   }
   &__math-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     background-color: var(--color-bg);
     padding: 15px;
     border-radius: 8px;
     border: 1px solid var(--color-vuetify-table-borders);
     overflow-x: auto;
-    white-space: nowrap;
     @include default-text(18px, 18px, var(--color-text));
     font-family: "Courier New", Courier, monospace;
     &::-webkit-scrollbar {
@@ -500,6 +611,12 @@ watch(dynamicMaxScore, () => {
       background-color: var(--color-text-gray);
       border-radius: 4px;
     }
+  }
+  &__math-box-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: max-content;
   }
   &__math-line {
     display: flex;
@@ -513,15 +630,54 @@ watch(dynamicMaxScore, () => {
     &_final {
       color: var(--color-points);
     }
-    &_base {
-      color: var(--color-score-formula-base);
+    &_actual-sr {
+      color: var(--color-formula-actual-sr);
+    }
+    &_map-sr {
+      color: var(--color-formula-map-sr);
+    }
+    &_fm-bonus {
+      color: var(--color-formula-fm-bonus);
+    }
+    &_score-mult {
+      color: var(--color-formula-score-mult);
+    }
+    &_score-percent {
+      color: var(--color-formula-score-percent);
     }
     &_cat {
-      color: var(--color-score-formula-cat);
+      color: var(--color-formula-cat-mult);
     }
-    &_fm {
-      color: var(--color-score-formula-fm);
-    }
+  }
+  .cat-fm1 {
+    color: var(--color-btn-bg-fm1);
+  }
+  .cat-fm2 {
+    color: var(--color-btn-bg-fm2);
+  }
+  .cat-fm3 {
+    color: var(--color-btn-bg-fm3);
+  }
+  .cat-tb {
+    color: var(--color-btn-bg-tb);
+  }
+  .mod-hd {
+    color: var(--color-mod-combination-hd);
+  }
+  .mod-hr {
+    color: var(--color-mod-combination-hr);
+  }
+  .mod-ez {
+    color: var(--color-club-reading);
+  }
+  .mod-fl {
+    color: var(--color-text-gray);
+  }
+  .mod-dt {
+    color: var(--color-mod-combination-dt);
+  }
+  .mod-nm {
+    color: var(--color-mod-combination-nm);
   }
   .math-bracket {
     font-size: 24px;

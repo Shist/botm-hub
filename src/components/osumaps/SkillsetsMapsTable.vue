@@ -156,6 +156,7 @@ import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { CATEGORIES_SORT_PRIORITIES } from "@/constants";
 import { formatMapRank } from "@/utils";
 import {
+  getAdjustedStarRate,
   calculateBasePoints,
   getMaxScoreForMods,
   calculateFinalCategoryPoints,
@@ -261,12 +262,16 @@ const filteredItemsForTable = computed(() => {
         const maxScore = getMaxScoreForMods(modsArray);
         const percentage =
           maxScore > 0 ? (scoreData.score / maxScore) * 100 : 0;
-        const basePoints = calculateBasePoints(percentage, item.starRate);
+        const adjustedStarRate = getAdjustedStarRate(
+          item.starRate,
+          item.category,
+          modsArray
+        );
+        const basePoints = calculateBasePoints(percentage, adjustedStarRate);
 
         const finalPts = calculateFinalCategoryPoints(
           basePoints,
-          item.category,
-          modsArray
+          item.category
         );
 
         mapUserScores.push({

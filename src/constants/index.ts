@@ -37,6 +37,13 @@ export const CATEGORY_MULTIPLIERS: Record<OsuMapCategory, number> = {
   [OsuMapCategory.TB]: 1.74,
 };
 
+export const MOD_SR_BONUSES: Record<"FL" | "EZ" | "HR" | "HD", number> = {
+  FL: 1.5,
+  EZ: 0.75,
+  HR: 0.5,
+  HD: 0.25,
+};
+
 export const MAPS_CATEGORIES: Record<OsuMapCategory, string> = {
   [OsuMapCategory.NM1]: "NM1 (Raw Aim)",
   [OsuMapCategory.NM2]: "NM2 (Flow Tapping)",
