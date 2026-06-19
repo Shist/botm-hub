@@ -9,6 +9,7 @@ import { useMetaStore } from "@/stores/meta";
 import { useUsersStore } from "@/stores/users";
 import { useOsumapsStore } from "@/stores/osumaps";
 import {
+  getAdjustedStarRate,
   getMaxScoreForMods,
   calculateBasePoints,
   calculateFinalCategoryPoints,
@@ -121,11 +122,18 @@ export const useScoresStore = defineStore("scores", () => {
             const allowedMods = VALID_MODS_FOR_CATEGORY[category];
 
             if (isOsuScoreMod(modKey) && allowedMods.includes(modKey)) {
-              const currentBasePoints = calculateBasePoints(percentage, stars);
-              const finalCategoryPoints = calculateFinalCategoryPoints(
-                currentBasePoints,
+              const adjustedStarRate = getAdjustedStarRate(
+                stars,
                 category,
                 modsArray
+              );
+              const currentBasePoints = calculateBasePoints(
+                percentage,
+                adjustedStarRate
+              );
+              const finalCategoryPoints = calculateFinalCategoryPoints(
+                currentBasePoints,
+                category
               );
 
               addStatsToBucket(
@@ -242,14 +250,18 @@ export const useScoresStore = defineStore("scores", () => {
             mapData.categories.forEach((catInfo) => {
               const allowedMods = VALID_MODS_FOR_CATEGORY[catInfo.category];
               if (isOsuScoreMod(modKey) && allowedMods.includes(modKey)) {
+                const adjustedStarRate = getAdjustedStarRate(
+                  catInfo.stars,
+                  catInfo.category,
+                  modsArray
+                );
                 const currentBasePts = calculateBasePoints(
                   percentage,
-                  catInfo.stars
+                  adjustedStarRate
                 );
                 const finalPts = calculateFinalCategoryPoints(
                   currentBasePts,
-                  catInfo.category,
-                  modsArray
+                  catInfo.category
                 );
 
                 if (finalPts > maxFinalPoints) {

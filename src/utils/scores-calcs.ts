@@ -1,13 +1,21 @@
-import { CATEGORY_MULTIPLIERS } from "@/constants";
+import { CATEGORY_MULTIPLIERS, MOD_SR_BONUSES } from "@/constants";
 import { OsuMapCategory } from "@/types/osumaps";
 
-export const getFmTbModMultiplier = (mods: string[]): number => {
-  let multiplier = 1.0;
-  if (mods.includes("FL")) multiplier *= 1.5;
-  if (mods.includes("EZ")) multiplier *= 1.2;
-  if (mods.includes("HR")) multiplier *= 1.1;
-  if (mods.includes("HD")) multiplier *= 1.06;
-  return multiplier;
+export const getAdjustedStarRate = (
+  baseStars: number,
+  category: OsuMapCategory,
+  mods: string[]
+): number => {
+  const catUpper = category.toUpperCase();
+  if (!catUpper.startsWith("FM") && catUpper !== "TB") return baseStars;
+
+  let extraStars = 0;
+  if (mods.includes("FL")) extraStars += MOD_SR_BONUSES.FL;
+  if (mods.includes("EZ")) extraStars += MOD_SR_BONUSES.EZ;
+  if (mods.includes("HR")) extraStars += MOD_SR_BONUSES.HR;
+  if (mods.includes("HD")) extraStars += MOD_SR_BONUSES.HD;
+
+  return baseStars + extraStars;
 };
 
 export const getAdjustedScore = (rawScore: number, mods: string[]): number => {
@@ -35,13 +43,7 @@ export const calculateBasePoints = (
 
 export const calculateFinalCategoryPoints = (
   basePoints: number,
-  category: OsuMapCategory,
-  mods: string[]
+  category: OsuMapCategory
 ): number => {
-  let finalPoints = basePoints * CATEGORY_MULTIPLIERS[category];
-  const categoryStr = category.toUpperCase();
-  if (categoryStr.startsWith("FM") || categoryStr === "TB") {
-    finalPoints *= getFmTbModMultiplier(mods);
-  }
-  return finalPoints;
+  return basePoints * CATEGORY_MULTIPLIERS[category];
 };

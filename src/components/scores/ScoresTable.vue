@@ -345,6 +345,7 @@ import UserCard from "@/components/users/UserCard.vue";
 import CategoryBadge from "@/components/osumaps/CategoryBadge.vue";
 import { formatMapRank, isValidModCombinationForCategory } from "@/utils";
 import {
+  getAdjustedStarRate,
   calculateBasePoints,
   calculateFinalCategoryPoints,
 } from "@/utils/scores-calcs";
@@ -525,13 +526,15 @@ const enrichedScoresList = computed(() => {
 
         const currentBasePts =
           score.percentage >= 60
-            ? calculateBasePoints(score.percentage, m.starRate)
+            ? calculateBasePoints(
+                score.percentage,
+                getAdjustedStarRate(m.starRate, m.category, modsArray)
+              )
             : 0;
 
         const finalPts = calculateFinalCategoryPoints(
           currentBasePts,
-          m.category,
-          modsArray
+          m.category
         );
 
         return {
