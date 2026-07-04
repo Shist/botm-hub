@@ -76,11 +76,9 @@
           </div>
           <div class="workout-constructor-page__session-block">
             <span>Минимальный старрейт:</span>
-            <span>{{ suggestedMapsList[0]?.starRate }}</span>
+            <span>{{ minSuggestedStarRate }}⭐</span>
             <span>Максимальный старрейт:</span>
-            <span>
-              {{ suggestedMapsList[suggestedMapsList.length - 1]?.starRate }}
-            </span>
+            <span>{{ maxSuggestedStarRate }}⭐</span>
           </div>
         </div>
       </v-skeleton-loader>
@@ -143,6 +141,14 @@ const totalMapsDurationLabel = computed(() => {
 const totalBreaksDurationLabel = computed(() => {
   const totalSeconds = 60 * chosenBreak.value * (suggestedMapsList.length - 1);
   return fromTotalSecondsToLabel(totalSeconds);
+});
+const minSuggestedStarRate = computed(() => {
+  if (!suggestedMapsList.length) return "0.00";
+  return Math.min(...suggestedMapsList.map((m) => m.starRate)).toFixed(2);
+});
+const maxSuggestedStarRate = computed(() => {
+  if (!suggestedMapsList.length) return "0.00";
+  return Math.max(...suggestedMapsList.map((m) => m.starRate)).toFixed(2);
 });
 
 watch(
