@@ -138,6 +138,9 @@
             class="skillsets-maps-table__badge"
           />
         </template>
+        <template #[`item.starRate`]="{ item }">
+          {{ item.starRate }}⭐
+        </template>
         <template #no-data>
           <div class="skillsets-maps-table__no-data">Нет данных о картах</div>
         </template>
