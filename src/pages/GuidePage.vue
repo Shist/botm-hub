@@ -516,12 +516,12 @@ watch(dynamicMaxScore, () => {
   }
   &__calc-card {
     background-color: var(--color-tabs-bg);
-    padding: 25px;
+    padding: 20px;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
     position: sticky;
     top: 105px;
     @media (max-width: $tablet-l) {
@@ -537,7 +537,7 @@ watch(dynamicMaxScore, () => {
   &__results {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
   &__results-title {
     @include default-headline(22px, 22px, var(--color-text));
