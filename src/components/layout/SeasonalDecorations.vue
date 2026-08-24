@@ -3,112 +3,131 @@
     <template v-if="currentEvent === 'valentines'">
       <div class="seasonal-decorations__val-overlay"></div>
       <div
+        v-if="seasonalStore.settings.valCorners"
         class="seasonal-decorations__val-corner seasonal-decorations__val-corner_left"
       >
         <img src="@/assets/images/valentines.png" alt="Valentines Decor" />
       </div>
       <div
+        v-if="seasonalStore.settings.valCorners"
         class="seasonal-decorations__val-corner seasonal-decorations__val-corner_right"
       >
         <img src="@/assets/images/valentines.png" alt="Valentines Decor" />
       </div>
-      <div
-        v-for="heart in hearts"
-        :key="`heart-${heart.id}`"
-        class="seasonal-decorations__floating-heart"
-        :style="{
-          left: `${heart.left}%`,
-          width: `${heart.size}px`,
-          opacity: heart.opacity,
-          animationDuration: `${heart.duration}s`,
-          animationDelay: `${heart.delay}s`,
-        }"
-      >
-        <img
-          src="@/assets/images/heart.png"
-          class="seasonal-decorations__floating-heart-img"
+      <template v-if="seasonalStore.settings.valHearts">
+        <div
+          v-for="heart in hearts"
+          :key="`heart-${heart.id}`"
+          class="seasonal-decorations__floating-heart"
           :style="{
-            animationDuration: `${heart.driftDuration}s`,
+            left: `${heart.left}%`,
+            width: `${heart.size}px`,
+            opacity: heart.opacity,
+            animationDuration: `${heart.duration}s`,
             animationDelay: `${heart.delay}s`,
           }"
-        />
-      </div>
+        >
+          <img
+            src="@/assets/images/heart.png"
+            class="seasonal-decorations__floating-heart-img"
+            :style="{
+              animationDuration: `${heart.driftDuration}s`,
+              animationDelay: `${heart.delay}s`,
+            }"
+          />
+        </div>
+      </template>
     </template>
     <template v-if="currentEvent === 'april_fools'">
-      <div
-        class="seasonal-decorations__clown seasonal-decorations__clown_bottom-left"
-        :style="{ left: `${clown1X}%` }"
-        @animationiteration="updateClown(1)"
-      >
-        <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
-      </div>
-      <div
-        class="seasonal-decorations__clown seasonal-decorations__clown_bottom-right"
-        :style="{ right: `${clown2X}%` }"
-        @animationiteration="updateClown(2)"
-      >
-        <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
-      </div>
-      <div
-        class="seasonal-decorations__clown seasonal-decorations__clown_top"
-        :style="{ left: `${clown3X}%` }"
-        @animationiteration="updateClown(3)"
-      >
-        <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
-      </div>
+      <template v-if="seasonalStore.settings.aprilClowns">
+        <div
+          class="seasonal-decorations__clown seasonal-decorations__clown_bottom-left"
+          :style="{ left: `${clown1X}%` }"
+          @animationiteration="updateClown(1)"
+        >
+          <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
+        </div>
+        <div
+          class="seasonal-decorations__clown seasonal-decorations__clown_bottom-right"
+          :style="{ right: `${clown2X}%` }"
+          @animationiteration="updateClown(2)"
+        >
+          <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
+        </div>
+        <div
+          class="seasonal-decorations__clown seasonal-decorations__clown_top"
+          :style="{ left: `${clown3X}%` }"
+          @animationiteration="updateClown(3)"
+        >
+          <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
+        </div>
+      </template>
     </template>
     <template v-if="currentEvent === 'osu_bday'">
-      <div class="seasonal-decorations__osu-overlay"></div>
-      <div class="seasonal-decorations__peppy seasonal-decorations__peppy_left">
-        <img src="@/assets/images/peppy.png" alt="Peppy osu!" />
-      </div>
-      <div
-        class="seasonal-decorations__peppy seasonal-decorations__peppy_right"
-      >
-        <img src="@/assets/images/peppy.png" alt="Peppy osu!" />
-      </div>
+      <template v-if="seasonalStore.settings.osuPeppy">
+        <div class="seasonal-decorations__osu-overlay"></div>
+        <div
+          class="seasonal-decorations__peppy seasonal-decorations__peppy_left"
+        >
+          <img src="@/assets/images/peppy.png" alt="Peppy osu!" />
+        </div>
+        <div
+          class="seasonal-decorations__peppy seasonal-decorations__peppy_right"
+        >
+          <img src="@/assets/images/peppy.png" alt="Peppy osu!" />
+        </div>
+      </template>
     </template>
     <template v-if="currentEvent === 'halloween'">
-      <div class="seasonal-decorations__halloween-overlay"></div>
-      <div
-        class="seasonal-decorations__pumpkin seasonal-decorations__pumpkin_left"
-      >
-        <img src="@/assets/images/pumpkin.png" alt="Halloween Pumpkin" />
-      </div>
-      <div
-        class="seasonal-decorations__pumpkin seasonal-decorations__pumpkin_right"
-      >
-        <img src="@/assets/images/pumpkin.png" alt="Halloween Pumpkin" />
-      </div>
+      <template v-if="seasonalStore.settings.halloweenPumpkins">
+        <div class="seasonal-decorations__halloween-overlay"></div>
+        <div
+          class="seasonal-decorations__pumpkin seasonal-decorations__pumpkin_left"
+        >
+          <img src="@/assets/images/pumpkin.png" alt="Halloween Pumpkin" />
+        </div>
+        <div
+          class="seasonal-decorations__pumpkin seasonal-decorations__pumpkin_right"
+        >
+          <img src="@/assets/images/pumpkin.png" alt="Halloween Pumpkin" />
+        </div>
+      </template>
     </template>
     <template v-if="currentEvent === 'new_year'">
       <div class="seasonal-decorations__newyear-overlay"></div>
-      <div
-        class="seasonal-decorations__branch seasonal-decorations__branch_left"
-      >
-        <img src="@/assets/images/pine-branch.png" alt="Pine Branch" />
-      </div>
-      <div
-        class="seasonal-decorations__branch seasonal-decorations__branch_right"
-      >
-        <img src="@/assets/images/pine-branch.png" alt="Pine Branch" />
-      </div>
-      <div
-        class="seasonal-decorations__snow seasonal-decorations__snow_layer-1"
-      ></div>
-      <div
-        class="seasonal-decorations__snow seasonal-decorations__snow_layer-2"
-      ></div>
-      <div
-        class="seasonal-decorations__snow seasonal-decorations__snow_layer-3"
-      ></div>
+      <template v-if="seasonalStore.settings.newYearBranches">
+        <div
+          class="seasonal-decorations__branch seasonal-decorations__branch_left"
+        >
+          <img src="@/assets/images/pine-branch.png" alt="Pine Branch" />
+        </div>
+        <div
+          class="seasonal-decorations__branch seasonal-decorations__branch_right"
+        >
+          <img src="@/assets/images/pine-branch.png" alt="Pine Branch" />
+        </div>
+      </template>
+      <template v-if="seasonalStore.settings.newYearSnow">
+        <div
+          class="seasonal-decorations__snow seasonal-decorations__snow_layer-1"
+        ></div>
+        <div
+          class="seasonal-decorations__snow seasonal-decorations__snow_layer-2"
+        ></div>
+        <div
+          class="seasonal-decorations__snow seasonal-decorations__snow_layer-3"
+        ></div>
+      </template>
     </template>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
+import { useSeasonalStore } from "@/stores/seasons";
 import { type ISeasonalEvent, type IFloatingParticle } from "@/types/seasons";
+
+const seasonalStore = useSeasonalStore();
 
 const currentEvent = ref<ISeasonalEvent>(null);
 const clown1X = ref(10);
@@ -143,6 +162,31 @@ const updateClown = (id: number) => {
   if (id === 2) clown2X.value = Math.floor(Math.random() * 40);
   if (id === 3) clown3X.value = Math.floor(Math.random() * 80);
 };
+
+watch(
+  [
+    () => seasonalStore.settings.aprilCursor,
+    () => seasonalStore.settings.osuCursor,
+    currentEvent,
+  ],
+  () => {
+    if (
+      currentEvent.value === "april_fools" &&
+      seasonalStore.settings.aprilCursor
+    ) {
+      document.body.classList.add("theme-april-fools");
+    } else {
+      document.body.classList.remove("theme-april-fools");
+    }
+
+    if (currentEvent.value === "osu_bday" && seasonalStore.settings.osuCursor) {
+      document.body.classList.add("theme-osu-bday");
+    } else {
+      document.body.classList.remove("theme-osu-bday");
+    }
+  },
+  { immediate: true }
+);
 
 onMounted(() => {
   currentEvent.value = determineEvent();

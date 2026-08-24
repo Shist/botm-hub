@@ -1,4 +1,8 @@
 <template>
+  <SeasonalDecorationsModal
+    :isOpened="isSeasonalModalOpened"
+    @close="closeSeasonalModal"
+  />
   <AppModal
     :isOpened="isPatchNotesModalOpened"
     title="🛠️ Последние Обновления 🛠️"
@@ -66,6 +70,11 @@
               </a>
             </li>
             <li class="burger-menu__nav-list-item">
+              <button class="burger-menu__btn" @click.stop="openSeasonalModal">
+                Сезонные Украшения
+              </button>
+            </li>
+            <li class="burger-menu__nav-list-item">
               <button
                 class="burger-menu__btn"
                 @click.stop="openPatchNotesModal"
@@ -100,6 +109,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useThemeStore } from "@/stores/theme";
 import useToast from "@/composables/useToast";
 import ThemeSwitcher from "@/components/layout/ThemeSwitcher.vue";
+import SeasonalDecorationsModal from "@/components/layout/SeasonalDecorationsModal.vue";
 import PatchNotes from "@/components/layout/PatchNotes.vue";
 import { getFirebaseErrorMsg } from "@/utils";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
@@ -112,6 +122,7 @@ const themeStore = useThemeStore();
 const { setErrorToast } = useToast();
 
 const isMenuOpened = ref(false);
+const isSeasonalModalOpened = ref(false);
 const isPatchNotesModalOpened = ref(false);
 const newPatchImagePath = ref(newPatchImage);
 
@@ -137,6 +148,13 @@ const isLogInBtnVisible = computed(
 
 const openMenu = () => {
   isMenuOpened.value = true;
+};
+
+const openSeasonalModal = () => {
+  isSeasonalModalOpened.value = true;
+};
+const closeSeasonalModal = () => {
+  isSeasonalModalOpened.value = false;
 };
 
 const openPatchNotesModal = () => {

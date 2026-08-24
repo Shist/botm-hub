@@ -6,6 +6,18 @@ export type ISeasonalEvent =
   | "osu_bday"
   | null;
 
+export interface ISeasonalSettings {
+  valCorners: boolean;
+  valHearts: boolean;
+  aprilClowns: boolean;
+  aprilCursor: boolean;
+  osuPeppy: boolean;
+  osuCursor: boolean;
+  halloweenPumpkins: boolean;
+  newYearBranches: boolean;
+  newYearSnow: boolean;
+}
+
 export interface IFloatingParticle {
   id: number;
   left: number;
