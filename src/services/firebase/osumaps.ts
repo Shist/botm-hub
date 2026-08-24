@@ -5,9 +5,13 @@ import {
   doc,
   getDoc,
   updateDoc,
-  arrayUnion,
+  Timestamp,
 } from "firebase/firestore/lite";
-import { OsuMapCategory, type IOsuMap } from "@/types/osumaps";
+import {
+  OsuMapCategory,
+  type IOsuMap,
+  type IUploadMapLog,
+} from "@/types/osumaps";
 
 async function loadAllMapsFromFirebase(): Promise<IOsuMap[]> {
   const db = getFirestore();
@@ -38,50 +42,139 @@ async function loadAllMapsFromFirebase(): Promise<IOsuMap[]> {
   }
 }
 
-async function uploadMapsToFirebase(maps: Omit<IOsuMap, "link">[]) {
+async function uploadMapsToFirebase(
+  maps: Omit<IOsuMap, "link">[]
+): Promise<IUploadMapLog[]> {
   const db = getFirestore();
+  const logs: IUploadMapLog[] = [];
+  let hasAnyChanges = false;
 
   const categorizedMaps: Partial<
     Record<OsuMapCategory, Omit<IOsuMap, "link" | "category">[]>
   > = {};
+
   maps.forEach((map) => {
     const category = map.category;
     if (!categorizedMaps[category]) categorizedMaps[category] = [];
     const { category: _, ...mapInfo } = map;
-    categorizedMaps[category].push(mapInfo);
+    categorizedMaps[category]!.push(mapInfo);
   });
 
   for (const category in categorizedMaps) {
     const mapsToUpload = categorizedMaps[category as OsuMapCategory] ?? [];
+    if (!mapsToUpload.length) continue;
 
     const categoryDocRef = doc(db, "maps", category);
-    const categoryDoc = await getDoc(categoryDocRef);
-    const categoryMaps = (categoryDoc.data()?.maps ?? []) as Omit<
-      IOsuMap,
-      "link" | "category"
-    >[];
 
-    for (const map of mapsToUpload) {
-      const mapId = map.id;
+    try {
+      const categoryDoc = await getDoc(categoryDocRef);
+      const currentMaps = (categoryDoc.data()?.maps ?? []) as Omit<
+        IOsuMap,
+        "link" | "category"
+      >[];
 
-      if (categoryMaps.some((m) => m.id === mapId)) {
-        console.error(
-          `[${category}] Карта с ID = ${mapId} уже существует. Пропуск...`
+      let isCategoryChanged = false;
+      const updatedMapsArray = [...currentMaps];
+
+      for (const newMap of mapsToUpload) {
+        const existingIndex = updatedMapsArray.findIndex(
+          (m) => m.id === newMap.id
         );
-        continue;
+        const existingMap = updatedMapsArray[existingIndex];
+        const logMapName = `[ID: ${newMap.id}] ${newMap.name}`;
+
+        if (existingIndex !== -1 && existingMap) {
+          const oldComment = existingMap.comment ?? "";
+          const newCommentPart = (newMap.comment ?? "").trim();
+
+          if (!newCommentPart) {
+            logs.push({
+              mapName: logMapName,
+              type: "updated",
+              message: `[${category.toUpperCase()}] Карта уже существует, а новый комментарий пуст. Пропущена.`,
+            });
+            continue;
+          }
+
+          const existingTags = oldComment
+            .split(";")
+            .map((t) => t.trim())
+            .filter(Boolean);
+
+          if (existingTags.includes(newCommentPart)) {
+            logs.push({
+              mapName: logMapName,
+              type: "updated",
+              message: `[${category.toUpperCase()}] Карта уже содержит комментарий "${newCommentPart}". Пропущена.`,
+            });
+            continue;
+          }
+
+          const mergedComment = oldComment
+            ? `${oldComment}; ${newCommentPart}`
+            : newCommentPart;
+
+          updatedMapsArray[existingIndex] = {
+            ...existingMap,
+            comment: mergedComment,
+          };
+
+          isCategoryChanged = true;
+          hasAnyChanges = true;
+
+          logs.push({
+            mapName: logMapName,
+            type: "updated",
+            message: `[${category.toUpperCase()}] Обновлён комментарий: "${oldComment}" ➔ "${mergedComment}"`,
+          });
+        } else {
+          updatedMapsArray.push(newMap);
+          isCategoryChanged = true;
+          hasAnyChanges = true;
+
+          logs.push({
+            mapName: logMapName,
+            type: "added",
+            message: `[${category.toUpperCase()}] Успешно добавлена новая карта!`,
+          });
+        }
       }
 
-      try {
-        await updateDoc(categoryDocRef, { maps: arrayUnion(map) });
-        console.log(`[${category}] Карта с ID = ${mapId} успешно добавлена`);
-      } catch (error) {
-        console.error(
-          `[${category}] Ошибка при добавлении карты с ID = ${mapId}:`,
-          error
-        );
+      if (isCategoryChanged) {
+        await updateDoc(categoryDocRef, { maps: updatedMapsArray });
       }
+    } catch (error: unknown) {
+      const errorMsg = error instanceof Error ? error.message : "Ошибка БД";
+      logs.push({
+        mapName: `Категория ${category}`,
+        type: "error",
+        message: `Ошибка при обработке категории: ${errorMsg}`,
+      });
     }
   }
+
+  if (hasAnyChanges) {
+    try {
+      const metaDocRef = doc(db, "global", "meta");
+      await updateDoc(metaDocRef, {
+        mapsUpdatedAt: Timestamp.now(),
+      });
+      logs.push({
+        mapName: "Метаданные системы",
+        type: "added",
+        message: "Таймстемп mapsUpdatedAt в /global/meta успешно обновлён!",
+      });
+    } catch (error: unknown) {
+      const errorMsg = error instanceof Error ? error.message : "Ошибка БД";
+      logs.push({
+        mapName: "Метаданные системы",
+        type: "error",
+        message: `Не удалось обновить mapsUpdatedAt: ${errorMsg}`,
+      });
+    }
+  }
+
+  return logs;
 }
 
 export { loadAllMapsFromFirebase, uploadMapsToFirebase };

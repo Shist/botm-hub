@@ -51,6 +51,12 @@ export interface MapsTableHeader {
     | ((a: string, b: string) => number);
 }
 
+export interface IUploadMapLog {
+  mapName: string;
+  type: "added" | "updated" | "error";
+  message: string;
+}
+
 export function isOsuMapCategory(value: string): value is OsuMapCategory {
   return Object.values(OsuMapCategory).includes(value as OsuMapCategory);
 }

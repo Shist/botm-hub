@@ -7,6 +7,7 @@ import GuidePage from "@/pages/GuidePage.vue";
 import PlayersPage from "@/pages/players/PlayersPage.vue";
 import PlayerProfilePage from "@/pages/players/PlayerProfilePage.vue";
 import SkillsetsMapsPage from "@/pages/skillsets-maps/SkillsetsMapsPage.vue";
+import UploadMapsPage from "@/pages/skillsets-maps/UploadMapsPage.vue";
 import AllMapsPage from "@/pages/skillsets-maps/AllMapsPage.vue";
 import CategoryMapsPage from "@/pages/skillsets-maps/CategoryMapsPage.vue";
 import MapProfilePage from "@/pages/skillsets-maps/MapProfilePage.vue";
@@ -20,6 +21,7 @@ import GlobalLeaderboardPage from "@/pages/leaderboards/GlobalLeaderboardPage.vu
 import CategoryLeaderboardPage from "@/pages/leaderboards/CategoryLeaderboardPage.vue";
 import NotFoundPage from "@/pages/NotFoundPage.vue";
 import { useAuthStore } from "@/stores/auth";
+import { SHIST_UID } from "@/constants";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -66,6 +68,11 @@ const router = createRouter({
           path: "",
           component: SkillsetsMapsPage,
           name: "skillsets-maps",
+        },
+        {
+          path: "upload",
+          component: UploadMapsPage,
+          name: "skillset-maps-upload",
         },
         {
           path: "all",
@@ -154,6 +161,12 @@ router.beforeEach((to, _, next) => {
       next();
     } else {
       next({ name: "sign-in" });
+    }
+  } else if (to.name === "skillset-maps-upload") {
+    if (user && user.uid === SHIST_UID) {
+      next();
+    } else {
+      next({ name: "main" });
     }
   } else {
     next();

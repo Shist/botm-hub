@@ -55,6 +55,22 @@ const breadcrumbs = computed(() => {
     to: "/",
   });
 
+  if (routeName === "skillset-maps-upload") {
+    items.push({
+      title: ROUTE_LABELS["skillsets-maps"] ?? "Карты Скиллсетов",
+      disabled: false,
+      to: "/skillsets-maps",
+    });
+
+    items.push({
+      title: "Загрузка и обновление маппулов",
+      disabled: true,
+      to: route.path,
+    });
+
+    return items;
+  }
+
   if (routeName === "map-profile") {
     items.push({
       title: ROUTE_LABELS["skillsets-maps"] ?? "Карты Скиллсетов",
