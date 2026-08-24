@@ -1,5 +1,39 @@
 <template>
   <div class="seasonal-decorations" v-if="currentEvent">
+    <template v-if="currentEvent === 'valentines'">
+      <div class="seasonal-decorations__val-overlay"></div>
+      <div
+        class="seasonal-decorations__val-corner seasonal-decorations__val-corner_left"
+      >
+        <img src="@/assets/images/valentines.png" alt="Valentines Decor" />
+      </div>
+      <div
+        class="seasonal-decorations__val-corner seasonal-decorations__val-corner_right"
+      >
+        <img src="@/assets/images/valentines.png" alt="Valentines Decor" />
+      </div>
+      <div
+        v-for="heart in hearts"
+        :key="`heart-${heart.id}`"
+        class="seasonal-decorations__floating-heart"
+        :style="{
+          left: `${heart.left}%`,
+          width: `${heart.size}px`,
+          opacity: heart.opacity,
+          animationDuration: `${heart.duration}s`,
+          animationDelay: `${heart.delay}s`,
+        }"
+      >
+        <img
+          src="@/assets/images/heart.png"
+          class="seasonal-decorations__floating-heart-img"
+          :style="{
+            animationDuration: `${heart.driftDuration}s`,
+            animationDelay: `${heart.delay}s`,
+          }"
+        />
+      </div>
+    </template>
     <template v-if="currentEvent === 'april_fools'">
       <div
         class="seasonal-decorations__clown seasonal-decorations__clown_bottom-left"
@@ -65,13 +99,13 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from "vue";
-import { type ISeasonalEvent } from "@/types/seasons";
+import { type ISeasonalEvent, type IFloatingParticle } from "@/types/seasons";
 
 const currentEvent = ref<ISeasonalEvent>(null);
-
 const clown1X = ref(10);
 const clown2X = ref(15);
 const clown3X = ref(50);
+const hearts = ref<IFloatingParticle[]>([]);
 
 const determineEvent = (): ISeasonalEvent => {
   const now = new Date();
@@ -109,6 +143,18 @@ onMounted(() => {
     updateClown(2);
     updateClown(3);
   }
+
+  if (currentEvent.value === "valentines") {
+    hearts.value = Array.from({ length: 50 }).map((_, i) => ({
+      id: i,
+      left: -5 + Math.random() * 110,
+      duration: 15 + Math.random() * 25,
+      delay: -(Math.random() * 40),
+      size: 15 + Math.random() * 35,
+      opacity: 0.2 + Math.random() * 0.6,
+      driftDuration: 3 + Math.random() * 5,
+    }));
+  }
 });
 
 onUnmounted(() => {
@@ -143,6 +189,61 @@ body.theme-april-fools * {
   z-index: 100;
   pointer-events: none;
   overflow: hidden;
+  &__val-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle,
+      transparent 50%,
+      rgba(255, 182, 193, 0.05) 100%
+    );
+    .light-theme & {
+      background: radial-gradient(
+        circle,
+        transparent 60%,
+        rgba(255, 105, 180, 0.15) 100%
+      );
+    }
+  }
+  &__val-corner {
+    position: absolute;
+    bottom: -5px;
+    width: 250px;
+    height: auto;
+    filter: drop-shadow(0 -5px 10px rgba(0, 0, 0, 0.5));
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    &_left {
+      left: -5px;
+    }
+    &_right {
+      right: -5px;
+      transform: scaleX(-1);
+    }
+    @media (max-width: 768px) {
+      width: 120px;
+    }
+  }
+  &__floating-heart {
+    position: absolute;
+    bottom: -100px;
+    pointer-events: none;
+    animation-name: organic-float-up;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    &-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      animation-name: organic-drift;
+      animation-timing-function: ease-in-out;
+      animation-iteration-count: infinite;
+      animation-direction: alternate;
+    }
+  }
   &__clown {
     position: absolute;
     width: 120px;
@@ -295,6 +396,22 @@ body.theme-april-fools * {
   }
 }
 
+@keyframes organic-float-up {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-120vh);
+  }
+}
+@keyframes organic-drift {
+  0% {
+    transform: translateX(-25px);
+  }
+  100% {
+    transform: translateX(25px);
+  }
+}
 @keyframes clown-peek-bottom {
   0%,
   85%,

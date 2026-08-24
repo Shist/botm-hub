@@ -5,3 +5,13 @@ export type ISeasonalEvent =
   | "valentines"
   | "osu_bday"
   | null;
+
+export interface IFloatingParticle {
+  id: number;
+  left: number;
+  duration: number;
+  delay: number;
+  size: number;
+  opacity: number;
+  driftDuration: number;
+}
