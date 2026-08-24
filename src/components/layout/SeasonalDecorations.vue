@@ -1,5 +1,28 @@
 <template>
   <div class="seasonal-decorations" v-if="currentEvent">
+    <template v-if="currentEvent === 'april_fools'">
+      <div
+        class="seasonal-decorations__clown seasonal-decorations__clown_bottom-left"
+        :style="{ left: `${clown1X}%` }"
+        @animationiteration="updateClown(1)"
+      >
+        <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
+      </div>
+      <div
+        class="seasonal-decorations__clown seasonal-decorations__clown_bottom-right"
+        :style="{ right: `${clown2X}%` }"
+        @animationiteration="updateClown(2)"
+      >
+        <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
+      </div>
+      <div
+        class="seasonal-decorations__clown seasonal-decorations__clown_top"
+        :style="{ left: `${clown3X}%` }"
+        @animationiteration="updateClown(3)"
+      >
+        <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
+      </div>
+    </template>
     <template v-if="currentEvent === 'halloween'">
       <div class="seasonal-decorations__halloween-overlay"></div>
       <div
@@ -41,10 +64,14 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { type ISeasonalEvent } from "@/types/seasons";
 
 const currentEvent = ref<ISeasonalEvent>(null);
+
+const clown1X = ref(10);
+const clown2X = ref(15);
+const clown3X = ref(50);
 
 const determineEvent = (): ISeasonalEvent => {
   const now = new Date();
@@ -68,10 +95,35 @@ const determineEvent = (): ISeasonalEvent => {
   return null;
 };
 
+const updateClown = (id: number) => {
+  if (id === 1) clown1X.value = Math.floor(Math.random() * 40);
+  if (id === 2) clown2X.value = Math.floor(Math.random() * 40);
+  if (id === 3) clown3X.value = Math.floor(Math.random() * 80);
+};
 onMounted(() => {
   currentEvent.value = determineEvent();
+
+  if (currentEvent.value === "april_fools") {
+    document.body.classList.add("theme-april-fools");
+    updateClown(1);
+    updateClown(2);
+    updateClown(3);
+  }
+});
+
+onUnmounted(() => {
+  document.body.classList.remove("theme-april-fools");
 });
 </script>
+
+<style lang="scss">
+body.theme-april-fools,
+body.theme-april-fools * {
+  cursor:
+    url("@/assets/images/eh-clown-cursor.png") 16 16,
+    crosshair !important;
+}
+</style>
 
 <style lang="scss" scoped>
 @use "sass:math";
@@ -91,6 +143,32 @@ onMounted(() => {
   z-index: 100;
   pointer-events: none;
   overflow: hidden;
+  &__clown {
+    position: absolute;
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    &_bottom-left {
+      bottom: -160px;
+      animation: clown-peek-bottom 7s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+    }
+    &_bottom-right {
+      bottom: -160px;
+      animation: clown-peek-bottom 12s cubic-bezier(0.25, 1, 0.5, 1) infinite 3s;
+    }
+    &_top {
+      top: -160px;
+      animation: clown-peek-top 15s cubic-bezier(0.25, 1, 0.5, 1) infinite 7s;
+    }
+    @media (max-width: 768px) {
+      width: 90px;
+    }
+  }
   &__halloween-overlay {
     position: absolute;
     inset: 0;
@@ -217,6 +295,30 @@ onMounted(() => {
   }
 }
 
+@keyframes clown-peek-bottom {
+  0%,
+  85%,
+  100% {
+    bottom: -160px;
+  }
+  10%,
+  75% {
+    bottom: -5px;
+  }
+}
+@keyframes clown-peek-top {
+  0%,
+  85%,
+  100% {
+    top: -160px;
+    transform: rotate(180deg);
+  }
+  10%,
+  75% {
+    top: -5px;
+    transform: rotate(180deg);
+  }
+}
 @keyframes halloween-breathe {
   0% {
     filter: drop-shadow(0 0 8px rgba(255, 120, 0, 0.4));
