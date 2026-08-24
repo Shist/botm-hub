@@ -218,14 +218,22 @@ const placeBadgeClass = computed(() => {
     place === "23-28" ||
     place === "29-32" ||
     place === "25-32" ||
-    place === "17-32"
+    place === "17-32" ||
+    place === "25-40"
   )
     return "tournament-roster-card__badge_place-25-32";
-  if (place === "33-64" || place === "17-64")
-    return "tournament-roster-card__badge_place-33-64";
-  if (place === "33+" || place === "65+")
-    return "tournament-roster-card__badge_place-65-plus";
-  return "tournament-roster-card__badge_place-65-plus";
+  if (
+    place === "33-40" ||
+    place === "41-48" ||
+    place === "33-48" ||
+    place === "17-48"
+  )
+    return "tournament-roster-card__badge_place-33-48";
+  if (place === "49-64" || place === "33-64" || place === "17-64")
+    return "tournament-roster-card__badge_place-49-64";
+  if (place === "33+" || place === "41+" || place === "49+" || place === "65+")
+    return "tournament-roster-card__badge_place-plus";
+  return "tournament-roster-card__badge_place-plus";
 });
 
 const stageBadgeClass = computed(() => {
@@ -389,10 +397,13 @@ const embedRosterRevealUrl = computed(() => {
     &_place-25-32 {
       @include colored-badge(220, 80%);
     }
-    &_place-33-64 {
+    &_place-33-48 {
       @include colored-badge(250, 80%);
     }
-    &_place-65-plus {
+    &_place-49-64 {
+      @include colored-badge(280, 80%);
+    }
+    &_place-plus {
       color: hsl(0, 0%, 65%);
       border: 2px solid hsla(0, 0%, 65%, 0.3);
       opacity: 0.7;
