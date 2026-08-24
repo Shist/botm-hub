@@ -19,6 +19,7 @@ import ClubProfilePage from "@/pages/clubs/ClubProfilePage.vue";
 import LeaderboardsPage from "@/pages/leaderboards/LeaderboardsPage.vue";
 import GlobalLeaderboardPage from "@/pages/leaderboards/GlobalLeaderboardPage.vue";
 import CategoryLeaderboardPage from "@/pages/leaderboards/CategoryLeaderboardPage.vue";
+import MpLinkSearcherPage from "@/pages/MpLinkSearcherPage.vue";
 import NotFoundPage from "@/pages/NotFoundPage.vue";
 import { useAuthStore } from "@/stores/auth";
 import { SHIST_UID } from "@/constants";
@@ -137,6 +138,11 @@ const router = createRouter({
       ],
     },
     {
+      path: "/mp-link-searcher",
+      name: "mp-link-searcher",
+      component: MpLinkSearcherPage,
+    },
+    {
       path: "/:catchAll(.*)",
       name: "not-found",
       component: NotFoundPage,
@@ -162,7 +168,10 @@ router.beforeEach((to, _, next) => {
     } else {
       next({ name: "sign-in" });
     }
-  } else if (to.name === "skillset-maps-upload") {
+  } else if (
+    to.name === "skillset-maps-upload" ||
+    to.name === "mp-link-searcher"
+  ) {
     if (user && user.uid === SHIST_UID) {
       next();
     } else {

@@ -38,6 +38,7 @@ const ROUTE_LABELS: Record<string, string> = {
   tournaments: "Турниры и Наши Ростеры",
   clubs: "Профильные Клубы",
   leaderboards: "Лидерборды и Скоры",
+  "mp-link-searcher": "Секретный Радар Лобби",
 };
 
 const breadcrumbs = computed(() => {

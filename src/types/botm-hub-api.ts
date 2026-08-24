@@ -8,7 +8,16 @@ export interface IVerifyPlayerResponse {
   error?: string;
 }
 
+export interface IOsuMatchUser {
+  id: number;
+  username: string;
+}
+
 export interface IFetchMatchResponse {
+  match?: unknown;
   events?: IOsuApiEvent[];
+  users?: IOsuMatchUser[];
+  first_event_id?: number | null;
+  latest_event_id?: number | null;
   error?: string;
 }
