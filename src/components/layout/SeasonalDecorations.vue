@@ -13,6 +13,28 @@
         <img src="@/assets/images/pumpkin.png" alt="Halloween Pumpkin" />
       </div>
     </template>
+    <template v-if="currentEvent === 'new_year'">
+      <div class="seasonal-decorations__newyear-overlay"></div>
+      <div
+        class="seasonal-decorations__branch seasonal-decorations__branch_left"
+      >
+        <img src="@/assets/images/pine-branch.png" alt="Pine Branch" />
+      </div>
+      <div
+        class="seasonal-decorations__branch seasonal-decorations__branch_right"
+      >
+        <img src="@/assets/images/pine-branch.png" alt="Pine Branch" />
+      </div>
+      <div
+        class="seasonal-decorations__snow seasonal-decorations__snow_layer-1"
+      ></div>
+      <div
+        class="seasonal-decorations__snow seasonal-decorations__snow_layer-2"
+      ></div>
+      <div
+        class="seasonal-decorations__snow seasonal-decorations__snow_layer-3"
+      ></div>
+    </template>
 
     <!-- TODO (other events...) -->
   </div>
@@ -52,6 +74,17 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+@use "sass:math";
+@use "sass:string";
+
+@function random-snow($n, $opacity) {
+  $value: "#{math.random(3000)}px #{math.random(3000)}px rgba(255, 255, 255, #{$opacity})";
+  @for $i from 2 through $n {
+    $value: "#{$value}, #{math.random(3000)}px #{math.random(3000)}px rgba(255, 255, 255, #{$opacity})";
+  }
+  @return string.unquote($value);
+}
+
 .seasonal-decorations {
   position: fixed;
   inset: 0;
@@ -102,13 +135,118 @@ onMounted(() => {
       }
     }
   }
+  &__newyear-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle,
+      transparent 60%,
+      rgba(173, 216, 230, 0.05) 100%
+    );
+    .light-theme & {
+      background: radial-gradient(
+        circle,
+        transparent 60%,
+        rgba(173, 216, 230, 0.2) 100%
+      );
+    }
+  }
+  &__snow {
+    position: absolute;
+    top: -3000px;
+    left: -100px;
+    border-radius: 50%;
+    pointer-events: none;
+    &::after {
+      content: "";
+      position: absolute;
+      top: 3000px;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      box-shadow: inherit;
+    }
+    &_layer-1 {
+      width: 2.5px;
+      height: 2.5px;
+      box-shadow: random-snow(250, 0.9);
+      animation: snow-fall-1 25s linear infinite;
+    }
+    &_layer-2 {
+      width: 1.5px;
+      height: 1.5px;
+      box-shadow: random-snow(400, 0.6);
+      animation: snow-fall-2 35s linear infinite;
+    }
+    &_layer-3 {
+      width: 1px;
+      height: 1px;
+      box-shadow: random-snow(600, 0.3);
+      animation: snow-fall-3 50s linear infinite;
+    }
+  }
+  &__branch {
+    position: absolute;
+    bottom: -30px;
+    width: 320px;
+    height: auto;
+    filter: drop-shadow(0 -4px 6px rgba(0, 0, 0, 0.4));
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    &_left {
+      left: -50px;
+    }
+    &_right {
+      right: -50px;
+      transform: scaleX(-1);
+    }
+    @media (max-width: 768px) {
+      width: 150px;
+      bottom: -15px;
+      &_left {
+        left: -25px;
+      }
+      &_right {
+        right: -25px;
+      }
+    }
+  }
 }
+
 @keyframes halloween-breathe {
   0% {
     filter: drop-shadow(0 0 8px rgba(255, 120, 0, 0.4));
   }
   100% {
     filter: drop-shadow(0 0 25px rgba(255, 140, 0, 0.8));
+  }
+}
+@keyframes snow-fall-1 {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    transform: translateY(3000px) translateX(100px);
+  }
+}
+@keyframes snow-fall-2 {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    transform: translateY(3000px) translateX(-50px);
+  }
+}
+@keyframes snow-fall-3 {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    transform: translateY(3000px) translateX(30px);
   }
 }
 </style>
