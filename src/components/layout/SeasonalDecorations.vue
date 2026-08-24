@@ -57,6 +57,17 @@
         <img src="@/assets/images/eh-clown.png" alt="Clown Cat" />
       </div>
     </template>
+    <template v-if="currentEvent === 'osu_bday'">
+      <div class="seasonal-decorations__osu-overlay"></div>
+      <div class="seasonal-decorations__peppy seasonal-decorations__peppy_left">
+        <img src="@/assets/images/peppy.png" alt="Peppy osu!" />
+      </div>
+      <div
+        class="seasonal-decorations__peppy seasonal-decorations__peppy_right"
+      >
+        <img src="@/assets/images/peppy.png" alt="Peppy osu!" />
+      </div>
+    </template>
     <template v-if="currentEvent === 'halloween'">
       <div class="seasonal-decorations__halloween-overlay"></div>
       <div
@@ -92,8 +103,6 @@
         class="seasonal-decorations__snow seasonal-decorations__snow_layer-3"
       ></div>
     </template>
-
-    <!-- TODO (other events...) -->
   </div>
 </template>
 
@@ -134,6 +143,7 @@ const updateClown = (id: number) => {
   if (id === 2) clown2X.value = Math.floor(Math.random() * 40);
   if (id === 3) clown3X.value = Math.floor(Math.random() * 80);
 };
+
 onMounted(() => {
   currentEvent.value = determineEvent();
 
@@ -142,6 +152,10 @@ onMounted(() => {
     updateClown(1);
     updateClown(2);
     updateClown(3);
+  }
+
+  if (currentEvent.value === "osu_bday") {
+    document.body.classList.add("theme-osu-bday");
   }
 
   if (currentEvent.value === "valentines") {
@@ -159,6 +173,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.body.classList.remove("theme-april-fools");
+  document.body.classList.remove("theme-osu-bday");
 });
 </script>
 
@@ -167,6 +182,13 @@ body.theme-april-fools,
 body.theme-april-fools * {
   cursor:
     url("@/assets/images/eh-clown-cursor.png") 16 16,
+    crosshair !important;
+}
+
+body.theme-osu-bday,
+body.theme-osu-bday * {
+  cursor:
+    url("@/assets/images/osu-how.png") 16 16,
     crosshair !important;
 }
 </style>
@@ -268,6 +290,44 @@ body.theme-april-fools * {
     }
     @media (max-width: 768px) {
       width: 90px;
+    }
+  }
+  &__osu-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle,
+      transparent 60%,
+      rgba(255, 102, 170, 0.12) 100%
+    );
+  }
+  &__peppy {
+    position: absolute;
+    bottom: -10px;
+    width: 180px;
+    height: auto;
+    filter: drop-shadow(0 0 12px rgba(255, 102, 170, 0.5));
+    img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    &_left {
+      left: 10px;
+    }
+    &_right {
+      right: 10px;
+      transform: scaleX(-1);
+    }
+    @media (max-width: 768px) {
+      width: 100px;
+      bottom: -5px;
+      &_left {
+        left: 5px;
+      }
+      &_right {
+        right: 5px;
+      }
     }
   }
   &__halloween-overlay {
