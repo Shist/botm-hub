@@ -58,6 +58,7 @@
       </main>
       <TheFooter :style="{ paddingRight: scrollbarWidth }" />
     </div>
+    <SeasonalDecorations />
   </template>
 </template>
 
@@ -70,6 +71,7 @@ import { useScrollbarPaddingStore } from "@/stores/scrollbar-padding";
 import TheHeader from "@/components/layout/TheHeader.vue";
 import TheFooter from "@/components/layout/TheFooter.vue";
 import TheBreadcrumbs from "@/components/layout/TheBreadcrumbs.vue";
+import SeasonalDecorations from "@/components/layout/SeasonalDecorations.vue";
 import newPatchImage from "@/assets/images/new-patch-modal-img.gif";
 
 const metaStore = useMetaStore();
