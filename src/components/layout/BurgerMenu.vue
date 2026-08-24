@@ -272,24 +272,27 @@ const onLogOutBtnClicked = async () => {
     position: relative;
     max-width: 70%;
     width: 100%;
-    padding: 30px;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     background-color: var(--color-burger-menu-bg);
     max-height: 100dvh;
     overflow-y: auto;
     @media (max-width: $tablet-l) {
-      padding: 20px;
+      padding: 15px;
     }
     @media (max-width: $phone-l) {
       padding: 10px;
     }
     .burger-menu__curr-acc-wrapper {
-      margin-bottom: 25px;
+      margin-bottom: 15px;
       width: 100%;
       display: flex;
       flex-direction: column;
-      row-gap: 10px;
+      row-gap: 5px;
+      @media (max-width: $phone-l) {
+        margin-bottom: 10px;
+      }
       .burger-menu__curr-acc-label {
         @include default-headline(32px, 32px, var(--color-burger-menu-text));
         @media (max-width: $tablet-l) {
@@ -307,7 +310,7 @@ const onLogOutBtnClicked = async () => {
       .burger-menu__acc-info-wrapper {
         display: flex;
         flex-direction: column;
-        row-gap: 5px;
+        row-gap: 2px;
         .burger-menu__email-wrapper {
           display: flex;
           align-items: center;
@@ -367,19 +370,26 @@ const onLogOutBtnClicked = async () => {
     }
     .burger-menu__headline {
       @include default-headline(48px, 48px, var(--color-burger-menu-text));
-      margin-bottom: 35px;
+      margin-bottom: 20px;
       text-align: center;
       @media (max-width: $tablet-l) {
         font-size: 36px;
         line-height: 36px;
       }
+      @media (max-width: $phone-l) {
+        margin-bottom: 10px;
+      }
     }
     .burger-menu__option-wrapper {
-      margin-bottom: 25px;
+      margin-bottom: 15px;
       display: flex;
       flex-direction: column;
       align-items: center;
       row-gap: 5px;
+      @media (max-width: $phone-l) {
+        margin-bottom: 10px;
+        row-gap: 2px;
+      }
       .burger-menu__theme-switch-label {
         @include default-text(32px, 32px, var(--color-burger-menu-text));
         @media (max-width: $tablet-l) {
@@ -396,7 +406,7 @@ const onLogOutBtnClicked = async () => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      row-gap: 20px;
+      row-gap: 10px;
       .burger-menu__nav-list-item {
         width: 80%;
         text-align: center;
@@ -426,6 +436,7 @@ const onLogOutBtnClicked = async () => {
             line-height: 24px;
           }
           @media (max-width: $phone-l) {
+            padding: 15px;
             font-size: 20px;
             line-height: 20px;
           }
@@ -443,6 +454,7 @@ const onLogOutBtnClicked = async () => {
             line-height: 24px;
           }
           @media (max-width: $phone-l) {
+            padding: 15px;
             font-size: 20px;
             line-height: 20px;
           }
